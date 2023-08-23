@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="9fae7a66-8160-438c-9fce-76eb8404dd4f">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="idCaracteristiques.libelle" class="java.lang.String"/>
+	<field name="valeur" class="java.lang.String"/>
+	<field name="idGroup.id" class="java.lang.Long"/>
+	<field name="idPolice.police" class="java.math.BigDecimal"/>
+	<group name="groupe">
+		<groupExpression><![CDATA[$F{idPolice.police}]]></groupExpression>
+		<groupHeader>
+			<band height="6"/>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="13">
+			<textField>
+				<reportElement uuid="e1f12cfa-ef01-452c-bc15-d25cee02871f" mode="Transparent" x="0" y="0" width="259" height="13" backcolor="#CCCCCC"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{idCaracteristiques.libelle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1f12cfa-ef01-452c-bc15-d25cee02871f" mode="Transparent" x="259" y="0" width="336" height="13" backcolor="#CCCCCC"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{valeur}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

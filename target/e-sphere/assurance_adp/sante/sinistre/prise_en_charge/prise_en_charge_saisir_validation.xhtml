@@ -1,0 +1,748 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right">#{msg['prise_en_charge']} #{msg['prise_en_charge_saisir_validation']}</i></li>
+        <li>
+            <p:link outcome="/assurance_adp/sante/sinistre/prise_en_charge/prise_en_charge_saisir_validation">#{msg['prise_en_charge_saisir_validation']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <!--                    <h:form id="form11">
+                                            
+                                            <p:spacer width="10"/>
+                    
+                    
+                    
+                                        </h:form>-->
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"  escape="false"/>   
+
+                        <p:fieldset  legend="#{msg['pec.saisir.valide']}"  styleClass="fieldset" class="fieldset"   >
+                            <p:splitter >
+                                <p:splitterPanel styleClass="flex align-items-center justify-content-center"  minSize="10">
+                                    <h5>   #{msg['sinistre']}</h5>
+                                    <h:panelGrid columns="5" cellpadding="7" styleClass="mb-3">
+                                        <p:outputLabel  value="#{msg['sinistre.num']}"/>
+                                        <p:inputText id="num_sinistre" value="#{sinistreMaladieController.police.idIntermediaire.idRefIntermediaire.code} | #{sinistreMaladieController.sinistre.idRegistreSinistre.idExercice.code} | #{sinistreMaladieController.sinistre.numero_sinistre}" disabled="true" >
+
+                                        </p:inputText>
+                                        <p:commandButton  icon="pi pi-search"  
+                                                          styleClass="infos-button p-mr-2 p-mb-2" style="margin-right: .5rem" onclick="PF('manageSinistreDialog').show()"  />
+
+
+                                        <p:outputLabel  value="#{msg['ref.sinistre']}"/>
+                                        <p:inputText id="ref_sinistre" value="#{sinistreMaladieController.sinistre.ref_sinistre}"  >
+
+                                        </p:inputText>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="4" cellpadding="7" styleClass="mb-3">
+
+                                        <p:outputLabel  value="#{msg['survenu.le']}"/>
+                                        <p:calendar value="#{sinistreMaladieController.sinistre.date_Survenu}"  mode="popup"   showOn="both"  id="date_survenu" pattern="dd/MM/yyyy" >
+                                            <f:ajax event="dateSelect"  render="date_survenu" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['declare.le']}"/>
+                                        <p:calendar value="#{sinistreMaladieController.sinistre.date_Declaration}"  mode="popup"   showOn="both"  id="date_declaration" pattern="dd/MM/yyyy"   >
+                                            <f:ajax event="dateSelect"  render="date_declaration" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['date_effet']}" rendered="#{sinistreMaladieController.sinistre.id!=null}"/>
+                                        <p:calendar value="#{sinistreMaladieController.effet}"  mode="popup"   showOn="both"  id="date_effet" pattern="dd/MM/yyyy"  disabled="true" rendered="#{sinistreMaladieController.sinistre.id!=null}">
+                                            <!--<f:ajax   render="date_survenu" />-->
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['date_echeance']}" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+                                        <p:calendar value="#{sinistreMaladieController.echeance}"  mode="popup"   showOn="both"  id="date_echeance" pattern="dd/MM/yyyy"  disabled="true" rendered="#{sinistreMaladieController.sinistre.id!=null}" >
+                                            <!--<f:ajax  render="date_declaration" />-->
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['adherent']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="adherent" value="#{sinistreMaladieController.risqueSelecte}"   style="width: 200px" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listeRisque}" var="r" itemLabel="#{r.libelle} "  itemValue="#{r}" />
+                                            <p:ajax event="change" update=":form1:membre"  listener="#{sinistreMaladieController.chargerRisqueFamilleByRisque()}"/>
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['membre']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="membre" value="#{sinistreMaladieController.risqueFamille}"  style="width: 200px"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listeRisqueFamille}"  var="fr" itemLabel="#{fr.nom_membre} "  itemValue="#{fr}"  />
+                                            <f:ajax event="change" render="membre" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['prestataire']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="prestataire" value="#{sinistreMaladieController.prestataire}"   style="width: 200px" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listePrestataire}" var="p" itemLabel="#{p.idRefPrestataire.code} | #{p.idRefPrestataire.libelle}  "  itemValue="#{p}" />
+                                            <f:ajax event="change" render="prestataire" />
+                                        </p:selectOneMenu>
+
+
+                                        <p:outputLabel  value="#{msg['natureMaladie']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="nature_maladie" value="#{sinistreMaladieController.natureMaladie}"  style="width: 200px"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listeNatureMaladie}" var="nm" itemLabel="#{nm.idRefNatureMaladie.code} | #{nm.idRefNatureMaladie.libelle}  "  itemValue="#{nm}" />
+                                            <f:ajax event="change" render="nature_maladie" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['rubrique']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="rubrique" value="#{sinistreMaladieController.rubrique}"  style="width: 200px"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listeRubrique}" var="rb" itemLabel="#{rb.code} | #{rb.libelle}  "  itemValue="#{rb}" />
+                                            <p:ajax event="change" update=":form1:rubrique" listener="#{sinistreMaladieController.chargePrestationDetail()}"/>
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['garantie']}"/>
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="garantie" value="#{sinistreMaladieController.garantie}"  style="width: 200px"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{sinistreMaladieController.listeGarantie}" var="g" itemLabel="#{g.idRefGaranties.code} | #{g.idRefGaranties.libelle}  "  itemValue="#{g}" />
+                                            <f:ajax event="change" render="rubrique" />
+                                        </p:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="6" cellpadding="7" styleClass="mb-3">
+                                        <p:outputLabel  value="#{msg['ref.bordereau']}" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+                                        <p:inputText id="ref_bordereau" value="#{sinistreMaladieController.bordereau.ref_bordereau}" rendered="#{sinistreMaladieController.sinistre.id!=null}" disabled="true" >
+
+                                        </p:inputText>
+                                        <p:outputLabel  value="#{msg['num.bordereau']}" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+                                        <p:inputText id="num_brodereau" value="#{sinistreMaladieController.bordereau.numero_bordereau}" rendered="#{sinistreMaladieController.sinistre.id!=null}" disabled="true" >
+
+                                        </p:inputText>
+                                        <p:outputLabel  value="#{msg['num.reglement']}" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+                                        <p:inputText id="num_reglement" value="#{sinistreMaladieController.bordereau.numero_reglement}" rendered="#{sinistreMaladieController.sinistre.id!=null}" disabled="true" >
+
+                                        </p:inputText>
+                                    </h:panelGrid>
+                                </p:splitterPanel>
+                                <p:splitterPanel >
+                                    <p:splitter layout="vertical">
+                                        <p:splitterPanel styleClass="flex align-items-center justify-content-center" size="15">
+                                            <h5>  #{msg['police']}</h5>
+                                            <h:panelGrid columns="4" cellpadding="7" styleClass="mb-3">
+                                                <p:outputLabel  value="#{msg['police.num']}"/>
+                                                <p:inputText id="agence" value=" #{sinistreMaladieController.police.idIntermediaire.idRefIntermediaire.code}"  style="width: 50px" disabled="true"/>
+                                                <p:autoComplete id="police" value="#{sinistreMaladieController.police_value}" completeMethod="#{sinistreMaladieController.completeText}"   >
+                                                    <f:ajax event="blur" render="police"/>
+                                                    <p:ajax event="itemSelect" listener="#{sinistreMaladieController.chargePoliceByNumPolice()}" update=":form1"  />
+                                                </p:autoComplete>
+                                                <p:inputText id="avenant" value=" #{sinistreMaladieController.avenant.numero_avenant}"  style="width: 50px" disabled="true" />
+
+                                            </h:panelGrid>
+                                            <h:panelGrid columns="4" cellpadding="7" styleClass="mb-3">
+                                                <p:outputLabel  value="#{msg['categorie']}"/>
+                                                <p:inputText id="categorie" value=" #{sinistreMaladieController.police.idCategories.code} | #{formatDateController.valueObject(sinistreMaladieController.police.idCategories.libelle,sinistreMaladieController.police.idCategories)}"  disabled="true" />
+                                                <p:outputLabel  value="#{msg['group']}"/>
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="group" value="#{sinistreMaladieController.groupePolice}"    >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{sinistreMaladieController.listeGroupePolice}"  var="g" itemLabel="#{g.idRefGroupe.libelle}" />
+                                                    <p:ajax event="change" update=":form1:adherent"  />
+                                                </p:selectOneMenu> 
+                                                <p:outputLabel  value="#{msg['souscripteur']}"/>
+                                                <p:inputText id="souscripteur" value=" #{sinistreMaladieController.souscripteur}"   disabled="true"/>
+                                                <p:outputLabel  value="#{msg['convention']}"/>
+                                                <p:inputText id="convention" value=" #{sinistreMaladieController.police.idConvention.libelle}"  disabled="true" />
+                                                <p:outputLabel  value="#{msg['fait.par']}"/>
+                                                <p:inputText id="fait_part" value=" #{sinistreMaladieController.police.idUtilisateur.login}"  disabled="true"  />
+                                                <p:outputLabel  value="#{msg['sort']}"/>
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="sort" value="#{sinistreMaladieController.sinistre.sort}"    >
+                                                    <!--<f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/>--> 
+                                                    <f:selectItems  value="#{sinistreMaladieController.sorts}"  />
+                                                    <f:ajax event="change" render="sort" />
+                                                </p:selectOneMenu>
+                                                <p:outputLabel  value="#{msg['num.facture']}" rendered="#{sinistreMaladieController.sinistre.id!=null}"/>
+                                                <p:inputText id="num_fact" value=" #{sinistreMaladieController.facture.numero_facture}"  disabled="true" rendered="#{sinistreMaladieController.sinistre.id!=null}"/>
+                                                <p:outputLabel  value="#{msg['num.reglement.valid']}" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+                                                <p:inputText id="num_regle_valide" value=" #{sinistreMaladieController.facture.nume_regle_valide}"  disabled="true" rendered="#{sinistreMaladieController.sinistre.id!=null}" />
+
+                                            </h:panelGrid>
+                                        </p:splitterPanel>
+                                        <p:splitterPanel >
+                                            <p:splitter>
+                                                <p:splitterPanel styleClass="flex align-items-center justify-content-center" size="20">
+<!--                                                    <h5>   #{msg['bordereau']}</h5> -->
+
+                                                    <h:panelGrid columns="3" >
+                                                        <p:fieldset    styleClass="fieldset" class="fieldset"    >
+                                                            <p:commandButton value="#{msg['valide.pec']}" icon="pi pi-check"   
+                                                                             styleClass="primary-button" style="margin-right: .5rem" disabled="#{sinistreMaladieController.sinistre.valide_pec==true}"    actionListener="#{sinistreMaladieController.validPEC()}"/> 
+                                                       
+
+                                                            <p:commandButton value="#{msg['bouton.rejet.pec']}" icon="pi pi-ban"  disabled="#{sinistreMaladieController.sinistre.valide_pec==true}"
+                                                                             styleClass="danger-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.rejetterPEC()}" />
+                                                           
+
+                                                            <p:commandButton value="#{msg['bouton.imprimer']}" icon="pi pi-print"  
+                                                                             styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.enregistreOrPrintPEC()}" />
+   <!--                                                            <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-sync"  
+                                                                                styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.reload()}" />
+                                                            -->
+                                                        </p:fieldset>
+                                                    </h:panelGrid>
+                                                </p:splitterPanel>
+                                                <p:splitterPanel styleClass="flex align-items-center justify-content-center" size="40" >
+                                                    <!--#{msg['facture']}-->
+
+                                                    <h:panelGrid columns="3"  rendered="false">
+                                                        <p:fieldset    styleClass="fieldset" class="fieldset"    >
+                                                            <p:commandButton value="#{msg['valide.pec']}" icon="pi pi-check"   
+                                                                             styleClass="primary-button" style="margin-right: .5rem"     actionListener="#{sinistreMaladieController.validPEC()}"/> 
+
+
+                                                            <p:commandButton value="#{msg['bouton.rejet.pec']}" icon="pi pi-ban"  
+                                                                             styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.reload()}" />
+                                                            <p:commandButton value="#{msg['bouton.imprimer']}" icon="pi pi-print"  
+                                                                             styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.enregistreOrPrintPEC()}" />
+
+                                                        </p:fieldset>
+                                                    </h:panelGrid>
+
+
+                                                </p:splitterPanel>
+                                            </p:splitter>
+                                        </p:splitterPanel>
+                                    </p:splitter>
+                                </p:splitterPanel>
+                            </p:splitter>
+                            <p:tabView  id="tabprincipal" widgetVar="accordP">
+                                <p:ajax event="tabChange" listener="#{sinistreMaladieController.onTabChange}" update=":form1"/>
+
+                                <p:tab title="#{msg['prestation']}">
+                                    <p:fieldset  legend="#{msg['prestation']}"  styleClass="fieldset" class="fieldset"   >
+                                        <p:dataTable id="idsinistre_maladie" var="sin_maladie" value="#{sinistreMaladieController.listeSinistreMaladie}" widgetVar="sinistre_maladie"  rowIndexVar="indice">
+                                            <p:columnGroup type="header">
+                                                <p:row style="background:#1e83aa ">
+<!--                                                    <p:column rowspan="1" headerText="#{msg['adherent_membre']}"/>
+                                                    <p:column colspan="14" headerText="#{msg['infogene']}"/>-->
+                                                </p:row>
+                                                <p:row>
+                                                    <p:column colspan="3" />
+                                                    <h5>  <p:column colspan="4" headerText="#{msg['frais.reel']}" style="background-color: yellowgreen"/></h5>
+                                                    <h5><p:column colspan="5" headerText="#{msg['base.remb']}" style="background-color: yellow"/></h5>
+                                                    <p:column colspan="3" />
+                                                </p:row>
+                                                <p:row>
+                                                    <p:column headerText="#{msg['code']}"/>
+                                                    <p:column headerText="#{msg['cle']}"/>
+                                                    <p:column headerText="#{msg['date.acte']}"/>
+                                                    <p:column headerText="#{msg['nb.acte']}" style="background-color: yellowgreen"/>
+                                                    <p:column headerText="#{msg['nb.cle']}" style="background-color: yellowgreen"/>
+                                                    <p:column headerText="#{msg['cout.unitaire']}" style="background-color: yellowgreen"/>
+                                                    <p:column headerText="#{msg['debout.reel']}" style="background-color: yellowgreen"/>
+                                                    <p:column headerText="#{msg['nb.acte']}" style="background-color: yellow"/>
+                                                    <p:column headerText="#{msg['nb.cle']}" style="background-color: yellow"/>
+                                                    <p:column headerText="#{msg['montant.exclure']}" style="background-color: yellow"/>
+                                                    <p:column headerText="#{msg['base.remb']}" style="background-color: yellow"/>
+                                                    <p:column headerText="#{msg['remb.externe']}" style="background-color: yellow"/>
+                                                    <p:column headerText="#{msg['taux']}%" />
+                                                    <p:column headerText="#{msg['montant.remb']}" />
+                                                    <p:column headerText="#{msg['sort']}" />
+                                                </p:row>
+                                            </p:columnGroup>
+                                            <p:column>
+                                                <p:inputText id="code" value="#{sin_maladie.idPrestation.code}" >
+                                                    <p:ajax event="keyup"  oncomplete="PF('managePrestationDialog').show()"   update=":form2" />
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.chargeInfosPrestation(sin_maladie)}"   update=":form1" />
+                                                </p:inputText>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputText id="cle" value="#{sin_maladie.cle}">
+                                                    <f:ajax event="blur"  render="cle" />
+                                                </p:inputText>
+
+                                            </p:column>
+                                            <p:column>
+
+                                                <p:calendar value="#{sin_maladie.date_acte}"  mode="popup"   showOn="both"  id="date_acte" pattern="dd/MM/yyyy"  >
+                                                    <f:ajax event="dateSelect"  render="date_acte" />
+                                                </p:calendar>
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="nb_acte_reel" value="#{sin_maladie.nombre_acte_reel}" minValue="#{1}">
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculDebourReel(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:debours_reel"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="nb_cle_reel" value="#{sin_maladie.nombre_cle_reel}" minValue="#{1}">
+                                                    <f:ajax event="change" render="nb_cle_reel" />
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculDebourReel(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:debours_reel"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="cout_unitaire" value="#{sin_maladie.montant_unitant}"  maxValue="#{sin_maladie.forfait}"  >
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculDebourReel(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:debours_reel"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="debours_reel" value="#{sin_maladie.deboursement_reel}"/>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="nb_acte_remb" value="#{sin_maladie.nombre_acte_remb}" minValue="#{1}">
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculDebourRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:base_rembours"/>
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculMontantRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:montant_remb"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="nb_cle_remb" value="#{sin_maladie.nombre_cle_remb}"  minValue="#{1}"  >
+                                                    <p:ajax event="change"   update="nb_cle_remb"/>
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculDebourRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:base_rembours"/>
+
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculMontantRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:montant_remb"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="montant_exclure" value="#{sin_maladie.montant_exclure}">
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculMontantRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:montant_remb"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="base_rembours" value="#{sin_maladie.base_remboursement}"/>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="rembours_externe" value="#{sin_maladie.remb_externe}">
+                                                    <p:ajax event="change"  listener="#{sinistreMaladieController.calculMontantRemboursement(sin_maladie, indice)}"  update=":form1:tabprincipal:idsinistre_maladie:montant_remb"/>
+                                                    <p:ajax event="change"   update=":form1:tabprincipal:idsinistre_maladie"/>
+                                                </p:inputNumber>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="taux" value="#{sin_maladie.taux}"    disabled="true"/>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:inputNumber id="montant_remb" value="#{sin_maladie.montant_remb}"/>
+
+                                            </p:column>
+                                            <p:column>
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="sort_maladie" value="#{sin_maladie.sort}">
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{sinistreMaladieController.sortSinistreMaladie}"  />
+                                                    <f:ajax event="change" render="sort_maladie" />
+                                                    <p:ajax event="change"  update=":form1:tabprincipal:idsinistre_maladie"  listener="#{sinistreMaladieController.chargeMotifRejet(indice, sin_maladie)}"/>
+                                                </p:selectOneMenu>
+                                            </p:column>
+                                            <p:columnGroup type="footer">
+                                                <p:column colspan="6" style="text-align:right" footerText="Totals:"/>
+                                                <p:column >
+                                                    <f:facet name="footer">
+                                                        <p:inputText  value="#{formatDateController.formatNumberGeneral(sinistreMaladieController.total_debours_reels.longValue())}" style="width: 200px;color: red" disabled="true">
+
+
+                                                        </p:inputText>
+                                                    </f:facet>
+
+                                                </p:column>
+                                                <p:column   footerText="" >
+
+                                                </p:column>
+                                                <p:column   footerText="" >
+
+                                                </p:column>
+                                                <p:column>
+
+                                                    <f:facet name="footer">
+                                                        <p:inputText  value="#{formatDateController.formatNumberGeneral(sinistreMaladieController.total_exclure.longValue())}" style="width: 200px;color: red" disabled="true">
+
+
+                                                        </p:inputText>
+                                                    </f:facet>
+
+                                                </p:column>
+                                                <p:column  >
+                                                    <f:facet name="footer">
+                                                        <p:inputText  value="#{formatDateController.formatNumberGeneral(sinistreMaladieController.total_base_remb.longValue())}" style="width: 200px;color: red" disabled="true">
+
+
+                                                        </p:inputText>
+                                                    </f:facet>
+                                                </p:column>
+                                                <p:column  >
+                                                    <f:facet name="footer">
+                                                        <p:inputText  value="#{formatDateController.formatNumberGeneral(sinistreMaladieController.total_remb_externe.longValue())}" style="width: 200px;color: red" disabled="true">
+
+
+                                                        </p:inputText>
+                                                    </f:facet>
+                                                </p:column>
+                                                <p:column   footerText="" >
+
+                                                </p:column>
+                                                <p:column     >
+                                                    <f:facet name="footer">
+                                                        <p:inputText  value="#{formatDateController.formatNumberGeneral(sinistreMaladieController.total_montant_remb.longValue())}" style="width: 200px;color: red" disabled="true">
+
+
+                                                        </p:inputText>
+                                                    </f:facet>
+                                                </p:column>
+
+                                            </p:columnGroup>
+
+                                        </p:dataTable>
+                                        <h:panelGrid columns="4" cellpadding="7" styleClass="mb-3">
+                                            <p:outputLabel  value="#{msg['prestation']}"/>
+                                            <p:inputText id="prestation_infod" value=" #{sinistreMaladieController.sinistreMaladie_infos.idPrestation.libelle}"  disabled="true"  style="width: 500px" />
+                                            <p:outputLabel  value="#{msg['plafond']}"/>
+                                            <p:inputText id="plafond" value=" #{formatDateController.formatNumberGeneral(sinistreMaladieController.
+                                                                                sinistreMaladie_infos.forfait.longValue())}"  disabled="true" />
+
+                                        </h:panelGrid>
+
+                                    </p:fieldset>
+                                </p:tab>
+                                <p:tab title="#{msg['medicament']}" id="idmedicament">
+
+                                    <p:fieldset  legend="#{msg['medicament']}"  styleClass="fieldset" class="fieldset"   >
+                                        <p:dataTable var="md" value="#{sinistreMaladieController.listesMedicamentSinistreMaladie}"  widgetVar="medicalTable" 
+
+
+                                                     emptyMessage="#{msg['emptyMessage']}"    id="idmedicalTable" rowIndexVar="indice"
+
+                                                     >
+
+
+                                            <p:column  >
+                                                <p:commandButton  icon="pi pi-plus"  rendered="#{md.afficher==true}"
+                                                                  styleClass="success-button" style="margin-right: .5rem"   >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.addRowForMedicament()}" update=":form1:tabprincipal:idmedicalTable"/>
+                                                </p:commandButton>
+                                                <p:commandButton  icon="pi pi-trash"  rendered="#{md.afficher==true}"
+                                                                  styleClass="danger-button" style="margin-right: .5rem"  >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.removeRowForMedicament(indice)}" update=":form1:tabprincipal:idmedicalTable"/>
+                                                </p:commandButton>
+
+
+
+
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['code']}"   style="width: 50px">
+                                                <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{md.idMedicament.code}"   rendered="#{md.afficher==true}"  >
+                                                    <f:ajax event="blur" render="code" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['medicament']}" >
+                                                <p:inputText id="libelle"  placeholder="  #{msg['medicament']}"   value="#{md.idMedicament.libelle}"  rendered="#{md.afficher==true}"   >
+                                                    <f:ajax event="blur" render="libelle" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['quantite']}" >
+                                                <p:inputNumber id="quantite"     value="#{md.quantie}" rendered="#{md.afficher==true}"  >
+                                                    <f:ajax event="change" render="quantite" />
+                                                    <p:ajax event="change" update=":form1:tabprincipal:idmedicalTable"  listener="#{sinistreMaladieController.calculMontantRembMedical(md, indice)}"/>
+
+                                                </p:inputNumber>
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['cout.unitaire']}" >
+                                                <p:inputNumber id="prix"     value="#{md.montant}" rendered="#{md.afficher==true}"  >
+                                                    <f:ajax event="change" render="prix" />
+                                                    <p:ajax event="change" update=":form1:tabprincipal:idmedicalTable"  listener="#{sinistreMaladieController.calculMontantRembMedical(md, indice)}"/>
+
+                                                </p:inputNumber>
+                                            </p:column>
+                                            <p:column headerText="#{msg['taux']}" >
+                                                <p:inputNumber id="taux"     value="#{md.taux}" rendered="#{md.afficher==true}"  maxValue="#{100}">
+                                                    <f:ajax event="change" render="taux" />
+                                                    <p:ajax event="change" update=":form1:tabprincipal:idmedicalTable"  listener="#{sinistreMaladieController.calculMontantRembMedical(md, indice)}"/>
+                                                </p:inputNumber>
+                                            </p:column>
+                                            <p:column headerText="#{msg['montant.remb']}" >
+                                                <p:inputNumber id="mbr"     value="#{md.montant_remb}" rendered="#{md.afficher==true}"  >
+                                                    <f:ajax event="change" render="mbr" />
+                                                </p:inputNumber>
+                                            </p:column>
+                                            <p:column headerText="#{msg['sort']}" >
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="sort_medicament" value="#{md.sort}" rendered="#{md.afficher==true}" >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{sinistreMaladieController.sortSinistreMaladie}"  />
+                                                    <f:ajax event="change" render="sort_medicament" />
+
+                                                </p:selectOneMenu>
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['motif.rejet']}" >
+                                                <p:inputText id="motif_rejet"     value="#{md.motif}"  rendered="#{md.afficher==true}" >
+                                                    <f:ajax event="blur" render="motif_rejet" />
+                                                </p:inputText>
+                                            </p:column>
+
+
+
+                                        </p:dataTable>
+                                    </p:fieldset>
+
+                                </p:tab>
+                                <p:tab title="#{msg['intervenant']}" id="idintervenant">
+                                    <p:fieldset  legend="#{msg['intervenant']}"  styleClass="fieldset" class="fieldset"   >
+                                        <p:dataTable var="intv" value="#{sinistreMaladieController.listesIntervenant}"  widgetVar="intervenantTable" 
+
+
+                                                     emptyMessage="#{msg['emptyMessage']}"    id="idintervenantTable" rowIndexVar="indice"
+
+                                                     >
+
+
+                                            <p:column  >
+                                                <p:commandButton  icon="pi pi-plus"  rendered="#{intv.afficher==true}"
+                                                                  styleClass="success-button" style="margin-right: .5rem"   >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.addRowForIntervenant()}" update=":form1:tabprincipal:idintervenantTable"/>
+                                                </p:commandButton>
+                                                <p:commandButton  icon="pi pi-trash"  rendered="#{intv.afficher==true}"
+                                                                  styleClass="danger-button" style="margin-right: .5rem"  >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.removeRowForIntervenant(indice)}" update=":form1:tabprincipal:idintervenantTable"/>
+                                                </p:commandButton>
+
+
+
+
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['code']}"   style="width: 50px">
+                                                <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{intv.code}"   rendered="#{intv.afficher==true}"  >
+                                                    <f:ajax event="blur" render="code" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['nom']}" >
+                                                <p:inputText id="nom"     value="#{intv.nom}"  rendered="#{intv.afficher==true}"   >
+                                                    <f:ajax event="blur" render="nom" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['nature']}" >
+                                                <p:inputText id="nature"     value="#{intv.nature}"  rendered="#{intv.afficher==true}"   >
+                                                    <f:ajax event="blur" render="nom" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['date.designation']}" >
+                                                <p:calendar value="#{intv.date_creation}"  mode="popup"   showOn="both"  id="date_designation" pattern="dd/MM/yyyy" rendered="#{intv.afficher==true}" >
+                                                    <f:ajax event="dateSelect"  render="date_designation" />
+                                                </p:calendar>
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['horaire']}" >
+                                                <p:calendar value="#{intv.date_creation}"  mode="popup"   showOn="both"  id="horaire" pattern="hh:mm:ss" rendered="#{intv.afficher==true}" >
+                                                    <f:ajax event="dateSelect"  render="horaire" />
+                                                </p:calendar>
+                                            </p:column>
+
+
+
+                                        </p:dataTable>
+                                    </p:fieldset>
+                                </p:tab>
+                                <p:tab title="#{msg['Evenements']}" id="idevenement">
+                                    <p:fieldset  legend="#{msg['Evenements']}"  styleClass="fieldset" class="fieldset"   >
+                                        <p:dataTable var="evn" value="#{sinistreMaladieController.listesEvenement}"  widgetVar="eventTable" 
+
+
+                                                     emptyMessage="#{msg['emptyMessage']}"    id="ideventTable" rowIndexVar="indice"
+
+                                                     >
+
+
+                                            <p:column  >
+                                                <p:commandButton  icon="pi pi-plus"  rendered="#{evn.afficher==true}"
+                                                                  styleClass="success-button" style="margin-right: .5rem"   >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.addRowForEvenement()}" update=":form1:tabprincipal:ideventTable"/>
+                                                     <!--<p:ajax event="click"  listener="#{sinistreMaladieController.addRowForMedicament()}" update=":form1:tabprincipal:idmedicalTable"/>-->
+
+                                                </p:commandButton>
+                                                <p:commandButton   icon="pi pi-trash"  rendered="#{evn.afficher==true}"
+                                                                   styleClass="danger-button" style="margin-right: .5rem"  >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.removeRowForEvenement(indice)}" update=":form1:tabprincipal:ideventTable"/>
+                                                </p:commandButton>
+
+
+
+
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['date']}" >
+                                                <p:calendar value="#{evn.date_evenement}"  mode="popup"   showOn="both"  id="date_evenement" pattern="dd/MM/yyyy" rendered="#{evn.afficher==true}" >
+                                                    <f:ajax event="dateSelect"  render="date_evenement" />
+                                                </p:calendar>
+                                            </p:column>
+                                            <p:column headerText="#{msg['Evenements']}" >
+                                                <p:inputText id="libelle"     value="#{evn.evenement}"  rendered="#{evn.afficher==true}"   >
+                                                    <f:ajax event="blur" render="libelle" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['observation']}" >
+                                                <p:inputText id="observation_evnt"     value="#{evn.observation}"  rendered="#{evn.afficher==true}">
+                                                    <f:ajax event="blur" render="observation_evnt" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['traite']}" >
+                                                <p:selectBooleanCheckbox value="#{evn.traite}" rendered="#{evn.afficher==true}" id="traiter">
+                                                    <f:ajax event="change" render="traiter" />
+                                                </p:selectBooleanCheckbox>
+                                            </p:column>
+
+
+
+
+
+                                        </p:dataTable>
+                                    </p:fieldset>
+                                </p:tab>
+                                <p:tab title="#{msg['caracteristiques']}" id="icaracteristique">
+                                    <p:fieldset  legend="#{msg['caracteristique']}"  styleClass="fieldset" class="fieldset"   >
+                                        <p:dataTable var="caract" value="#{sinistreMaladieController.listesCaracteristiques}"  widgetVar="caractTable" 
+
+
+                                                     emptyMessage="#{msg['emptyMessage']}"    id="idcaractTable" rowIndexVar="indice"
+
+                                                     >
+
+
+                                            <p:column  >
+                                                <p:commandButton  icon="pi pi-plus"  rendered="#{caract.afficher==true}"
+                                                                  styleClass="success-button" style="margin-right: .5rem"   >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.addRowForCaracteristique()}" update=":form1:tabprincipal:idcaractTable"/>
+                                                </p:commandButton>
+                                                <p:commandButton  icon="pi pi-trash"  rendered="#{caract.afficher==true}"
+                                                                  styleClass="danger-button" style="margin-right: .5rem"  >
+                                                    <p:ajax event="click"  listener="#{sinistreMaladieController.removeRowForCaracteristique(indice)}" update=":form1:tabprincipal:idcaractTable"/>
+                                                </p:commandButton>
+
+
+
+
+                                            </p:column>
+
+
+                                            <p:column headerText="#{msg['libelle']}" >
+                                                <p:autoComplete id="libelle_caract" value="#{caract.libelle}" completeMethod="#{sinistreMaladieController.completeMethode}"    >
+                                                    <f:ajax event="itemSelect" render="libelle_caract"/>
+                                                    <!--<p:ajax event="itemSelect" listener="#{sinistreMaladieController.chargePoliceByNumPolice()}" update=":form1"  />-->
+                                                </p:autoComplete>
+                                            </p:column>
+
+
+
+
+
+
+                                        </p:dataTable>
+                                    </p:fieldset>
+                                </p:tab>
+                            </p:tabView>
+                        </p:fieldset>
+
+                    </h:form>
+                    <h:form id="form2" >
+                        <p:dialog header="#{msg['Motif.rejet']}"  showEffect="fade" modal="true" widgetVar="manageMotifDialog" responsive="true">
+                            <h:panelGrid columns="4" cellpadding="7" styleClass="mb-3">
+                                <p:outputLabel  value="#{msg['motif.rejet']}"/>
+                                <p:inputText id="motif_rejet" value="#{sinistreMaladieController.motif_rejet}"  />
+                                <p:outputLabel  value="#{msg['observation']}"/>
+                                <p:inputTextarea rows="6" cols="33" value="#{sinistreMaladieController.observation}"/>
+
+                            </h:panelGrid>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['Bouton.Sauvegarde']}"     actionListener="#{sinistreMaladieController.saveMotifRejet()}" oncomplete="PF('manageMotifDialog').hide()" update=":form1:tabprincipal"     />
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+
+                        <p:dialog header="#{msg['prestation']}"  showEffect="fade" modal="true" widgetVar="managePrestationDialog" responsive="true">
+
+                            <p:dataTable id="idprestation" var="p" value="#{sinistreMaladieController.listesDetailPolicePlafond}" 
+                                         selection="#{sinistreMaladieController.detailPolicePlafondSelected}" rowKey="#{p.id}"
+                                         style="margin-bottom:0" paginator="true" rows="20"  selectionMode="single"   widgetVar="prestationTable"   >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{sinistreMaladieController.chargeDetailPrestation()}"     
+                                        process="@this" update=":form1"  oncomplete="PF('managePrestationDialog').hide()"  />
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('prestationTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column  style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="#{msg['code']}" sortBy="#{p.idPrestation.code}" filterBy="#{p.idPrestation.code}"  >
+                                    <h:outputText value="#{p.idPrestation.code}" />
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{p.idPrestation.libelle}" filterBy="#{p.idPrestation.libelle}" >
+                                    <h:outputText value="#{p.idPrestation.libelle}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['libelle']}" >
+                                    <h:outputText value="#{p.taux}%" />
+                                </p:column>
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['SAISIR']}"  showEffect="fade" modal="true" widgetVar="manageSinistreDialog" responsive="true">
+
+                            <h:panelGrid columns="7" cellpadding="7" styleClass="mb-3">
+                                <p:outputLabel  value="#{msg['sinistre.num']}"/>
+                                <p:inputText id="code_agence" placeholder="#{msg['code.agence']}" value="#{sinistreMaladieController.code_agence}" style="width: 100px; text-align: right" >
+                                    <f:ajax event="blur"  render="code_agence" />
+                                </p:inputText>
+                                <p:inputText id="code_exercice"  placeholder="#{msg['exercice']}" value="#{sinistreMaladieController.code_exercice}" style="width: 100px; text-align: right">
+                                    <f:ajax event="blur"  render="code_exercice" />
+                                </p:inputText>
+                                <p:inputText id="num_sinistre" placeholder="#{msg['sinistre.num']}" value="#{sinistreMaladieController.numero_sinistre}" style="width: 100px; text-align: right" >
+                                    <f:ajax event="blur"  render="num_sinistre" />
+                                </p:inputText>
+                                <p:commandButton  icon="pi pi-search"  
+                                                  styleClass="infos-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{sinistreMaladieController.selecteSinistreByNumeroSinistre()}"   update=":form1" oncomplete="PF('manageSinistreDialog').hide()"/>
+
+
+
+
+                            </h:panelGrid>  
+                        </p:dialog>
+
+
+
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,609 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/intermediaire">#{msg['intermediaire']}</p:link>
+        </li>
+    </ui:define>
+
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <f:view locale="#{languageController.localeCode}">
+            <div class="p-grid">
+                <div class="p-col">
+                    <h:form id="form11"  >
+                       <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                         styleClass="warning-button" style="margin-right: .5rem"       actionListener="#{intermediaireController.reload()}" />
+
+                    </h:form>
+                    <br/>
+                    <div class="card">
+
+
+                        <p:accordionPanel id="accord"   widgetVar="accordP"  multiple="false"   activeIndex="1"  tabindex="1"  >
+
+                            <p:tab id="tab1"  title="#{msg['creer']} #{msg['intermediaire']}" closable="true"  >
+                                <h:form id="form1"  >
+                                    <p:growl id="msg" showDetail="true" escape="false"/>
+
+ <!--<p:fieldset legend="#{msg['intermediaire']}" id="fieldset1">-->
+                                    <!--                                    <p:panelGrid columns="8"  id="grid1"  
+                                                                                     layout="grid" >-->
+                                    <p:outputPanel  rendered="#{intermediaireController.suspension==false}">
+                                        
+                                    
+                                    <div class="ui-g"  >
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><p:outputLabel value="#{msg['code']}*: " for="code" /> </div>  
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3">   <p:autoComplete id="code"  title="code"   value="#{intermediaireController.refIntermediaire.code}" completeMethod="#{intermediaireController.completeText}"   >
+                                                <f:ajax event="blur" render=":code"/>  
+                                                <p:ajax event="itemSelect" listener="#{intermediaireController.onItemSelect}"  update=":accord:form1"/>
+                                            </p:autoComplete></div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:outputLabel value="#{msg['raison.social']}: *" for="raison_social"  /> </div> 
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:inputText id="raison_social"  title="raison_social"   value="#{intermediaireController.refIntermediaire.raisonSociale}" style="width: 200px ; text-transform: uppercase; "  >
+                                                <f:ajax event="blur" render=":raison_social"/>  
+                                            </p:inputText> </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:outputLabel value="#{msg['type.intermediaire']}: *" for="type_bureau"  /> </div> 
+                                        <div >
+                                            <p:selectOneMenu  converter="#{genericConverter}" id="type_bureau" value="#{intermediaireController.intermediaires.idTypeBureau}" var="tp" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                <f:selectItems  value="#{intermediaireController.listeTypeBureau}" var="typ" itemLabel=" #{typ.code} | #{formatDateController.valueObject(typ.typeBureau,typ)} "  itemValue="#{typ}" />
+                                                <f:ajax event="change" render="type_bureau"/>
+                                                <p:column>
+                                                    #{tp.code} | #{formatDateController.valueObject(tp.typeBureau,tp)} 
+                                                </p:column>
+                                            </p:selectOneMenu>
+                                        </div > 
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:commandButton  icon="pi pi-plus"    actionListener="#{intermediaireController.initialisationBureau()}"
+                                                                                                styleClass="success-button" style="margin-right: .5rem" update="form4" process="@this"  rendered="#{intermediaireController.accessAjouteBureau()}"/>
+                                        </div>
+                                    </div>
+                                        </p:outputPanel>
+
+
+
+
+
+
+
+                                    <!--<p:message for="code" />-->
+
+
+
+                                    <!--<p:message for="type_bureau" />-->
+
+
+                                    <!--<p:message for="raison_social" />-->
+
+                                    <!--</p:panelGrid>--> 
+                                    <!--</p:fieldset>-->
+
+                                    <p:tabView id="tabprincipal" style="height: 300px" dynamic="true" cache="true" >
+                                        <p:ajax event="tabChange"  listener="#{intermediaireController.onTabChange}" update="tabprincipal:pickListfonctionnalite,accord:form1:msg,accord:form1:tabprincipal,accord:form1" process="@this"/>
+                                        <p:tab id="tab1" title="#{msg['information']}">
+
+                                            <p:tabView id="tabprincipalSecond" style="height: 300px" >
+                                                <p:tab id="tab11" title="#{msg['infogene']}">
+                                                    <p:panelGrid styleClass="noBorders" columns="7"  columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+                                                                 layout="grid"
+
+                                                                 style="border:0px none; background-color:transparent;" >
+
+                                                        <p:outputLabel value="#{msg['adresse.bp']}: *" for="bp"  />   
+                                                        <p:inputText id="bp"  title="bp"   value="#{intermediaireController.intermediaires.adresse.bp}"  >
+                                                            <f:ajax event="blur" render="bp"/>  
+                                                        </p:inputText>
+                                                        <!--                                                        <p:message for="bp" />-->
+                                                        <p:outputLabel value="#{msg['adresse.ville']}: *" for="ville"  /> 
+                                                        <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{intermediaireController.intermediaires.idVille}"  var="v" filter="true" filterMatchMode="contains">
+                                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                            <f:selectItems  value="#{intermediaireController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}" itemValue="#{v}" />
+                                                            <f:ajax event="change" render="ville"/>
+                                                            <p:column>
+                                                                #{v.code} | #{v.libelle} 
+                                                            </p:column>
+                                                        </p:selectOneMenu>
+                                                        <!--<p:message for="ville" />-->
+                                                        <p:commandButton  icon="pi pi-plus"    actionListener="#{intermediaireController.initialisationVille()}"
+                                                                          styleClass="success-button" style="margin-right: .5rem" update="form3" process="@this"  rendered="#{intermediaireController.accessAjouteVille()}"/>
+
+
+                                                        <p:outputLabel value="#{msg['adresse.email']}: "  />  
+                                                        <p:inputText id="email"  title="email"   value="#{intermediaireController.intermediaires.adresse.email}"  />  
+
+                                                    </p:panelGrid>
+                                                    <p:panelGrid styleClass="noBorders" columns="4" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+                                                                 layout="grid" style="border: 0px; border-bottom: 0px; " >
+                                                        <p:outputLabel value="#{msg['adresse.telephone']}: "  />  
+                                                        <p:inputText id="tel"  title="bp"   value="#{intermediaireController.intermediaires.adresse.tel}"  /> 
+                                                        <p:outputLabel value="#{msg['fax']}: "  />  
+                                                        <p:inputText id="fax"  title="fax"   value="#{intermediaireController.intermediaires.numeroFax}"  >
+
+                                                        </p:inputText>  
+                                                        <p:outputLabel value="#{msg['telex']}: "  />  
+                                                        <p:inputText id="telex"  title="telex"   value="#{intermediaireController.intermediaires.numeroTelex}"  />  
+
+                                                        <!--</p:panelGrid>-->
+                                                        <!--                                            <p:panelGrid styleClass="noBorders" columns="4" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+                                                                                                                 layout="grid" style="border: 0px; border-bottom: 0px; " >-->
+
+                                                        <p:outputLabel value="#{msg['nom.contact']}: "  />  
+                                                        <p:inputText id="contact"  title="contact"   value="#{intermediaireController.intermediaires.nom_contact}"  />  
+
+                                                    </p:panelGrid>
+
+
+                                                </p:tab>
+                                                <p:tab id="tab12" title="#{msg['information.administratif']}">
+                                                    <p:panelGrid styleClass="noBorders" columns="6" layout="grid" style="border: 0px; border-bottom: 0px; " >
+
+                                                        <p:outputLabel value="#{msg['num.patente']}: "  />  
+                                                        <p:inputText id="patente"  title="patente"   value="#{intermediaireController.intermediaires.noPatente}"  /> 
+                                                        <p:outputLabel value="#{msg['num.tva']}: "  />  
+                                                        <p:inputText id="tva"  title="tva"   value="#{intermediaireController.intermediaires.noTva}"  />  
+                                                        <p:outputLabel value="#{msg['num.impot']}: "  />  
+                                                        <p:inputText id="impot"  title="impot"   value="#{intermediaireController.intermediaires.noImpot}"  />
+                                                        <p:outputLabel value="#{msg['num.ss']}: "  />  
+                                                        <p:inputText id="noCnss"  title="noCnss"   value="#{intermediaireController.intermediaires.noCnss}"  />
+                                                        <p:outputLabel value="#{msg['num.agrement']}: "  />  
+                                                        <p:inputText id="agrement"  title="agrement"   value="#{intermediaireController.intermediaires.numeroAgrement}"  />
+
+                                                        <p:outputLabel value="#{msg['num.registre.commercial']}: "  />  
+                                                        <p:inputText id="rc"  title="rc"   value="#{intermediaireController.intermediaires.numeroRegiCommerce}"  />
+
+                                                        <p:outputLabel value="#{msg['capital.social']}: "  />  
+                                                        <p:inputText id="capital"  title="capital"   value="#{intermediaireController.intermediaires.capitalSocial}"  />
+                                                        <h:outputLabel value="#{msg['apposition.timbre']}: " />
+                                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="timbre" value="#{intermediaireController.intermediaires.apposition_timbre}">
+                                                            <f:ajax event="change" render="timbre"/>
+
+                                                        </p:selectBooleanButton>
+
+<!--                                                <p:outputLabel value="#{msg['ancien.code']}: "  />  
+                                                <p:inputText id="ancien_code"  title="ancien_code"   value="#{intermediaireController.intermediaires.ancienCode}" style="width: 75px" />-->
+
+                                                    </p:panelGrid>
+                                                </p:tab>
+                                                <p:tab id="tab13" title="#{msg['autre.infos']}">
+                                                    <p:panelGrid styleClass="noBorders" columns="6" style="border: 0px; border-bottom: 0px; " layout="grid" >
+                                                        <h:outputLabel value="#{msg['date.nomination']}: " for="date_nomination" />
+                                                        <p:calendar value="#{intermediaireController.intermediaires.dateNomination}" mode="popup"  title="#{msg['date.nomination']}" showOn="both"  id="date_fin" pattern="dd/MM/yyyy" />
+
+
+                                                    </p:panelGrid>
+                                                </p:tab>
+                                                <p:tab id="tab14" title="#{msg['infos.comptable']}">
+                                                    <p:panelGrid styleClass="noBorders" columns="8" style="border: 0px; border-bottom: 0px; " layout="grid" >
+                                                        <p:outputLabel value="#{msg['compte.prime']}: "  />  
+                                                        <p:inputText id="comptePrime"  title="comptePrime"   value="#{intermediaireController.intermediaires.comptePrime}" style="width: 250px" />
+                                                        <p:outputLabel value="#{msg['compte.commission']}: "  />  
+                                                        <p:inputText id="compteComission"  title="compteComission"   value="#{intermediaireController.intermediaires.compteCommission}" style="width: 250px" />
+
+                                                    </p:panelGrid>
+                                                </p:tab>
+
+
+                                            </p:tabView> 
+
+                                        </p:tab>
+                                        <p:tab id="suspension" title="#{msg['Suspension']}" rendered="#{intermediaireController.accessSuspention() and intermediaireController.intermediaires.idIntermediaire==null }">
+                                            <p:wizard flowListener="#{intermediaireController.onFlowProcess}" >
+                                                <p:tab id="branche" title="#{msg['Suspension.branche']}">
+                                                    <p:messages closable="true" />
+                                                    <h:panelGrid rendered="#{intermediaireController.suspension==true}">
+                                                        <f:facet name="header">
+
+                                                            <h:outputLabel value="#{msg['intermediaire']}* : "  style="float: left;"/>
+                                                            <p:selectOneMenu value="#{intermediaireController.intermediairesSelect}" style=" float: left; width: 250px;" 
+                                                                             converter="#{genericConverter}" id="intermediaireSelect" validator="requiredValidator" required="true" var="int" filter="true" filterMatchMode="contains" >
+                                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                                <f:selectItems value="#{intermediaireController.listeIntermediaire}" var="int" itemLabel="#{int.idRefIntermediaire.code} #{int.idRefIntermediaire.raisonSociale}" itemValue="#{int}"/>
+                                                                <p:ajax event="change" listener="#{intermediaireController.chargeModelBranche()}" update="tabprincipal:pickListfonctionnalite"/>
+                                                                <p:column>
+                                                                    #{int.idRefIntermediaire.code} | #{int.idRefIntermediaire.raisonSociale} 
+                                                                </p:column>
+                                                            </p:selectOneMenu>   
+
+                                                            <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{intermediaireController.addSuspensionBrancheForIntermediare()}"  update="accord:form1:msg" style="float: right;"/>  
+
+
+                                                        </f:facet>
+                                                        <p:pickList id="pickListfonctionnalite" value="#{intermediaireController.brancheModel}" var="item" itemLabel=" #{formatDateController.valueObject(item.libelle,item)}" itemValue="#{item}"
+                                                                    showSourceControls="true"  responsive="true" 
+
+                                                                    showTargetControls="true" showCheckbox="true"
+                                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}" > 
+
+                                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                                            <p:ajax event="transfer" listener="#{intermediaireController.onTransfer}" update="accord:form1:msg"/>
+                                                            <p:ajax event="select" listener="#{intermediaireController.onSelect}" update="accord:form1:msg"/>
+                                                            <p:ajax event="unselect" listener="#{intermediaireController.onUnselect}" update="accord:form1:msg"/>
+                                                            <p:ajax event="reorder" listener="#{intermediaireController.onReorder}" update="accord:form1:msg"/>
+                                                            <p:column style="width:300px">
+                                                                <div class="p-d-flex p-ai-center">
+                                                                    <span class="flag flag- #{formatDateController.valueObject(item.libelle,item)} p-mr-2" style="width: 50px; height: 20px" />
+                                                                    <h:outputText value=" #{formatDateController.valueObject(item.libelle,item)}"/>
+                                                                </div>
+                                                            </p:column>
+                                                        </p:pickList>
+                                                    </h:panelGrid>
+                                                </p:tab>
+                                                <p:tab id="categorie" title="#{msg['Suspension.categorie']}">
+                                                    <h:panelGrid>
+                                                        <f:facet name="header">
+
+                                                            <h:outputLabel value="#{msg['branche']}* : "  style="float: left;"/>
+                                                            <p:selectOneMenu value="#{intermediaireController.brancheSelect}" style=" float: left; width: 250px;" 
+                                                                             converter="#{genericConverter}" id="brancheSelect" var="br" filter="true" filterMatchMode="contains" >
+                                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                                <f:selectItems value="#{intermediaireController.listeBranchesesAccees}" var="int" itemLabel="#{int.code} #{formatDateController.valueObject(int.libelle,int)}" itemValue="#{int}"/>
+                                                                <p:ajax event="change" listener="#{intermediaireController.chargeModelCategorie()}" update="tabprincipal:pickListCategorie"/>
+                                                                <p:column>
+                                                                    #{br.code} | #{formatDateController.valueObject(br.libelle,br)} 
+                                                                </p:column>
+                                                            </p:selectOneMenu> 
+
+
+                                                            <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{intermediaireController.addSuspensionCategorieForIntermediare()}"  update="accord:form1:msg" style="float: right;"/>  
+
+
+                                                        </f:facet>
+                                                        <p:pickList id="pickListCategorie" value="#{intermediaireController.categorieModel}" var="item" itemLabel=" #{formatDateController.valueObject(item.libelle,item)}" itemValue="#{item}"
+                                                                    showSourceControls="true"  responsive="true" 
+
+                                                                    showTargetControls="true" showCheckbox="true"
+                                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}" > 
+
+                                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                                            <p:ajax event="transfer" listener="#{intermediaireController.onTransfer}" update="accord:form1:msg"/>
+                                                            <p:ajax event="select" listener="#{intermediaireController.onSelect}" update="accord:form1:msg"/>
+                                                            <p:ajax event="unselect" listener="#{intermediaireController.onUnselect}" update="accord:form1:msg"/>
+                                                            <p:ajax event="reorder" listener="#{intermediaireController.onReorder}" update="accord:form1:msg"/>
+                                                            <p:column style="width:300px">
+                                                                <div class="p-d-flex p-ai-center">
+                                                                    <span class="flag flag- #{formatDateController.valueObject(item.libelle,item)} p-mr-2" style="width: 50px; height: 20px" />
+                                                                    <h:outputText value=" #{formatDateController.valueObject(item.libelle,item)}"/>
+                                                                </div>
+                                                            </p:column>
+                                                        </p:pickList>
+                                                    </h:panelGrid>
+                                                </p:tab>
+                                            </p:wizard>
+                                        </p:tab>
+                                    </p:tabView>
+
+                                    <p:toolbarGroup rendered="#{intermediaireController.suspension==false}" > 
+                                       
+
+                                        <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update="accord:form1,accord:form2,form3,form4,accord:form1:msg" process="@all" 
+                                                         styleClass="success-button" style="margin-right: .5rem"  disabled="#{intermediaireController.intermediaires.idIntermediaire!=null}"  actionListener="#{intermediaireController.addIntermediaire()}" rendered="#{intermediaireController.accessCree()}"/>
+                                        <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update="accord:form1,accord:form2,form3,form4,accord:form1:msg,accord:form2:idtableIntemediare" process="@all"  rendered="#{intermediaireController.accessModifier()}"
+                                                         styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"  disabled="#{intermediaireController.intermediaires.idIntermediaire==null}"  actionListener="#{intermediaireController.updateIntermediare()}"  ajax="false"/>
+                                         
+
+                                    </p:toolbarGroup>
+
+
+                                </h:form>
+
+
+                            </p:tab>
+                            <p:tab id="tab2"  title="#{msg['liste.intermediaire']}">
+                                <h:form id="form2">
+                                    <!--<p:dialog header="#{msg['welcome.bienvenue']}" width="950"  height="600" showEffect="fade" modal="true" widgetVar="manageIntermediaireDialog" responsive="true">-->
+                                    <p:dataTable var="pa" value="#{intermediaireController.listeIntermediaire}" paginator="true" rows="10" widgetVar="tableIntemediare"  id="idtableIntemediare"
+                                                 paginatorAlwaysVisible="false" rowsPerPageTemplate="10,50,100,500,1000" filterEvent="enter" filteredValue="#{intermediaireController.filteredIntermediaires}"
+                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 currentPageReportTemplate=" Total :{totalRecords} "
+                                                 emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" 
+
+                                                 scrollable="true"  >
+
+                                                 <!--<p:ajax event="rowDblselect"  listener="#{intermediaireController.showDetails(pa)}" update="accord:form1,accord:form1:msg"  oncomplete="PF('accordP').select(0);" />-->
+
+
+
+
+                                        <f:facet name="header">
+                                            <p:outputPanel>
+                                                <h:outputText value="#{msg['recherche']} : "/>
+
+                                                <p:inputText id="globalFilter"
+                                                             onkeyup="PF('tableIntemediare').filter()"
+                                                             style="width:350px" placeholder="Search text"   />
+                                            </p:outputPanel>
+
+                                        </f:facet>
+
+                                        <p:column style="width: 50px;">
+                                            <f:facet name="header">
+                                                <h:outputText value="Options"/>
+                                            </f:facet>
+
+
+
+                                            <p:column exportable="false">
+                                                <p:commandButton icon="pi pi-pencil" 
+                                                                 styleClass="edit-button rounded-button success-button" process="@this" update="accord:form1,accord:form1:msg"  title="#{msg['bouton.modifier']}" actionListener="#{intermediaireController.showDetailIntermediare(pa)}"  oncomplete="PF('accordP').select(0);"
+                                                                 >
+                                                    <f:setPropertyActionListener value="#{pa}" target="#{intermediaireController.intermediaires}"  />
+                                                </p:commandButton>
+
+                                            </p:column>
+                                        </p:column>
+                                        <p:column headerText="#{msg['code']}" sortBy="#{pa.idRefIntermediaire.code}" filterBy="#{pa.idRefIntermediaire.code}">
+                                            <h:outputText value="#{pa.idRefIntermediaire.code}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg['raison.social']}" sortBy="#{pa.idRefIntermediaire.raisonSociale}" filterBy="#{pa.idRefIntermediaire.raisonSociale}">
+
+                                            <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                          value="#{pa.idRefIntermediaire.raisonSociale}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg['type.intermediaire']}" sortBy="#{formatDateController.valueObject(pa.idTypeBureau.typeBureau,pa.idTypeBureau)}" filterBy="#{formatDateController.valueObject(pa.idTypeBureau.typeBureau,pa.idTypeBureau)}">
+
+                                            <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                          value="#{pa.idTypeBureau.code} | #{formatDateController.valueObject(pa.idTypeBureau.typeBureau,pa.idTypeBureau)}"/>
+                                        </p:column>
+
+
+                                        <p:column headerText="#{msg['adresse.ville']}" sortBy="#{pa.adresse.ville}" filterBy="#{pa.adresse.ville}">
+
+                                            <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                          value="#{pa.idVille.code} #{pa.idVille.libelle}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg['adresse.telephone']}" >
+                                            <h:outputText value="#{pa.adresse.tel}"/>
+                                        </p:column>
+                                        <p:column headerText="#{msg['nom.contact']}" >
+                                            <h:outputText value="#{pa.nom_contact}"/>
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                    <!--                                        <f:facet name="footer">
+                                                                                <center>
+                                    
+                                                                                    <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  update="accord:form1:msg,accord:form1" process="@all" 
+                                                                                                     styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageIntermediaireDialog').hide()" />
+                                    
+                                                                                </center>
+                                                                            </f:facet>-->
+
+                                    <!--</p:dialog>-->
+
+
+                                </h:form>
+
+                            </p:tab>
+                        </p:accordionPanel>
+
+                        <h:form id="form3"  >
+                            <p:dialog header="#{msg['welcome.bienvenue']}" width="850" showEffect="fade" modal="true" widgetVar="manageVilleDialog" responsive="true" >
+
+                                <p:toolbarGroup id="tg1">
+
+
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update="accord:form1,accord:form1:msg,:form3:idtableVille"  process="@this" onclick="PF('manageVilleDialog'.show()" 
+                                                     styleClass="success-button" style="margin-right: .5rem"    actionListener="#{intermediaireController.addVille()}" rendered="#{intermediaireController.accessCree()}"  disabled="#{intermediaireController.ville.id!=null}" id="creer" oncomplete="PF('accordP').select(0);" />
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update="accord:form1:msg,:form3" process="@this"  rendered="#{intermediaireController.accessModifier()}"
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"  disabled="#{intermediaireController.ville.id==null}"  actionListener="#{intermediaireController.updateVille()}"  id="modifier" onclick="PF('manageVilleDialog'.show()"  oncomplete="PF('accordP').select(0);" />
+                                    <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                     styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{intermediaireController.reset()}" update="@form" process="@this"  onclick="PF('manageVilleDialog'.hide()" oncomplete="PF('accordP').select(0);" />
+
+
+                                </p:toolbarGroup>
+
+                                <p:panelGrid columns="4" layout="flex" id="grid1" 
+                                             columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4"
+                                             contentStyleClass="p-align-baseline ui-fluid" >
+
+                                    <p:outputLabel value="#{msg['code']}: *" for="codeVille"  /> 
+                                    <p:inputText id="codeVille"  title="code" validator="requiredValidator"  value="#{intermediaireController.code}" style="width: 100px" >
+                                        <f:ajax event="blur" render="codeVille"/>
+                                    </p:inputText>
+                                    <p:outputLabel value="#{msg['libelle']}: *" for="libelleVille" /> 
+                                    <p:inputText id="libelleVille"  title="libelle" validator="requiredValidator" value="#{intermediaireController.libelle}"  >
+                                        <f:ajax event="blur" render="libelleVille"/>
+                                    </p:inputText>
+                                </p:panelGrid>
+                                <!--                                <p:outputPanel id="manage-ville-content" class="ui-fluid">
+                                                                    <div class="p-field">
+                                
+                                                                    </div>
+                                                                </p:outputPanel>
+                                
+                                                                <div class="p-field">
+                                                                  
+                                                                </div>-->
+
+
+
+                                <p:dataTable var="pa" value="#{intermediaireController.listeVille}" paginator="true" rows="5" widgetVar="profilTable"  id="idtableVille"
+                                             paginatorAlwaysVisible="true" rowsPerPageTemplate="5,15,50,100,500,1000" filterEvent="enter" filteredValue="#{intermediaireController.filteredVille}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{pa.id}" 
+
+                                             scrollable="true"  scrollHeight="200">
+
+<!--                                    <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{intermediaireController.showDetailVille(pa)}"  
+                                            process="@this" update=":form3:manage-ville-content,:form1:msg"  />
+                                    -->
+
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('profilTable').filter()"
+                                                         style="width:350px" placeholder="Search text"  />
+                                        </p:outputPanel>
+
+                                    </f:facet>
+
+                                    <p:column style="width: 50px;">
+                                        <f:facet name="header">
+                                            <h:outputText value="Options"/>
+                                        </f:facet>
+
+
+
+                                        <p:column exportable="false">
+                                            <p:commandButton icon="pi pi-pencil" 
+                                                             styleClass="edit-button rounded-button success-button" process="@this" update=":form3,accord:form1:msg,:form3:libelleVille,:form3:tg1,form3:modifier,form3"  title="#{msg['bouton.modifier']}" actionListener="#{intermediaireController.showDetailVille(pa)}" 
+                                                             onclick="PF('manageVilleDialog').show()"    oncomplete="PF('manageVilleDialog').show()"  >
+                                                <!--<f:setPropertyActionListener value="#{pa}" target="#{intermediaireController.ville}"  />-->
+                                            </p:commandButton>
+
+                                        </p:column>
+                                    </p:column>
+                                    <p:column headerText="#{msg['code']}" sortBy="#{pa.code}" filterBy="#{pa.code}">
+                                        <h:outputText value="#{pa.code}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}" sortBy="#{pa.libelle}" filterBy="#{pa.libelle}">
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{pa.libelle}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                                <f:facet name="footer">
+                                    <center>
+
+                                        <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  update="accord:form1:msg,accord:form1" process="@all" 
+                                                         styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageVilleDialog').hide()" />
+
+                                    </center>
+                                </f:facet>
+
+                            </p:dialog>
+
+
+                        </h:form>
+
+                        <h:form id="form4"  >
+                            <p:dialog header="#{msg['welcome.bienvenue']}" width="850" showEffect="fade" modal="true" widgetVar="manageBureauDialog" responsive="true" >
+
+                                <p:toolbarGroup id="tg1">
+
+
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update="accord:form1,accord:form1:msg,idtableVille"  
+                                                     styleClass="success-button" style="margin-right: .5rem"    actionListener="#{intermediaireController.addTypeBufreau()}" rendered="#{intermediaireController.accessCree()}"  disabled="#{intermediaireController.typeBureau.id!=null}"  oncomplete="PF('manageBureauDialog').hide();PF('accordP').select(0);"/>
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update="accord:form1:msg,:form3:idtableVille" process="@all"  rendered="#{intermediaireController.accessModifier()}"
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"  disabled="#{intermediaireController.typeBureau.id==null}"  actionListener="#{intermediaireController.updateTyBureau()}"  />
+                                    <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                     styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{intermediaireController.reset()}"  process="@this"  oncomplete="PF('accordP').select(0);"  onclick="PF('manageBureauDialog'.hide()" />
+
+
+                                </p:toolbarGroup>
+
+
+                                <p:outputPanel id="manage-bureau-content" class="ui-fluid">
+                                    <div class="p-field">
+
+
+                                        <p:outputLabel value="#{msg['type']}: * "   /> 
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="typeBureau" value="#{intermediaireController.typeBureau.typeBureau}" style="width: 350px" validator="requiredValidator">
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{intermediaireController.typeBureauForCreer}"  />
+                                            <f:ajax event="change" render=":form4"   listener="#{intermediaireController.initialisationBureau()}" />
+                                        </p:selectOneMenu>
+                                    </div>
+                                </p:outputPanel>
+                                <p:panelGrid styleClass="noBorders" columns="8" style="border: 0px; border-bottom: 0px; "  layout="grid">
+                                    <p:outputLabel value="#{msg['code']}: *"  rendered="#{intermediaireController.chargeTybureauByLibelle()}" /> 
+                                    <p:inputText id="codeBureau"  title="code" validator="requiredValidator" value="#{intermediaireController.typeBureau.code}"  style="width: 250px" rendered="#{intermediaireController.chargeTybureauByLibelle()}">
+                                        <f:ajax event="blur" render=":form4:codeBureau"/>
+                                    </p:inputText>  
+
+                                    <p:outputLabel value="#{msg['libelle']}: *"  rendered="#{intermediaireController.chargeTybureauByLibelle()}" /> 
+                                    <p:inputText id="libelleBureau"  title="libelleBureau" validator="requiredValidator" value="#{intermediaireController.typeBureau.libelle}"  style="width: 250px" rendered="#{intermediaireController.chargeTybureauByLibelle()}">
+                                        <f:ajax event="blur" render=":form4:libelleBureau"/>
+                                    </p:inputText>
+                                </p:panelGrid>
+
+
+
+                                <p:dataTable var="pa" value="#{intermediaireController.listeTypeBureau}" paginator="true" rows="3" widgetVar="profilTable"  id="idtableVille"
+                                             paginatorAlwaysVisible="true" rowsPerPageTemplate="3,5,15,50,100,500,1000" filterEvent="enter" filteredValue="#{intermediaireController.filteredTypeBureau}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" 
+
+                                             scrollable="true" >
+
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('profilTable').filter()"
+                                                         style="width:350px" placeholder="Search text"  />
+                                        </p:outputPanel>
+
+                                    </f:facet>
+
+                                    <p:column style="width: 50px;">
+                                        <f:facet name="header">
+                                            <h:outputText value="Options"/>
+                                        </f:facet>
+
+
+
+                                        <p:column exportable="false">
+                                            <p:commandButton icon="pi pi-pencil" 
+                                                             styleClass="edit-button rounded-button success-button" process="@this" update=":form4,accord:form1:msg"  title="#{msg['bouton.modifier']}" actionListener="#{intermediaireController.showDetailTypeBureau()}" 
+                                                             onclick="PF('manageBureauDialog').show()"    oncomplete="PF('manageBureauDialog').show()"  >
+                                                <!--<f:setPropertyActionListener value="#{pa}" target="#{intermediaireController.ville}"  />-->
+                                            </p:commandButton>
+
+                                        </p:column>
+                                    </p:column>
+                                    <p:column headerText="#{msg['code']}" sortBy="#{pa.code}" filterBy="#{pa.code}">
+                                        <h:outputText value="#{pa.code}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['type']}" sortBy="#{pa.typeBureau}" filterBy="#{pa.typeBureau}">
+                                        <h:outputText value="#{formatDateController.valueObject(pa.typeBureau)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}" sortBy="#{pa.libelle}" filterBy="#{pa.libelle}">
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{pa.libelle}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                                <f:facet name="footer">
+                                    <center>
+
+                                        <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  update="accord:form1:msg,accord:form1" process="@all" 
+                                                         styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageBureauDialog').hide()"  oncomplete="PF('accordP').select(0);"/>
+
+                                    </center>
+                                </f:facet>
+
+                            </p:dialog>
+
+
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </f:view>
+    </ui:define>
+
+</ui:composition>

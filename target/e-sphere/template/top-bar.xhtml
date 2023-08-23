@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <style type="text/css">
+        #layout-menu_menu {
+            z-index: 9997!important;
+        }
+        #layout-menu_menu span.ui-menuitem-text {
+            margin-left: 2px;
+        }
+
+    </style>
+    <ul class="nav navbar-nav">
+        <li class="hidden-xs">
+
+            <h:form prependId="false">
+
+
+
+                <div class="right_header">
+
+
+                    <h:panelGroup style="float: left;margin:10px 10px 0 0  ">
+
+                        <h:outputText value="entite" style="color:#080808;font-style: normal;"/>   
+                        <h:outputText value="name of entite" style="color:#ffffff;font-style: normal;"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value="annee" style="color:#080808;font-style: normal;"/>   
+                        <h:outputText value="value " style="color:#ffffff;font-style: normal;"/>
+                        <p:spacer width="20"/>
+
+                    </h:panelGroup>
+                   
+                                       <p:selectOneMenu  style="width: 150px;"  >
+                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" /> 
+                            <f:selectItem itemLabel="Francais" itemValue="fr" />
+                            <f:selectItem itemLabel="Anglais" itemValue="en" /> 
+                            <f:selectItem itemLabel="Espagnol" itemValue="es" /> 
+
+
+                        </p:selectOneMenu>
+                   
+
+
+
+
+                </div> 
+
+            </h:form>
+        </li>
+        <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <pe:gravatar id="userImage"
+
+                             value="resources/images/connexion_public.png" />
+                <span class="hidden-xs">matricule</span>
+            </a>
+            <ul class="dropdown-menu">
+                <li class="user-header">
+                    <div class="hidden-xs">
+                        <pe:gravatar style="border-radius: 50%"
+                                     value="rmpestano@gmail.com"/>
+                    </div>
+                    <p>
+
+                        <small>matricule  </small>
+                    </p>
+                </li>
+
+                <li class="user-footer">
+                    <h:form prependId="false">
+                        <div class="pull-left">
+                            <p:commandLink styleClass="btn btn-danger" value="Change password"/>
+                        </div>
+                        <div class="pull-right">
+                            <p:commandLink id="logout"  title="Logoff">
+                                <i class="fa fa-sign-out fa-2x"></i>
+                            </p:commandLink>
+                        </div>
+                    </h:form>
+                </li>
+            </ul>
+        </li>
+        <li style="float: right;margin:10px 10px 0 0;color:gold;font-style: normal  ">
+          <!--<a id="layout-setup" href="#" class="#{adminConfig.controlSidebar.showOnMobile ? '':'hidden-sm hidden-xs'}" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>-->
+
+
+            <h:outputText class="jclock"  />
+
+
+
+        </li>
+
+    </ul>
+
+</ui:composition>

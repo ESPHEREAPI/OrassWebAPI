@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_1.xhtml">
+
+
+    <style type="text/css">
+        .roundedImage{
+            overflow:hidden;
+            -webkit-border-radius:50px;
+            -moz-border-radius:50px;
+            border-radius:50px;
+            width:90px;
+            height:90px;
+        }
+    </style>
+    <!--    <div class="roundedImage" style="background:url(/images/slideshow/1.jpg) no-repeat 0px 0px;">
+            &nbsp;
+        </div>-->
+
+    <ui:define name="title">E-SPHERE</ui:define>
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/accueil">#{msg['acceuille']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="ACCEUILLE PAGE" />
+
+    <ui:define name="content">
+        <f:view locale="#{languageController.localeCode}">
+            <h:form id="form1" >
+
+                <p:messages closable="true"   showSummary="true" globalOnly="false" id="msg1"/>
+                <p:growl id="msg" showDetail="true" escape="false"/>
+                <div class="p-grid">
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+
+                            <div class="card ">
+                                <center>
+                                    <h4>#{msg['mod.admin']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(1)}" disabled="#{!connectionController.showModuleAmin}">
+                                        <p:graphicImage name="modules-logos/ad22.png"  library="images" rendered="#{connectionController.showModuleAmin==true}"  />
+                                        <p:graphicImage name="modules-logos/ad2_black.jpg"  library="images" rendered="#{connectionController.showModuleAmin==false}" />
+
+                                    </p:commandLink>
+
+
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/ad2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.ass.auto']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(9)}"  disabled="#{!connectionController.showModuleAssureAuto}">
+                                        <p:graphicImage name="modules-logos/auto2.png"  library="images"  rendered="#{connectionController.showModuleAssureAuto==true}" />
+                                        <p:graphicImage name="modules-logos/black/auto2_black.png"  library="images" rendered="#{connectionController.showModuleAssureAuto==false}" />
+                                    </p:commandLink>
+
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/auto2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.assure.adp']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(6)}"    disabled="#{!connectionController.showModuleAssureAdp}">
+                                        <p:graphicImage name="modules-logos/adp.png"  library="images" rendered="#{connectionController.showModuleAssureAdp==true}"  />
+                                        <p:graphicImage name="modules-logos/black/adp_black.png"  library="images"  rendered="#{connectionController.showModuleAssureAdp==false}" />
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/adp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.assure.ird']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(2)}"  disabled="#{!connectionController.showModuleAssureIrd}">
+                                        <p:graphicImage name="modules-logos/ird2.png"  library="images" rendered="#{connectionController.showModuleAssureIrd==true}" />
+                                        <p:graphicImage name="modules-logos/black/ird2_black.png"  library="images" rendered="#{connectionController.showModuleAssureIrd==false}" />
+                                    </p:commandLink>
+
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/ird2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.transp']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(3)}"  disabled="#{!connectionController.showModuleTransport}">
+                                        <p:graphicImage name="modules-logos/tp.png"  library="images"  rendered="#{connectionController.showModuleTransport==true}"/>
+                                        <p:graphicImage name="modules-logos/black/tp_black.png"  library="images" rendered="#{connectionController.showModuleTransport==false}" />
+                                    </p:commandLink>
+
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/tp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.caution.credit']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(4)}"  disabled="#{!connectionController.showModuleCautionCredit}">
+                                        <p:graphicImage name="modules-logos/credit2.png"  library="images" rendered="#{connectionController.showModuleCautionCredit==true}" />
+                                        <p:graphicImage name="modules-logos/black/credit2_black.png"  library="images"  rendered="#{connectionController.showModuleCautionCredit==false}"/>
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/credit2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.agr']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(5)}"  disabled="#{!connectionController.showModuleAgricolte}">
+                                        <p:graphicImage name="modules-logos/ag2.png"  library="images" rendered="#{!connectionController.showModuleAgricolte==true}" />
+                                        <p:graphicImage name="modules-logos/black/ag2_black.png"  library="images" rendered="#{!connectionController.showModuleAgricolte==false}" />
+                                    </p:commandLink>
+
+                                    <!--                                    <h:link  outcome="/principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/ag2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.ref']}</h4>
+                                </center>
+                                <center>
+
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(13)}"  disabled="#{!connectionController.showModuleParametrage}">
+                                        <p:graphicImage name="modules-logos/055.png"  library="images"  rendered="#{connectionController.showModuleParametrage==true}"/>
+                                        <p:graphicImage name="modules-logos/black/055_black.png"  library="images"  rendered="#{connectionController.showModuleParametrage==false}"/>
+                                    </p:commandLink>
+
+
+
+
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.ges.ass']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(7)}"   disabled="#{!connectionController.showModuleGestionAssure}">
+                                        <p:graphicImage name="modules-logos/ga2.png"  library="images" rendered="#{connectionController.showModuleGestionAssure==true}" />
+                                        <p:graphicImage name="modules-logos/black/ga2_black.png"  library="images" rendered="#{connectionController.showModuleGestionAssure==false}" />
+                                    </p:commandLink>
+
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/ga2.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.compt.gene']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(8)}"  disabled="#{!connectionController.showModuleComptabiliteGeneral}">
+                                        <p:graphicImage name="modules-logos/cp.png"  library="images" rendered="#{connectionController.showModuleComptabiliteGeneral==true}" />
+                                        <p:graphicImage name="modules-logos/black/cp_black.png"  library="images"  rendered="#{connectionController.showModuleComptabiliteGeneral==false}" />
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/cp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <p:spacer width="10"></p:spacer>
+
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.compt.agence']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(10)}"  disabled="#{!connectionController.showModuleComptabiliteAgence}">
+                                        <p:graphicImage name="modules-logos/equilibre2.png"  library="images" rendered="#{connectionController.showModuleComptabiliteAgence==true}" />
+                                        <p:graphicImage name="modules-logos/black/equilibre2_black.png"  library="images" rendered="#{connectionController.showModuleComptabiliteAgence==false}"  />
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/cp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.reassu']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(11)}"  disabled="#{!connectionController.showModuleReassurance}">
+                                        <p:graphicImage name="modules-logos/044.png"  library="images" rendered="#{connectionController.showModuleReassurance==true}" />
+                                        <p:graphicImage name="modules-logos/black/044_black.png"  library="images" rendered="#{connectionController.showModuleReassurance==false}" />
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/cp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['gestionEtat']}</h4>
+                                </center>
+                                <center>
+
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoix(12)}"  disabled="#{!connectionController.showModuleReporting}">
+                                        <p:graphicImage name="modules-logos/reporting22.png"  library="images" rendered="#{connectionController.showModuleReporting==true}"  />
+                                        <p:graphicImage name="modules-logos/black/reporting22_black.png"  library="images" rendered="#{connectionController.showModuleReporting==false}" />
+                                    </p:commandLink>
+                                    <!--                                    <h:link  outcome="principal" styleClass="layout-topbar-logo">
+                                                                            <p:graphicImage name="modules-logos/cp.png"  library="images"  />
+                                    
+                                    
+                                                                        </h:link>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+
+                </div>
+                <p:spacer width="10"></p:spacer>
+
+                <div class="p-grid">
+
+
+
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.change.pass']}</h4>
+                                </center>
+                                <center>
+
+
+                                    <p:commandLink   styleClass="layout-topbar-logo" onclick="PF('pass').show()">
+                                        <p:graphicImage name="modules-logos/pass2.png"  library="images"  />
+
+
+                                    </p:commandLink>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <p:spacer width="20"></p:spacer>
+
+
+
+                </div>
+            </h:form>
+            <h:form id="form2">
+
+                <p:dialog header="Reset password" width="700" showEffect="fade" modal="true" widgetVar="pass" responsive="true">
+
+                    <p:panelGrid id="display" columns="2"  
+                                 layout="grid"
+
+                                 style="border:0px none; background-color:transparent;">  
+                        <h:outputLabel  value="#{msg['saisir.ancien.password']}* : " />  
+                        <p:password id="pwd5" value="#{connectionController.oldPassWord}"  validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" 
+                                    feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" style="width: 300px" />  
+
+                        <h:outputLabel for="pwd3" value=" #{msg['bouton.nouveau']}#{msg['motdePasse']}* : " />  
+                        <p:password id="pwd3" value="#{connectionController.newPassWord}" match="pwd4" validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator"  toggleMask="true"
+                                    feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" style="width: 300px" />  
+
+
+                        <h:outputLabel for="pwd4" value="#{msg['CONFIRM_MOT_DE_PASSE']}* : " />  
+                        <p:password id="pwd4" value="#{connectionController.newPassWord}" label="#{msg['CONFIRM_MOT_DE_PASSE']}" validator="requiredValidator" feedback="true" goodLabel="#{msg['user.info.pwdbon']}"  toggleMask="true" promptLabel="#{msg['CONFIRM_MOT_DE_PASSE']}" 
+                                    weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" style="width: 300px"/>  
+                        <h:outputLabel  value="#{msg['cle.securite']}* : " />  
+                        <p:password id="pwd44" value="#{connectionController.cle_securite}" label="#{msg['cle.securite']}" validator="requiredValidator"   toggleMask="true" maxlength="6"
+                                    redisplay="true" style="width: 300px"/>  
+                        <f:facet name="footer" >
+
+
+                            <center>
+                                <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.modifier']}"  oncomplete="PF('pass').hide()" update=":form1:msg" action="#{connectionController.updatePassWord()}" />  
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" styleClass="danger-button p-mr-2 p-mb-2" onclick="PF('pass').hide()" immediate="true"/>
+                            </center>
+                        </f:facet> 
+
+
+
+                    </p:panelGrid> 
+
+                </p:dialog> 
+            </h:form>
+        </f:view> 
+    </ui:define>
+
+
+</ui:composition>

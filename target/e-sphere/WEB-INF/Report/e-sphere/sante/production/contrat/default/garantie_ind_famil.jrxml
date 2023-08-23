@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="db6af00a-5bbc-4c8e-ad62-6bd29916d3f1">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="tva_v" class="java.math.BigDecimal"/>
+	<parameter name="tva_v_1" class="java.math.BigDecimal"/>
+	<field name="capital" class="java.math.BigDecimal"/>
+	<field name="taux" class="java.math.BigDecimal"/>
+	<field name="pourcentage" class="java.lang.Object"/>
+	<field name="prime" class="java.math.BigDecimal"/>
+	<field name="idGarantie.idRefGaranties.libelle" class="java.lang.String"/>
+	<field name="idGroup.id" class="java.lang.Long"/>
+	<field name="libelleCapital" class="java.lang.String"/>
+	<field name="libellePrime" class="java.lang.String"/>
+	<field name="libelleTaux" class="java.lang.String"/>
+	<field name="libellePourcentage" class="java.lang.String"/>
+	<variable name="totalPrime" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{prime}]]></variableExpression>
+	</variable>
+	<variable name="netpaye" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.add($V{taxeTva})]]></variableExpression>
+	</variable>
+	<variable name="taxeTva" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.multiply($P{tva_v_1})]]></variableExpression>
+	</variable>
+	<variable name="taux" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[java.math.BigDecimal.valueOf(19.25)]]></variableExpression>
+	</variable>
+	<group name="groupe">
+		<groupExpression><![CDATA[$F{idGroup.id}]]></groupExpression>
+		<groupHeader>
+			<band height="35">
+				<staticText>
+					<reportElement mode="Opaque" x="239" y="9" width="70" height="26" backcolor="#CCCCCC" uuid="aed7402e-82a3-40ab-b8fe-b8ebfa2dcab8"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Limitation des Garanties]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="309" y="22" width="42" height="13" backcolor="#CCCCCC" uuid="ac283819-9908-46b0-9eb9-2cde7c55302d"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Taux]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="351" y="22" width="63" height="13" backcolor="#CCCCCC" uuid="5867f7f6-4107-49c1-a951-f887eebbd632"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Min]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="475" y="9" width="80" height="26" backcolor="#CCCCCC" uuid="b83e6288-36bb-467c-8aa7-872b5382f05e"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Prime Nettes ]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="9" width="239" height="26" forecolor="#009999" backcolor="#CCCCCC" uuid="5abb1cff-aa92-4860-8e02-63d52a2c0e33"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans" size="12" isBold="true" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Garanties]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="414" y="22" width="61" height="13" backcolor="#CCCCCC" uuid="4439276c-85e4-49b1-a4fc-3142c9cff118"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Max]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="309" y="9" width="166" height="13" backcolor="#CCCCCC" uuid="9552af18-c834-4312-8ee9-04d33456361c"/>
+					<box>
+						<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Franchises]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="239" height="15" backcolor="#CCCCFF" uuid="bf6d8c5d-ebe2-431c-86d9-5ab87163234c"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" "+$F{idGarantie.idRefGaranties.libelle}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement mode="Opaque" x="239" y="0" width="70" height="15" backcolor="#CCCCFF" uuid="7d8cd505-4c07-4ccf-b0da-31c0e229603d"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libelleCapital}!=null)?$F{libelleCapital}:""]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement mode="Opaque" x="309" y="0" width="42" height="15" backcolor="#CCCCFF" uuid="27e65ff1-2960-4896-9ade-b1f280b14844"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libelleTaux}!=null && $F{libelleTaux}!="0" )? $F{libelleTaux}:""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="351" y="0" width="63" height="15" backcolor="#CCCCFF" uuid="6ebf2700-5fdb-471b-a233-e6bd6dbb383b"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libellePourcentage}!=null ) ? $F{libellePourcentage}:""]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement mode="Opaque" x="475" y="0" width="80" height="15" backcolor="#CCCCFF" uuid="0a801269-dd1b-43eb-b886-6ba9d4129c8d"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libellePrime}!=null)? $F{libellePrime}:""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="414" y="0" width="61" height="15" backcolor="#CCCCFF" uuid="3ae98e2b-b76d-46f8-85bb-aae05ef1ba9a"/>
+				<box>
+					<topPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="1.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="1.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libellePourcentage}!=null ) ? $F{libellePourcentage}:""]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

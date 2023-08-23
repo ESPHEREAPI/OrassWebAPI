@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/configuration.xhtml">#{msg['codeconfiguration']}</p:link>
+        </li>
+    </ui:define>
+    <ui:param name="viewname" value="CONFIGURATION PAGE" />
+    <ui:define name="content">
+        <div class="p-grid">
+            <!--<div class="card ">-->
+
+
+
+
+
+
+            <div class="p-col">
+<!--                <h4>#{msg['codeconfiguration']}</h4>-->
+
+
+                <div class="card  ">
+                    <f:view locale="#{languageController.localeCode}">
+                        <h:form id="form1">
+                            <p:commandButton value=" #{msg['creer.compagny']}"  icon="pi pi-plus" actionListener="#{configurationController.save()}" update="form1"  
+                                             styleClass="success-button" style="margin-right: .5rem" />
+                            <p:messages id="grwFile" showDetail="true" closable="true" />
+                            <p:tabView id="grid" style="height: 300px" >
+
+                                <p:tab id="tabEtab" title="#{msg['entite.entreprise']}">
+
+                                    <div class="ui-g">
+                                        <div class="ui-g-12 ui-md-2">
+
+                                            <p:fileUpload listener="#{configurationController.handleFileUpload}"  style="width:150px;"  
+                                                          auto="true"  
+                                                          sizeLimit="200000" 
+                                                          label="Choose Logo"
+                                                          allowTypes="/(\.|\/)(gif|jpe?g)$/"
+                                                          uploadLabel="Confirm"
+                                                          update=":form1:grwFile,:form1:grid:idlogo"
+                                                          /> 
+                                           <!--<p:graphicImage value="#{entrepriseController.logoimages}" alt="#{msg['photo.indisponible']}" id="idlogo" style="width:150px; height:125px"/>-->
+                                            <p:graphicImage id="idlogo" 
+                                                            value="#{configurationController.absolutePathImages}"  width="150px" alt="#{msg['photo.indisponible']}" />    
+
+
+
+                                        </div>
+                                        <div class="ui-g-12 ui-md-10 ui-g-nopad">
+
+
+                                            <div class="ui-g-12 ui-g-nopad">
+                                                <div class="ui-g">
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3"> <h:outputLabel value="#{msg['etabglo.label.codification']}*:" for="code" /></div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid">
+                                                        <p:autoComplete id="code"  title="code"   value="#{configurationController.societe.codesoci}" completeMethod="#{configurationController.completeTextByCode}"   >
+                                                            <f:ajax event="blur" render=":code"/>  
+                                                            <p:ajax event="itemSelect" listener="#{configurationController.onItemSelect}"  update="form1"/>
+                                                        </p:autoComplete>
+                                                        <!--<p:inputNumber id="code" value="#{configurationController.societe.codesoci}"   validator="requiredValidator"    />-->
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:message for="code" /></div>
+                                                </div>
+                                                <div class="ui-g">
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['raison.social']}*: " for="raison_social" /></div>     
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"><p:autoComplete id="raison_social"    value="#{configurationController.societe.raissoci}" completeMethod="#{configurationController.completeTextByRaison}"   >
+                                                            <f:ajax event="blur" render=":raison_social"/>  
+                                                            <p:ajax event="itemSelect" listener="#{configurationController.onItemSelect2}"  update="form1"/>
+                                                        </p:autoComplete>
+
+                                                        <!--<p:inputText id="raison_social" value="#{configurationController.societe.raissoci}" title="nom" validator="requiredValidator"   />--></div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><p:message for="raison_social" /> </div>
+                                                    </div>
+                                                    <div class="ui-g">
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['abreviation']}*: " for="raison_social" /></div>     
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"><p:inputText id="abreviation" value="#{configurationController.societe.abresoci}" title="nom" validator="requiredValidator"  /></div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><p:message for="raison_social" /> </div>
+                                                    </div>
+                                                    <div class="ui-g">
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['num.registre']}:" for="registe_number"/></div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"> <p:inputText id="registe_number" value="#{configurationController.societe.regicomm}"   validator="requiredValidator"/></div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:message for="registe_number" /> </div>
+
+                                                    </div>
+                                                    <div class="ui-g">
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3">   <h:outputLabel value="#{msg['patente.nume']}:" for="nume_patente"/> </div>    
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"> <p:inputText id="nume_patente" value="#{configurationController.societe.pertrare}" title="#{msg['immatricule']}"   /></div>
+                                                        <div class="ui-g-12 ui-md-6 ui-lg-3"><p:message for="nume_patente" /></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!--                                    <p:panelGrid  style="width:50%; height: 50%" styleClass="noBorders">
+                                                                                <div class="card ui-fluid">
+                                                                                                                            <div class="p-field p-grid " style="width:50%; height: 50%" > 
+                                                                                    <p:row>
+                                                                                        <p:column rowspan="6" style="width: 130px;">
+                                                                                            <p:fileUpload listener="#{configurationController.handleFileUpload}"  style="width:150px;"  
+                                                                                                          auto="true"  
+                                                                                                          sizeLimit="200000" 
+                                                                                                          label="Choose Logo"
+                                                                                                          allowTypes="/(\.|\/)(gif|jpe?g)$/"
+                                                                                                          uploadLabel="Confirm"
+                                                                                                          update=":form1:grwFile,:form1:grid:idlogo"
+                                                                                                          /> 
+                                                                                           <p:graphicImage value="#{entrepriseController.logoimages}" alt="#{msg['photo.indisponible']}" id="idlogo" style="width:150px; height:125px"/>
+                                                                                            <p:graphicImage id="idlogo" 
+                                                                                                            value="#{configurationController.absolutePathImages}"  width="150px" alt="#{msg['photo.indisponible']}" />    
+                                        
+                                                                                        </p:column>
+                                                                                        <p:column>
+                                                                                            <h:outputLabel value="#{msg['etabglo.label.codification']}*:" for="code" />
+                                                                                        </p:column>
+                                                                                        <p:column colspan="3">
+                                                                                            <p:inputText id="code" value="#{configurationController.entreprise.code}" title="code"  validator="requiredValidator"  style="text-transform: uppercase;" />
+                                                                                            <p:message for="code" />
+                                                                                        </p:column>
+                                                                                    </p:row>
+                                        
+                                        
+                                                                                    <p:row>
+                                                                                        <p:column>
+                                                                                            <h:outputLabel value="#{msg['raison.social']}*: " for="raison_social" />
+                                                                                        </p:column>
+                                                                                        <p:column colspan="3">
+                                                                                            <p:inputText id="raison_social" value="#{configurationController.entreprise.raisonSociale}" title="nom" validator="requiredValidator" size="50" style="text-transform: uppercase;" />
+                                                                                            <p:message for="raison_social" /> 
+                                                                                        </p:column>
+                                                                                    </p:row>
+                                                                                    <p:row>
+                                                                                        <p:column>
+                                                                                            <h:outputLabel value="#{msg['numero_contribuable']}:" for="numero"/>
+                                                                                        </p:column>
+                                                                                        <p:column colspan="3">
+                                                                                            <p:inputText id="numero" value="#{configurationController.entreprise.noContribuable}" title="#{msg['numero_contribuable']}" size="50" validator="requiredValidator"/>
+                                                                                            <p:message for="numero" /> 
+                                                                                        </p:column>
+                                                                                    </p:row>
+                                                                                    <p:row>
+                                                                                        <p:column>
+                                                                                            <h:outputLabel value="#{msg['immatricule']}:" for="immatricule"/>
+                                                                                        </p:column>
+                                                                                        <p:column colspan="3">
+                                                                                            <p:inputText id="immatricule" value="#{configurationController.entreprise.immatriculation}" title="#{msg['immatricule']}" size="50" validator="requiredValidator" />
+                                                                                            <p:message for="immatricule" /> 
+                                                                                        </p:column>
+                                                                                    </p:row>
+                                                                                    </div>
+                                                                                                                        <div class="card ">
+                                        
+                                        
+                                                                                    </div>
+                                        
+                                                                                </div>
+                                                                            </p:panelGrid>-->
+
+                                </p:tab>
+                                <p:tab id="tabEtab2" title="#{msg['infogene']}">
+                                    <!--                                    <h:panelGrid id="grid" columns="4" styleClass="noBorders">-->
+                                    <!--                                    <div class="card ui-fluid">-->
+                                    <!--<div class="p-formgrid p-grid ">-->
+
+
+                                    <div class="card ui-fluid ">
+
+                                        <!--<p:outputPanel id="grid" layout="inline"  class="ui-g-6">-->
+
+                                        <div class="ui-g">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3"><p:outputLabel for="nomRespo" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.nomRespo']}:</p:outputLabel></div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:inputText id="nomRespo" value="#{configurationController.societe.dgcontact}" title="#{msg['etabglo.label.nomRespo']}" />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="typeResponsabilite" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.responsableType']}:</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:inputText id="typeResponsabilite"  value="#{configurationController.societe.typeResponsabilite}"  title="#{msg['etabglo.label.responsableType']}" />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="tel" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.telephone']}:*</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="tel" value="#{configurationController.societe.telesoci}"    validator="requiredValidator" />
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="email" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['email']}:*</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+
+                                                <p:inputText id="email" value="#{configurationController.societe.email}"  validator="emailValidator" />
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="bp" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.bp']}:</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="bp" value="#{configurationController.societe.adresoci}"    />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="fax" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.fax']}:</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="fax" value="#{configurationController.societe.faxSoci }"   />
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="Site" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.Site']}: http://wwww.</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="Site" value="#{configurationController.societe.siteWeb}"  />
+
+                                            </div>
+
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="ville" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.ville']}*: </p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:selectOneMenu id="ville" value="#{configurationController.societe.villsoci}" validator="requiredValidator" converter="#{genericConverter}" >
+
+                                                    <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                                    <f:selectItems value="#{configurationController.listVille}" var="v" itemLabel="#{v.libevill}" itemValue="#{v}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+
+
+                                        </div>
+
+
+
+
+
+
+                                        <!--                                    <div class="p-field p-grid">
+                                                                                <p:outputLabel for="region" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['region']}: </p:outputLabel>
+                                                                                <div class="p-col-12 p-md-10">
+                                                                                    <p:inputText id="region" value="#{configurationController.entreprise.adresse.region}" />
+                                                                                </div>
+                                        
+                                                                            </div>-->
+
+                                        <!--</h:panelGrid>-->
+
+
+
+
+
+
+                                        <!--</p:outputPanel>-->
+                                    </div>
+
+
+                                    <!--</div>-->
+
+                                    <!--</div>-->
+
+                                </p:tab>  
+
+
+                                <p:tab id="tab3" title="#{msg['module.gestion']}">
+                                    <!--                                    <h:panelGrid id="idgrid" coClumns="3" styleClass="noBorders">-->
+
+                                    <div class="card ui-fluid">
+                                        <div class="p-field p-grid">
+                                            <p:outputLabel for="module" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['modulesecurite']}*: </p:outputLabel>
+                                            <div class="p-col-12 p-md-10">
+                                                <p:selectCheckboxMenu label=" #{msg['choix']} #{msg['modulesecurite']}" filter="true"  filterMatchMode="contains" id="module" value="#{configurationController.selectedModules}"   multiple="true"  >
+                                                    <f:selectItems var="m" value="#{configurationController.listModules}" itemLabel="#{msg[m.code]}  " />
+                                                    <!--<f:ajax event="change" render="module"/>-->
+                                                </p:selectCheckboxMenu>
+
+
+                                                <p:message for="module"/> 
+                                            </div>
+
+                                        </div>
+                                        <div class="p-field p-grid">
+                                            <p:outputLabel for="date_debut" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['datedebut']}:  </p:outputLabel>
+                                            <div class="p-col-12 p-md-10">
+                                                <p:calendar value="#{configurationController.debut}" mode="popup"  title="#{msg['datedebut']}" showOn="both" validator="requiredValidator" id="date_debut" pattern="dd/MM/yyyy" />
+                                                <p:message for="date_debut"/> 
+                                            </div>
+
+                                        </div>
+
+                                        <div class="p-field p-grid">
+                                            <p:outputLabel for="date_fin" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['datefin']}: </p:outputLabel>
+                                            <div class="p-col-12 p-md-10">
+                                                <p:calendar value="#{configurationController.fin}" mode="popup"  title="#{msg['datefin']}" showOn="both" validator="requiredValidator" id="date_fin" pattern="dd/MM/yyyy" />
+                                                <p:message for="date_fin"/> 
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!--</h:panelGrid>-->
+                                </p:tab>
+                                <p:tab id="tabEtab4" title="#{msg['cree.utilisateur']} / #{msg['administration']}">
+                                    <!--<h:panelGrid id="grid_utilisateur" columns="2" styleClass="noBorders" width="auto"  class="p-field">--> 
+                                    <!--<div class="card ui-fluid">-->
+                                    <div class="card ui-fluid" >
+                                        <div class="ui-g">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:outputLabel for="login" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['login']}* : </p:outputLabel>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="login"  title="login" value="#{configurationController.utilisateur.login}" validator="requiredValidator" />
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="name_utilisateur" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['nom']}* :  </p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="name_utilisateur" value="#{configurationController.utilisateur.nom}" title="name" validator="requiredValidator"/>                           
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="firstname" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['prenom']}:  </p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:inputText id="firstname"  value="#{configurationController.utilisateur.prenom}" title="firstname" />
+
+                                            </div>
+<!--                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <h:outputLabel value="#{msg['date_naissance']}: " for="dateNaissance" /></div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">     <p:calendar value="#{utilisateurController.utilisateurs.datenaissance}"  mode="popup"   showOn="both"  id="dateCreer" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                                    <f:ajax event="dateSelect"  render="dateNaissance" />
+                                                </p:calendar>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="statut" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['actif']}:  </p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:selectBooleanCheckbox value="#{configurationController.utilisateur.actif}" id="statut" />  
+                                            </div>-->
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="langueDefaut" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['langue.parle']}  </p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:selectOneMenu  id="langueDefaut" value="#{configurationController.utilisateur.langue}"    validator="requiredValidator"  >
+                                                    <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                                    <f:selectItems value="#{configurationController.languageCountrie}"  />
+                                                    <!--                                        <f:ajax event="change"  render="langueDefaut"/>-->
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                <p:outputLabel for="email_user" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['email']}:*</p:outputLabel>
+
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-3">
+
+                                                <p:inputText id="email_user" value="#{configurationController.utilisateur.adresse.email}"  validator="emailValidator" />
+
+                                            </div>
+                                        </div>
+
+
+
+
+                                        <!--                                        <div class="ui-g" >
+                                                                                    <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                        
+                                                                                    </div>
+                                                                                    <div class="ui-g-12 ui-md-6 ui-lg-4"> <p:commandButton value="#{msg['bouton.creer']} #{msg['motdePasse']}" icon="pi pi-plus"  oncomplete="PF('motPasseDialog').show()" 
+                                                                                                                                           styleClass="success-button" style="margin-right: .5rem" /> </div>
+                                                                                    <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                        
+                                                                                    </div>
+                                                                                </div>-->
+
+                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                                    <!--</h:panelGrid>-->
+
+
+                                </p:tab>
+
+
+
+
+
+                            </p:tabView>
+
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+
+                            <p:toolbarGroup>
+                                <h:link  outcome="/acceuil_admin_system" styleClass="layout-topbar-logo" >
+
+                                    <i class="topbar-icon pi pi-home " style="font-size: 2em"></i>
+
+
+                                </h:link>
+                            </p:toolbarGroup>
+
+
+
+
+                            <!--<div class="card ui-fluid" >-->
+
+                            <!--</div>-->
+
+                        </h:form>
+
+                        <h:form id="form2">
+                            <p:dialog header="#{msg['motdePasse']}"  showEffect="fade" modal="true" widgetVar="motPasseDialog" responsive="true" closable="false">
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-user"></i> #{msg['login']} * :
+                                    </label> 
+                                    <h4>#{configurationController.utilisateur.login}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['motdePasse']} * :
+                                    </label> 
+                                    <h4>#{configurationController.passWord}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['cle.securite']}* :
+                                    </label> 
+
+                                    <h4>#{configurationController.cle}</h4>
+                                </div>
+
+
+                                <f:facet name="footer">
+
+
+
+                                    <center>
+
+
+
+                                        <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.nouveau']}"  onclick="PF('motPasseDialog').hide()"  update="form1" actionListener="#{configurationController.reset()}" process="@this"/>  
+                                        <p:spacer width="10"/>
+                                        <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('motPasseDialog').hide()" immediate="true"  action="#{configurationController.accueil()}"/> 
+                                    </center>
+                                </f:facet>
+
+                            </p:dialog>
+                        </h:form>
+
+                    </f:view>
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </ui:define>
+
+</ui:composition>
+

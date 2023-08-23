@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/condition">#{msg['condition.gestion']}</p:link>
+        </li>
+    </ui:define>
+    <ui:param name="viewname" value="CONFIGURATION PAGE" />
+    <ui:define name="content">
+        <div class="p-grid">
+            <!--<div class="card ">-->
+
+
+
+
+
+
+            <div class="p-col">
+<!--                <h4>#{msg['condition.gestion']}</h4>-->
+
+
+                <div class="card  ">
+                    <f:view locale="#{languageController.localeCode}">
+                        <h:form id="form1">
+                              <h4>Empty Page</h4>
+                    
+
+                            <p:toolbarGroup>
+                                <h:link  outcome="/acceuil_admin_system" styleClass="layout-topbar-logo" >
+
+                                    <i class="topbar-icon pi pi-home " style="font-size: 2em"></i>
+
+
+                                </h:link>
+                            </p:toolbarGroup>
+
+
+
+                        </h:form>
+
+                    </f:view>
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </ui:define>
+
+</ui:composition>
+

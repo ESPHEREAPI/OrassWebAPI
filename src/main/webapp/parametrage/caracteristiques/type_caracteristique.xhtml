@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/caracteristiques/type_caracteristique">Type Caracteristique</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" escape="false"/>
+                       
+                            <!--<h4>#{msg['type_caracteristique']}</h4>-->
+                            <p:toolbarGroup>
+                              
+                                <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   
+                                                     styleClass="success-button" style="margin-right: .5rem"   rendered="#{true}"  onclick="PF('manageTypeCaracteristiqueDialog').show()" />
+                                    
+                                     <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                 styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{typeCaracteristiqueController.reset()}" update="@form" process="@all" />
+                                
+                               
+                            </p:toolbarGroup>
+                        
+                           
+                        
+                        <p:dialog header="#{msg['welcome.bienvenue']}"  showEffect="fade" modal="true" widgetVar="manageTypeCaracteristiqueDialog" responsive="true" closable="false">
+
+                             <p:fieldset  id="fieldset1" >
+                                <p:panelGrid styleClass="noBorders" columns="8" style="border: 0px; border-bottom: 0px" layout="grid" id="grid1">
+                                    <p:outputLabel value="#{msg['code']}: " for="code"  /> 
+                                    <p:inputText id="code"  title="code" validator="requiredValidator"  value="#{typeCaracteristiqueController.typeCaracteristique.code}"  required="true" >
+                                        <f:ajax event="blur" render="code"/>
+                                    </p:inputText>
+                                    <!--<p:message for="code" />-->
+                                    <p:outputLabel value="#{msg['libelle']}: " for="libelle" /> <!--
+                                    -->                                    <p:inputText id="libelle"  title="libelle" validator="requiredValidator" value="#{typeCaracteristiqueController.typeCaracteristique.libelle}" >
+                                        <f:ajax event="blur" render="libelle"/>
+                                    </p:inputText>
+                                </p:panelGrid>
+
+                            </p:fieldset>
+                            
+                            <f:facet name="footer">
+                                <center>
+                                    
+                                    
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update=":form2,:form1,:form1:msg" process="@this"  rendered="#{typeCaracteristiqueController.accessCree() and typeCaracteristiqueController.typeCaracteristique.id == null}"
+                                                     styleClass="success-button" style="margin-right: .5rem"   actionListener="#{typeCaracteristiqueController.addTypeCaracteristique()}" ajax="false" oncomplete="#{typeCaracteristiqueController.chargeDialog()}" />             
+                                <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form2,:form1,:form1:msg" process="@this"  rendered="#{typeCaracteristiqueController.accessModifier() and typeCaracteristiqueController.typeCaracteristique.id!=null}"
+                                                 styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"   actionListener="#{typeCaracteristiqueController.updateTypeCaracteristique()}" oncomplete="PF('manageTypeCaracteristiqueDialog').hide()" ajax="false"/>
+                               
+
+                                    <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  
+                                                     styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageTypeCaracteristiqueDialog').hide()" actionListener="#{typeCaracteristiqueController.reset()}" update="@form" process="@all"/>
+
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+                    </h:form>
+                     <h:form id="form2">
+                    
+
+                         <p:dataTable var="cl" value="#{typeCaracteristiqueController.listeTypeCaracteristique}" paginator="true" rows="10" widgetVar="typeCaractTable"  id="idTypeCaractTable"
+                                      paginatorAlwaysVisible="false" rowsPerPageTemplate="10,50,100,500,1000" filterEvent="enter" filteredValue="#{typeCaracteristiqueController.filterTypeCaracteristique}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                     emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cl.id}" selectionMode="single"  selection="#{typeCaracteristiqueController.typeCaracteristiqueSelect}"
+
+                                     scrollable="false"  scrollHeight="150" >
+
+                            <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{typeCaracteristiqueController.showDetails()}"  rendered="#{typeCaracteristiqueController.accessModifier()}"
+                                    process="@this" update=":form1,:form1:msg" oncomplete="PF('manageTypeCaracteristiqueDialog').show()" />
+                            
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('typeCaractTable').filter()"
+                                                 style="width:350px" placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+                            <p:column style="width: 50px;">
+                                <f:facet name="header">
+                                    <h:outputText value="Options"/>
+                                </f:facet>
+
+
+
+                                <p:commandButton  icon="pi pi-trash"  
+                                                  styleClass="danger-button" style="margin-right: .5rem" onclick="PF('manageDeleteDialog').show()"  rendered="#{typeCaracteristiqueController.accessSupprimer()}">
+                                    <f:setPropertyActionListener value="#{cl}" target="#{typeCaracteristiqueController.typeCaracteristique}"  />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-pencil"  
+                                                  styleClass="info-button" style="margin-right: .5rem" process="@this" update=":form1:grid1,:form1" rendered="#{typeCaracteristiqueController.accessModifier()}" oncomplete="PF('manageTypeCaracteristiqueDialog').show()" >
+                                    <f:setPropertyActionListener value="#{cl}" target="#{typeCaracteristiqueController.typeCaracteristique}"  />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column headerText="id"  style="width: 50px">
+                                <h:outputText value="#{cl.id}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['code']}" sortBy="#{cl.code}" filterBy="#{cl.code}" style="width: 100px">
+                                <h:outputText value="#{cl.code}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['libelle']}" sortBy="#{cl.libelle}" filterBy="#{cl.libelle}"  style="width: 100px">
+                                <h:outputText value="#{cl.libelle}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                    
+                </h:form>
+                </div>
+
+               
+
+                <h:form id="form4">
+                    <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                        <center>
+                            <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                        </center>
+
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="OK" actionListener="#{typeCaracteristiqueController.deleteTypeCaracteristique()}" update=":form1,:form2" onclick="PF('manageDeleteDialog').hide()" />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                            </center>
+                        </f:facet>
+                    </p:dialog>
+
+                </h:form>
+
+            </div>
+        </div>
+      
+    </ui:define>
+
+</ui:composition>

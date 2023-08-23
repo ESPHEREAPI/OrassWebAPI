@@ -1,0 +1,441 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/durees">#{msg['duree']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <p:tabView  id="tabprincipal">
+                        <p:tab title="#{msg['duree']}">
+                            <h:form id="form1">
+                                <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                                <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   
+                                                 styleClass="success-button" style="margin-right: .5rem"        onclick="PF('manageDureeDialog').show()"  />
+
+                                <p:dataTable var="d" value="#{dureeController.listDuree}" paginator="true" rows="10" widgetVar="dureeTable"  id="iddureeTable"
+                                             paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{dureeController.filterDuree}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;"   
+
+                                             scrollable="true" >
+
+
+
+                                    <f:facet name="header">
+
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('dureeTable').filter()"
+                                                         style="width:350px" placeholder="Search text"   immediate="true"/>
+                                        </p:outputPanel>
+
+                                    </f:facet>
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('manageDeleteDialog2').show()"  >
+                                            <f:setPropertyActionListener value="#{d}" target="#{dureeController.duree}"/>
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}" update=":form11"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"     oncomplete="#{dureeController.chargeDialog(d)}"  actionListener="#{dureeController.chargeDialog(d)}" >
+                                            <f:setPropertyActionListener value="#{d}" target="#{dureeController.duree}"/>
+
+                                        </p:commandButton>  
+
+                                    </p:column>
+
+
+                                    <!--
+                                                                        <p:column headerText="id"  style="width: 50px">
+                                                                            <h:outputText value="#{d.id}"/>
+                                                                        </p:column>-->
+                                    <p:column headerText="#{msg['code']}" sortBy="#{d.code}" filterBy="#{d.code}"  >
+                                        <h:outputText value="#{d.code}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}" sortBy="#{d.libelle}" filterBy="#{d.libelle}"  >
+                                        <span class="flag flag-#{d.libelle}" style="width: 30px; height: 20px"/>
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{d.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['Unite']}"   style="width: 75px" >
+                                        <h:outputText value="#{formatDateController.valueObject(d.uniteDuree)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['type']}"   >
+                                        <h:outputText value="#{formatDateController.valueObject(d.typeDuree)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['mode.prorata']}"   >
+                                        <h:outputText value="#{formatDateController.valueObject(d.modeProrata)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['base.prorata']}" style="width: 75px"  >
+                                        <h:outputText value="#{d.baseProrata}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['duree.min']}"   >
+                                        <h:outputText value="#{d.minDuree}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['duree.max']}"   >
+                                        <h:outputText value="#{d.maxDuree}"/>
+                                    </p:column>
+
+
+
+                                </p:dataTable>
+
+                            </h:form> 
+                        </p:tab>
+                        <p:tab title="#{msg['majoration']}">
+                            <!--                            <p:toolbarGroup>
+                            
+                            
+                                                            <p:commandButton value="#{msg['liste.categorie']}" icon="pi pi-sliders-h"  onclick="PF('manageCategorieDialog').show()" 
+                                                                             styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  update="form1" process="@this"  />
+                            
+                                                            <h:outputLabel value="#{rubriqueCategorieController.categoriesSelect.code}  #{formatDateController.valueObjectByLibelleAutres(rubriqueCategorieController.categoriesSelect.libelle)}" class="info-label"/>
+                                                        </p:toolbarGroup>-->
+
+                            <h:form id="form2">
+                                <p:growl id="msg2" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                                <p:toolbarGroup>
+                                    <h:outputLabel value="#{msg['duree']}: " style="float: left" />
+                                    <h:outputLabel style="float: left" />
+                                    <h:outputLabel style="float: left" />
+                                    <h:outputLabel style="float: left" />
+                                    <h:outputLabel style="float: left" />
+
+                                    <p:selectOneMenu value="#{dureeController.dureeSelect}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="type_carateristique" validator="requiredValidator" required="true" var="d" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{dureeController.listDuree}" var="dr" itemLabel="#{dr.code} #{dr.libelle}" itemValue="#{dr}"/>
+
+                                        <p:column>
+                                            #{d.code}  #{d.libelle} 
+                                        </p:column>
+                                        <p:ajax event="change"  listener="#{dureeController.chargeMajorationByDuree()}" update="tabprincipal:form2:idmajorationTable,form11:idtableCategorie" process="@this"/>
+                                    </p:selectOneMenu>  
+
+                                </p:toolbarGroup>
+
+                                <br/> 
+                                <br/>
+                                <br/>
+                                <p:dataTable var="m" value="#{dureeController.listMajoration}"  widgetVar="majorationTable" 
+                                             filteredValue="#{dureeController.filterMajoration}"    scrollable="true" 
+                                             globalFilterFunction="#{dureeController.globalFilterFunction}"
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idmajorationTable"
+
+                                             >
+
+                                    <f:facet name="header">
+                                        <!--                                        <p:outputPanel>
+                                                                                    <h:outputText value="#{msg['recherche']} : "/>
+                                        
+                                                                                    <p:inputText id="globalFilter"
+                                                                                                 onkeyup="PF('majorationTable').filter()"
+                                                                                                 style="width:150px" placeholder="Search text..."  > 
+                                        
+                                                                                    </p:inputText>  
+                                        
+                                        
+                                                                                </p:outputPanel>-->
+                                        <div class="p-d-flex p-jc-end">
+                                            <p:inputText id="globalFilter" onkeyup="PF('majorationTable').filter()" style="width:300px"
+                                                         placeholder="Search all text..." />
+                                        </div>
+
+
+                                    </f:facet> 
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{m.idDuree.id!=null and m.id==null}" onclick="PF('manageAddDialog').show()"  >
+                                            <f:setPropertyActionListener value="#{m}" target="#{dureeController.majorationDuree}"   />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-times"  
+                                                          styleClass="danger-button" style="margin-right: .5rem"  rendered="#{m.idDuree.id!=null and m.id==null}" oncomplete="PF('manageRemoveDialog').show()"    >
+                                            <f:setPropertyActionListener value="#{m}" target="#{dureeController.majorationDuree}"   />
+                                        </p:commandButton>
+                                        <!--                                <p:commandButton  icon="pi pi-check-circle"  
+                                                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{m.idDuree.id!=null and m.id!=null}"   disabled="true" >
+                                        
+                                                                        </p:commandButton>-->
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{m.idDuree.id!=null and m.id!=null}"   onclick="PF('manageUpdateDialog').show()" >
+                                            <f:setPropertyActionListener value="#{m}" target="#{dureeController.majorationDuree}"    />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"  rendered="#{m.idDuree.id!=null and m.id!=null}"   onclick="PF('managDeleteDialog').show()"    >
+                                            <f:setPropertyActionListener value="#{m}" target="#{dureeController.majorationDuree}"    />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['code']}" sortBy="#{m.idCategories.code}"  style="width: 50px">
+                                        <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{m.idCategories.code}"    >
+                                            <p:ajax event="keyup"   oncomplete="PF('manageCategorieDialog').show()" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}" sortBy="#{m.idCategories.libelle}"  >
+                                        <h:outputText value="#{formatDateController.valueObject(m.idCategories.libelle,m.idCategories)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['datedebut']}: "  >
+                                        <p:calendar value="#{m.effet}" mode="popup"  title="#{msg['datedebut']}" showOn="both"  id="date_debut" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="date_debut"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['datefin']}: "  >
+                                        <p:calendar value="#{m.fin}" mode="popup"  title="#{msg['datefin']}" showOn="both"  id="date_fin" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="date_fin"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['coefficient']}" >
+<!--                                        <p:inputNumber value="#{m.coefficient}"   decimalPlaces="2" emptyValue="empty"   style="width: 50px; float: left; " id="coef"   >
+                                            <f:ajax event="blur" render="coef"/>
+                                        </p:inputNumber>-->
+<!--                                        <p:inputNumber id="coef" value="#{m.prorogation}"   decimalPlaces="2" emptyValue="#{0}"
+                                                      >
+                                            <p:ajax update="coef" />  -->
+                                        <!--</p:inputNumber>-->
+                                          <p:inputNumber value="#{m.coefficient}"   decimalPlaces="0" emptyValue="#{0}"   style="width: 50px; float: left; " id="coef"  >
+                                            <f:ajax event="blur" render="coef"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['val.additif']}" >
+                                        <p:inputNumber value="#{m.valeurAdditif}"   decimalPlaces="0" emptyValue="#{0}"   style="width: 50px; float: left; " id="va"   >
+                                            <f:ajax event="blur" render="va"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['prorogation']}" >
+                                        <p:inputNumber value="#{m.prorogation}"   decimalPlaces="0" emptyValue="#{0}"   style="width: 50px; float: left; " id="prorogation"  >
+                                            <f:ajax event="blur" render="prorogation"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['type.contrat']}" >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="nature" value="#{m.typeContrat}" style="width: 150px"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{dureeController.typeContrat}"  />
+                                            <f:ajax event="change" render="nature"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+                                </p:dataTable>
+
+                            </h:form>
+
+                        </p:tab>
+                    </p:tabView>
+                    <h:form id="form11">
+                        <p:dialog header="#{msg['edition.duree']}" width="950" showEffect="fade" modal="true" widgetVar="manageDureeDialog" responsive="true" id="dgl">
+
+                            <p:fieldset  style=" color: #48b175" >
+                                <p:panelGrid columns="4" layout="flex" id="grid1" 
+                                             columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4"
+                                             contentStyleClass="p-align-baseline ui-fluid"  >
+                                    <p:outputLabel  value="#{msg['code']}"/>
+
+                                    <p:inputText id="code"  placeholder="#{msg['SAISIR']}"  value="#{dureeController.duree.code}"  style="text-transform: uppercase; width: 75px" validator="requiredValidator">
+                                        <f:ajax event="blur" render="code"/>
+                                    </p:inputText>
+
+                                    <p:outputLabel  value="#{msg['libelle']}"/>
+
+                                    <p:inputText id="libelle"  placeholder="#{msg['SAISIR']}"  value="#{dureeController.duree.libelle}"  style="text-transform: uppercase; width: 300px" validator="requiredValidator" >
+                                        <f:ajax event="blur" render="libelle"/>
+                                    </p:inputText>
+                                    <h:outputLabel value="#{msg['duree.min']}: " />
+                                    <p:inputNumber value="#{dureeController.duree.minDuree}"   decimalPlaces="0" emptyValue="#{null}"  style="width: 50px; float: left; " id="dureeMin"  required="true" validator="requiredValidator">
+                                        <f:ajax event="blur" render="dureeMin" />
+                                    </p:inputNumber>
+                                    <h:outputLabel value="#{msg['type']}: " />
+                                    <p:selectOneMenu  value="#{dureeController.duree.typeDuree}" style="width: 150px;" converter="#{genericConverter}" id="type"   validator="requiredValidator">
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" />
+                                        <f:selectItems value="#{dureeController.typeDuree}" />
+                                        <p:ajax event="change" update=":form11:grid1" listener="#{dureeController.testeValeurTypeDuree()}" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel value="#{msg['duree.max']}: "  rendered="#{dureeController.variable}"/>
+                                    <p:inputNumber value="#{dureeController.duree.maxDuree}"   decimalPlaces="0" emptyValue="#{null}" rendered="#{dureeController.variable}"  style="width: 50px; float: left; " id="dureeMax"  >
+                                        <f:ajax event="blur" render="dureeMax"/>
+                                    </p:inputNumber>
+
+                                    <h:outputLabel value="#{msg['Unite']}: " />
+                                    <p:selectOneMenu  value="#{dureeController.duree.uniteDuree}" style="width: 150px;" converter="#{genericConverter}" id="unite"   validator="requiredValidator" required="true">
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" />
+                                        <f:selectItems value="#{dureeController.uniteDuree}" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputLabel value="#{msg['mode.prorata']}: " />
+                                    <p:selectOneMenu  value="#{dureeController.duree.modeProrata}" style="width: 250px;" converter="#{genericConverter}" id="modeprorata"   validator="requiredValidator" required="true">
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" />
+                                        <f:selectItems value="#{dureeController.modeProrata}" />
+                                    </p:selectOneMenu>
+                                    <h:outputLabel value="#{msg['base.prorata']}: " />
+                                    <p:inputNumber value="#{dureeController.duree.baseProrata}"   decimalPlaces="0" emptyValue="#{0}"  style="width: 150px; float: left; " id="baseProrata"  >
+                                        <f:ajax event="blur" render="baseProrata"/>
+                                    </p:inputNumber>
+
+
+
+                                </p:panelGrid>
+
+                            </p:fieldset>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"   process="@this" 
+                                                     styleClass="success-button" style="margin-right: .5rem"  rendered="#{dureeController.duree.id==null}"  actionListener="#{dureeController.addDuree()}" ajax="false" id="add"  oncomplete="#{dureeController.chargeDialog()}" />
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil" rendered="#{dureeController.duree.id!=null}"   update="tabprincipal:form1,tabprincipal:form1:msg" process="@this"  
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"    actionListener="#{dureeController.updateDuree()}" oncomplete="PF('manageDureeDialog').hide()"  id="update" ajax="false"/>
+
+                                    <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  
+                                                     styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageDureeDialog').hide()" actionListener="#{dureeController.reset()}" />
+
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+
+
+                        <p:dialog header="#{msg['welcome.bienvenue']}" width="1000" showEffect="fade" modal="true" widgetVar="manageCategorieDialog" responsive="true">
+                            <p:dataTable var="cl" value="#{dureeController.lisCategories}" paginator="true" rows="10"  widgetVar="tableCategorie"  id="idtableCategorie"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{dureeController.filterCategories}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cl.idCategorie}" selectionMode="single"  selection="#{dureeController.categories}"
+
+                                         scrollable="true"  >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{dureeController.chargeMajorationByCategories()}"     
+                                        process="@this" update="tabprincipal:form2:idmajorationTable"  oncomplete="PF('manageCategorieDialog').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('tableCategorie').filter()"
+                                                     style="width:350px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+                                <p:column headerText="id"  style="width: 50px">
+                                    <h:outputText value="#{cl.idCategorie}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['code']}" sortBy="#{cl.code}" filterBy="#{cl.code}"  style="width: 200px">
+                                    <h:outputText value="#{cl.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{cl.libelle}" filterBy="#{cl.libelle}"  style="width: 250px">
+                                    <span class="flag flag-#{cl.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{formatDateController.valueObject(cl.libelle,cl)}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['branche']}" sortBy="#{cl.idBranche.code}" filterBy="#{cl.idBranche.code}" style="width: 250px">
+                                    <h:outputText value="#{cl.idBranche.code} #{formatDateController.valueObject(cl.idBranche.libelle,cl.idBranche)}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+
+
+                    </h:form>
+                    <h:form id="form22">
+                        <p:dialog widgetVar="manageDeleteDialog2" header="#{msg['welcome.dlg.header']}" closable="true" width="500" height="75" showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{dureeController.deleteDuree()}" update="tabprincipal:form1,tabprincipal:form1:msg"  process="@this" onclick="PF('manageDeleteDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()" />  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageAddDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{dureeController.addMajoration()}" oncomplete=" PF('manageAddDialog').hide()" update=":tabprincipal:form2,:tabprincipal:form2:msg2"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{dureeController.removeMajorationListeByListe()}" oncomplete=" PF('manageRemoveDialog').hide()" update=":tabprincipal:form2,:tabprincipal:form2:msg2"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{dureeController.updateMajoration()}" oncomplete=" PF('manageUpdateDialog').hide()" update=":tabprincipal:form2:idmajorationTable,:tabprincipal:form2:msg2"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{dureeController.deleteMajoration()}" oncomplete=" PF('managDeleteDialog').hide()" update=":tabprincipal:form2:idmajorationTable,:tabprincipal:form2:msg2"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

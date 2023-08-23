@@ -1,0 +1,247 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/reporting/assurance_adp/sante/production/affaire_nouvelle/contrat_production">#{msg['report.contrat.prod']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1">
+                        <p:growl id="msg">
+                            <p:autoUpdate />
+                        </p:growl>
+                        <p:fieldset  legend="#{msg['report.contrat.prod']}"  styleClass="fieldset" class="fieldset" id="fieldsetGeneral"  >
+                            <p:fieldset  legend="#{msg['periode.emition']}"  styleClass="fieldset" class="fieldset"  id="fperiode"    >
+                                <p:panelGrid   columns="9" layout="grid"  columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"  >
+                                    <p:outputLabel  value="#{msg['Du']}" />
+                                    <p:calendar value="#{etatProductionApporteurController.debut}"    mode="popup"   showOn="both"  id="debut" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                        <f:ajax event="dateSelect"  render="debut" />
+                                        <p:ajax event="dateSelect"  listener="#{etatProductionApporteurController.chargeIntermediaireByPeriode()}" update=":form1" />
+                                    </p:calendar>
+<!--                                    <p:datePicker id="dateDebut" value="#{etatProductionApporteurController.debut}" 
+                                          monthNavigator="true"
+                                          yearNavigator="true" showButtonBar="true"
+                                          >
+                                <p:ajax event="dateSelect" update="form1"  listener="#{etatProductionApporteurController.chargeIntermediaireByPeriode()}" />
+
+                            </p:datePicker>-->
+
+                                    <p:outputLabel  value="#{msg['Au']}" />
+                                    <p:calendar value="#{etatProductionApporteurController.fin}"    mode="popup"   showOn="both"  id="fin" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                        <f:ajax event="dateSelect"  render="fin" />
+                                        <p:ajax event="dateSelect"  listener="#{etatProductionApporteurController.chargeIntermediaireByPeriode()}" update=":form1" />
+                                    </p:calendar>
+<!--                                    <p:datePicker id="dateFin" value="#{etatProductionApporteurController.fin}" 
+                                          monthNavigator="true"
+                                          yearNavigator="true" showButtonBar="true" 
+                                          >
+                                <p:ajax event="dateSelect" update="form1" listener="#{etatProductionApporteurController.chargeIntermediaireByPeriode()}"/>
+
+                            </p:datePicker>-->
+
+                                    <h:outputLabel value="#{msg['agence']}" rendered="#{etatProductionApporteurController.allAgence==false}" />
+
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="agence"  value="#{etatProductionApporteurController.agence}" rendered="#{etatProductionApporteurController.allAgence==false}"
+                                                      var="int"  filter="true" filterMatchMode="startsWith" panelStyle="width:150px" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems  value="#{etatProductionApporteurController.listeIntermediaires}" var="ag" itemLabel="#{ag.idRefIntermediaire.code} #{ag.idRefIntermediaire.raisonSociale}" itemValue="#{ag}" />
+                                        <p:column style="width:5%">
+                                            #{int.idRefIntermediaire.code}  #{int.idRefIntermediaire.raisonSociale} 
+                                        </p:column>
+                                        <f:ajax event="change" render=":form1" listener="#{etatProductionApporteurController.chargeApporteurByIntermediaireForPeriode()}" />
+                                    </p:selectOneMenu>
+                                    <h:outputText value="#{msg['all.agence']}"  />
+                                    <p:selectBooleanButton id="allAgence" value="#{etatProductionApporteurController.allAgence}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px">
+                                        <p:ajax   update =":form1,:form1:allAgence"  listener="#{etatProductionApporteurController.chargeApporteurByIntermediaireForPeriode()}"/>
+                                    </p:selectBooleanButton>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  legend="#{msg['branche']}"  styleClass="fieldset" class="fieldset"  id="fbranche"   >
+                                <p:panelGrid  id="gridBranche" columns="8" layout="grid"  columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"  >
+                                    <h:outputLabel  value="#{msg['choix']}" rendered="#{etatProductionApporteurController.allBranche==false and etatProductionApporteurController.personnaliser_branche==false}" />
+                                    <p:selectCheckboxMenu  id="branche" value="#{etatProductionApporteurController.listeBranchesSelectect}" label="#{msg['branche']}" multiple="true"
+                                                           filter="true" filterMatchMode="startsWith" panelStyle="width:250px" rendered="#{etatProductionApporteurController.allBranche==false and etatProductionApporteurController.personnaliser_branche==false}" >
+                                        <p:ajax event="itemUnselect" listener="#{etatProductionApporteurController.onItemUnselect}"  update="form1:gridBranche,form1:gridCat"/>
+                                        <f:ajax  listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" render="form1:gridCat" />
+
+<!--                                         <p:ajax  event="toggleSelect" listener="#{etatProductionApporteurController.onSelect}" update=":form1:msg"/>
+   <p:ajax event="itemUnselect" listener="#{utilisateurController.onUnselect}" update=":form1:msg"/>-->
+                                        <f:selectItems value="#{etatProductionApporteurController.listeBranches}" var="br" itemLabel="#{br.code} - #{formatDateController.valueObject(br.libelle,br)}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="#{msg['all.branche']}"  />
+                                    <p:selectBooleanButton id="allbranche" value="#{etatProductionApporteurController.allBranche}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px">
+                                        <p:ajax update="form1:gridBranche" listener="#{etatProductionApporteurController.controlleAllBranche()}"  />
+                                    </p:selectBooleanButton>
+                                    <h:outputText value="#{msg['personnaliser.choix.branche']}" />
+                                    <p:selectBooleanButton id="perso_Branche" value="#{etatProductionApporteurController.personnaliser_branche}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px" >
+                                        <p:ajax event="change" update="form1:gridBranche,form1:gridCat" listener="#{etatProductionApporteurController.controllePersonnalistionBranche()}" />
+                                    </p:selectBooleanButton>
+<!--                                    <p:outputLabel value="#{msg['branche.de']}" rendered="#{etatProductionApporteurController.personnaliser_branche==true}" />
+                                    <p:autoComplete id="branche_debut" value="#{etatProductionApporteurController.brancheDebut.code}"  completeMethod="#{etatProductionApporteurController.completeTextBranche}"  rendered="#{etatProductionApporteurController.personnaliser_branche==true}" >
+                                        <p:ajax  update="form1:branche_debut,form1:gridCat" listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" />
+                                    </p:autoComplete>-->
+                                    <p:outputLabel value="#{msg['branche.de']}"  rendered="#{etatProductionApporteurController.personnaliser_branche==true}"/>
+                                    <p:autoComplete  id="branche_debut" value="#{etatProductionApporteurController.brancheDebut.code}" completeMethod="#{etatProductionApporteurController.completeTextBranche}" rendered="#{etatProductionApporteurController.personnaliser_branche==true}" >
+                                        <p:ajax  event="blur"  update="form1:gridCat" listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" />
+                                        <!--<p:ajax   update="form1,form1:branche_fin" listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" />-->
+                                    </p:autoComplete>
+                                    <p:outputLabel value="#{msg['branche.a']}"  rendered="#{etatProductionApporteurController.personnaliser_branche==true}"/>
+                                  <p:autoComplete  id="branche_fin" value="#{etatProductionApporteurController.brancheFin.code}" completeMethod="#{etatProductionApporteurController.completeTextBranche}" rendered="#{etatProductionApporteurController.personnaliser_branche==true}" >
+                                           <p:ajax  event="blur"  update="form1:gridCat" listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" />
+                                 
+     <!--<p:ajax   update="form1,form1:branche_fin" listener="#{etatProductionApporteurController.chargeCategoriesBySelecteBranche()}" />-->
+                                    </p:autoComplete>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset  legend="#{msg['apporteur']}"  styleClass="fieldset" class="fieldset"  id="finfos"   >
+                                <p:panelGrid  id="gridApp" columns="8" layout="grid"  columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"  >
+                                    <h:outputLabel  value="#{msg['choix']}" rendered="#{etatProductionApporteurController.allApporteur==false and etatProductionApporteurController.personnaliser_apporteur==false}"/>
+                                    <p:selectCheckboxMenu   id="apporteur" value="#{etatProductionApporteurController.listeApporteurSecte}" label="#{msg['apporteur']}" multiple="true"
+                                                            filter="true" filterMatchMode="startsWith" panelStyle="width:250px" rendered="#{etatProductionApporteurController.allApporteur==false and etatProductionApporteurController.personnaliser_apporteur==false}" >
+                                        <!--<p:ajax event="itemUnselect" listener="#{etatProductionApporteurController.onItemUnselect}" />-->
+                                        <!--<p:ajax event="change" update= ":form1" />-->
+                                        <f:selectItems value="#{etatProductionApporteurController.listeApporteur}" var="app" itemLabel="#{app.idRefApporteur.code} - #{app.idRefApporteur.raisonSociale}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="#{msg['all.apporteur']}"  />
+                                    <p:selectBooleanButton id="allApporteur" value="#{etatProductionApporteurController.allApporteur}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px">
+                                        <p:ajax update="form1:gridApp" listener="#{etatProductionApporteurController.controlleAllApporteur()}"  />
+                                    </p:selectBooleanButton>
+                                    <h:outputText value="#{msg['personnaliser.choix.apporteur']}" />
+                                    <p:selectBooleanButton id="perso_apporteur" value="#{etatProductionApporteurController.personnaliser_apporteur}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px" >
+                                        <p:ajax update="form1:gridApp" listener="#{etatProductionApporteurController.controllePersonnalistionApporteur()}" />
+                                    </p:selectBooleanButton>
+                                    <p:outputLabel value="#{msg['apporteur.de']}" rendered="#{etatProductionApporteurController.personnaliser_apporteur==true}" />
+                                    <p:autoComplete id="apport_debut" value="#{etatProductionApporteurController.apporteurDebut.idRefApporteur.code}"  completeMethod="#{etatProductionApporteurController.completeText}"  rendered="#{etatProductionApporteurController.personnaliser_apporteur==true}" >
+                                        <p:ajax event="select" update="form1:gridApp" />
+                                        <f:ajax event="select" render="form1:apport_debut" />
+                                    </p:autoComplete>
+
+                                    <p:outputLabel value="#{msg['apporteur.a']}"  rendered="#{etatProductionApporteurController.personnaliser_apporteur==true}"/>
+                                    <p:autoComplete id="apport_fin" value="#{etatProductionApporteurController.apporteurFin.idRefApporteur.code}" completeMethod="#{etatProductionApporteurController.completeText}" rendered="#{etatProductionApporteurController.personnaliser_apporteur==true}" >
+                                        <p:ajax event="select" update="form1:gridApp" />
+                                        <f:ajax event="select" render="form1:apport_fin" />
+                                    </p:autoComplete>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset  legend="#{msg['categorie']}"  styleClass="fieldset" class="fieldset"  id="fcategories"   >
+                                <p:panelGrid   columns="8" layout="grid" id="gridCat" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"  >
+                                    <h:outputLabel  value="#{msg['choix']}" rendered="#{etatProductionApporteurController.allCategories==false and etatProductionApporteurController.personnaliser_categories==false}"/>
+                                    <p:selectCheckboxMenu id="categories" value="#{etatProductionApporteurController.listeCategoriesSecte}" label="#{msg['categorie']}" multiple="true"
+                                                          filter="true" filterMatchMode="startsWith" panelStyle="width:250px" rendered="#{etatProductionApporteurController.allCategories==false and etatProductionApporteurController.personnaliser_categories==false}" >
+                                        <p:ajax event="itemUnselect" listener="#{etatProductionApporteurController.onItemUnselect}" />
+                                        <f:selectItems value="#{etatProductionApporteurController.listeCategories}" var="c" itemLabel="#{c.code} - #{formatDateController.valueObject(c.libelle,c)}" />
+                                    </p:selectCheckboxMenu>
+                                    <h:outputText value="#{msg['all.categories']}"  />
+                                    <p:selectBooleanButton id="allCategories" value="#{etatProductionApporteurController.allCategories}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px">
+                                        <p:ajax update=":form1:gridCat" listener="#{etatProductionApporteurController.controlleAllCategorie()}"  />
+                                    </p:selectBooleanButton>
+                                    <h:outputText value="#{msg['personnaliser.choix.categorie']}" />
+                                    <p:selectBooleanButton id="perso_categorie" value="#{etatProductionApporteurController.personnaliser_categories}" onLabel="Yes" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:60px" >
+                                        <p:ajax update="form1:gridCat" listener="#{etatProductionApporteurController.controllePersonnalistionCategorie()}" />
+                                    </p:selectBooleanButton>
+                                    <p:outputLabel value="#{msg['categorie.de']}" rendered="#{etatProductionApporteurController.personnaliser_categories==true}" />
+                                    <p:autoComplete id="categorie_debut" value="#{etatProductionApporteurController.categoriesDebut.code}"  completeMethod="#{etatProductionApporteurController.completeTextCategorie}"  rendered="#{etatProductionApporteurController.personnaliser_categories==true}"/>
+                                    <p:outputLabel value="#{msg['categorie.a']}"  rendered="#{etatProductionApporteurController.personnaliser_categories==true}"/>
+                                    <p:autoComplete id="categorie_fin" value="#{etatProductionApporteurController.categoriesFin.code}" completeMethod="#{etatProductionApporteurController.completeTextCategorie}" rendered="#{etatProductionApporteurController.personnaliser_categories==true}" />
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:panelGrid   columns="8" layout="grid"  columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"  >
+                                <h:outputLabel  value="#{msg['type.actes']}"/>
+                                <p:selectOneMenu id="typeActes" value="#{etatProductionApporteurController.typeActe}" label="#{msg['select']}" 
+                                                 filter="true" filterMatchMode="startsWith" panelStyle="width:250px"  >
+                               <!--<p:ajax event="itemUnselect" listener="#{etatProductionApporteurController.onItemUnselect}" />-->
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{etatProductionApporteurController.typeActes}" />
+                                </p:selectOneMenu>
+                                <h:outputLabel  value="#{msg['type.quittance']}"/>
+                                <p:selectOneMenu id="typetypeQuitance" value="#{etatProductionApporteurController.typeQuittance}" label="#{msg['select']}" 
+                                                 filter="true" filterMatchMode="startsWith" panelStyle="width:250px"  >
+                               <!--<p:ajax event="itemUnselect" listener="#{etatProductionApporteurController.onItemUnselect}" />-->
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{etatProductionApporteurController.typeQuittances}" />
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+
+                        </p:fieldset>
+                        <br/>
+                        <center>  
+                            <p:commandButton value="#{msg['telecharger']}" action="#{etatProductionApporteurController.selecteQuittanceByPeriodeFormatExcell()}"  update=":form1" icon="pi pi-file-excel" styleClass="secondary-button" ajax="false"/>
+                            <p:spacer width="10"/>
+                            <p:commandButton value="#{msg['bouton.imprimer']}" id="print"  action="#{etatProductionApporteurController.selecteQuittanceByPeriodeFormatPdf()}"  icon="pi pi-print" styleClass="success-button" ajax="false" onclick=" target = '_blank';
+                                    return true;" />
+                            <p:spacer width="10"/>
+                            <p:commandButton value="#{msg['bouton.rafraichir']}" action="#{etatProductionApporteurController.reload()}" icon="pi pi-refresh" styleClass="warning-button" />
+
+<!--                            <p:splitButton id="basic" value="#{msg['bouton.imprimer']}"   >
+                                <p:menuitem value="#{msg['telecharger']}" action="#{etatProductionApporteurController.selecteQuittanceByPeriodeFormatExcell()}" update=":form1" icon="pi pi-file-excel" />
+
+                                <p:separator />
+                                <p:menuitem value="#{msg['bouton.rafraichir']}" action="#{etatProductionApporteurController.reload()}" icon="pi pi-refresh" />
+                            </p:splitButton> -->
+
+                        </center>
+
+                    </h:form>
+                    <h:form id="form2">
+
+                        <p:dialog header="#{msg['type.etat']}"  showEffect="fade" modal="true" widgetVar="detail_etat" responsive="true" closable="false">
+                            <!--                            <center>
+                                                            <h:outputText value="#{msg['intermediaire']}" />
+                                                            <p:spacer width="10"/>
+                                                            <p:selectOneMenu value="#{productionController.intermediairesSelect}" 
+                                                                             converter="#{genericConverter}" id="agence"   var="in" filter="true" filterMatchMode="contains" style="width: 300px" >
+                                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                                <f:selectItems value="#{productionController.listeIntermediaires}" var="i" itemLabel=" #{i.idRefIntermediaire.code} - #{i.idRefIntermediaire.raisonSociale} "   itemValue="#{rb}"/>
+                            
+                                                                <p:column>
+                            #{in.idRefIntermediaire.code} #{in.idRefIntermediaire.raisonSociale}
+                        </p:column>
+                        <f:ajax event="change"  render="agence" listener="#{productionController.chargerPrestionByRubrique()}"  />
+                    </p:selectOneMenu> 
+                </center>-->
+                            <h3 style="margin-top:0">#{msg['select']}</h3>
+                            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                <p:outputLabel for="detail_etat" value="#{msg['select']} :" />
+                                <p:selectOneRadio id="detail_etat" value="#{etatProductionApporteurController.typeEtat}"  >
+                                    <f:selectItems value="#{etatProductionApporteurController.typeEtats}" />
+                                </p:selectOneRadio>
+                            </h:panelGrid>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{etatProductionApporteurController.valideChoixTypeEtat()}"  update=":form1"  />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

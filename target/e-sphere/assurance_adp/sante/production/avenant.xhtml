@@ -1,0 +1,2075 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/sante/production/avenant">#{msg['avenant']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+
+                <div class="card">
+                    <h:form id="form11">
+                        <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                         styleClass="secondary-button" style="margin-right: .5rem"       actionListener="#{avenantController.reload()}" />
+                        <p:commandButton value="#{msg['liste.contrat']}" icon="pi pi-sliders-h"  onclick="PF('managePoliceDialog').show()" 
+                                         styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  />
+                        <p:commandButton  value="#{msg['modifier.contrat']}" icon="pi pi-pencil"  styleClass="second-button" onclick="PF('manageConfirmeDialog').show()" rendered="#{avenantController.police.id!=null and avenantController.police.validation==false }"  process="@this"  />
+                        <p:spacer width="10"/>
+
+
+                    </h:form>
+
+                    <h:form id="form1">
+
+
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"  escape="false"/>   
+                        <p:panel header="#{msg['sante']} / #{msg['avenant']}/ #{msg['numero.police']} : #{avenantController.numero_police} / #{avenantController.intermediaires.idRefIntermediaire.code} #{avenantController.intermediaires.idRefIntermediaire.raisonSociale} / #{avenantController.policeSelect.idCategories.code} #{formatDateController.valueObject(avenantController.policeSelect.idCategories.libelle,avenantController.policeSelect.idCategories)} / #{msg['avenant.numero']} : #{avenantController.numeroAvenant}"  >
+                            <p:panelGrid   columns="8" layout="grid" >
+
+<!--                                <p:outputLabel  value="#{msg['numero.police']}" rendered="#{avenantController.categories.idCategorie!=null}"  /> 
+                                <p:outputLabel  value=""  rendered="#{avenantController.categories.idCategorie!=null}"  styleClass="#{avenantController.police.validation==false ? 'red':'old'}"   />  
+                                -->
+                                <p:outputLabel  value="#{msg['Ref']}"   rendered="#{avenantController.categories.idCategorie!=null}" />
+                                <p:inputText id="ref"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.police.ref_intermediaire}"  style="text-transform: uppercase; " rendered="#{avenantController.categories.idCategorie!=null}" disabled="#{avenantController.PAUreference==false  or avenantController.PAUreference==null}"  >
+                                    <f:ajax event="blur" render="ref"/>
+                                </p:inputText>
+                                <p:outputLabel  value="#{msg['numero.bordereau']} "  rendered="#{avenantController.categories.idCategorie!=null}" />
+                                <p:inputText id="bordereau"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.police.numero_Borderau}"  rendered="#{avenantController.categories.idCategorie!=null}"  disabled="#{avenantController.PAunumero_bordereau==false  or avenantController.PAunumero_bordereau==null}" >
+                                    <f:ajax event="blur" render="bordereau"/>
+                                </p:inputText>   
+                                <p:outputLabel  value="#{msg['typeAvenant']}"  />
+
+
+                                <p:selectOneMenu value="#{avenantController.typeAvenant}" 
+                                                 converter="#{genericConverter}" id="typeAvenant" validator="requiredValidator" required="true" var="c" filter="true" filterMatchMode="contains"   >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{avenantController.listeTypeAvenant}" var="av" itemLabel="#{av.idRefAvenant.libelle}" itemValue="#{av}"/>
+
+                                    <p:column>
+                                        #{c.idRefAvenant.libelle} 
+                                    </p:column>
+                                    <p:ajax event="change"  listener="#{avenantController.chargeTypeAvenantByChois()}" update=":form1,:form1:tabprincipal,form11" oncomplete="PF('accordP').select(0);" />
+                                </p:selectOneMenu> 
+
+
+
+
+                            </p:panelGrid>
+
+                        </p:panel>
+                        <p:tabView  id="tabprincipal" widgetVar="accordP"    >
+                            <p:ajax event="tabChange" listener="#{avenantController.onTabChange}" update=":form1:msg,:form1:tabprincipal"/>
+                            <p:tab title="#{msg['police']}">
+                                <p:tabView  id="tabsecond" widgetVar="accordPSecond">
+                                    <p:ajax event="tabChange" listener="#{avenantController.onTabChange}" update=":form1:msg,form1:tabprincipal:tabsecond"/>
+                                    <p:tab title="#{msg['souscripteur']}" id="souscripteur">
+                                        <p:panelGrid   columns="6" layout="flex"    >
+                                            <p:outputLabel  value="#{msg['code']}" rendered="#{avenantController.police.id!=null}" /> 
+                                            <p:outputLabel  value="#{avenantController.assure.code}" rendered="#{avenantController.police.id!=null}" />  
+                                            <p:outputLabel  value="#{msg['qualite']}"  />
+                                            <p:selectOneMenu value="#{avenantController.assure.idQualite}"  disabled="#{avenantController.PSqualite==false or avenantController.PSqualite==null}"
+                                                             converter="#{genericConverter}" id="qualite" validator="requiredValidator" required="true" var="q" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{avenantController.listQualite}" var="ql" itemLabel="#{ql.libelle}" itemValue="#{ql}"/>
+
+                                                <p:column>
+                                                    #{q.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="qualite" />
+                                            </p:selectOneMenu>  
+
+                                            <p:outputLabel  value="#{msg['nom']}" rendered="#{avenantController.tabShowGroup==false}" />
+<!--                                            <p:inputText id="nom"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.nom}" rendered="#{avenantController.tabShowGroup==false}"  autocomplete="on"  >
+                                                <f:ajax event="blur" render="nom"/>
+                                            </p:inputText>  -->
+                                            <p:autoComplete id="nom" value="#{avenantController.assure.nom}" completeMethod="#{avenantController.completeText}" rendered="#{avenantController.tabShowGroup==false}"  disabled="#{avenantController.PSnom==false or avenantController.PSnom==null}" >
+                                                <f:ajax event="blur" render="nom"/>
+                                                <p:ajax event="itemSelect" listener="#{avenantController.onItemSelect}"  />
+                                            </p:autoComplete>
+                                            <p:outputLabel  value="#{msg['raison.social']}" rendered="#{avenantController.tabShowGroup==true}" />
+                                            <p:autoComplete id="raisonSociale" value="#{avenantController.assure.raison_social}" completeMethod="#{avenantController.completeText}" rendered="#{avenantController.tabShowGroup==true}" disabled="#{avenantController.PSraison==false or avenantController.PSraison==null}">
+                                                <f:ajax event="blur" render="raisonSociale"/>
+                                                <p:ajax event="itemSelect" listener="#{avenantController.onItemSelect}" update=":form1:tabprincipal" />
+                                            </p:autoComplete>
+
+<!--                                            <p:inputText id="raisonSociale"  placeholder="#{msg['raison.social']}"  value="#{avenantController.assure.raison_social}"  rendered="#{avenantController.tabShowGroup==true}" autocomplete="on" >
+    <f:ajax event="blur" render="raisonSociale"/>
+</p:inputText>  -->
+                                            <p:outputLabel  value="#{msg['prenom']}" rendered="#{avenantController.tabShowGroup==false}" />
+                                            <p:inputText id="prenom"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.prenom}"  rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.PSprenom==false or avenantController.PSprenom==null}">
+                                                <f:ajax event="blur" render="prenom"/>
+                                            </p:inputText>  
+                                            <h:outputLabel value="#{msg['personne.ativite']}:" style="float: right" />
+                                            <p:selectOneMenu value="#{avenantController.assure.idActivite}" disabled="#{avenantController.PSactivite==false or avenantController.PSactivite==null}"
+                                                             converter="#{genericConverter}" id="activite" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" style="width: 200px" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{avenantController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act}"/>
+
+                                                <p:column>
+                                                    #{a.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="activite" />
+                                            </p:selectOneMenu> 
+
+<!--                                        <p:outputLabel  value="#{msg['prenom']}"  />
+                                        <p:inputText id="prenom"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.prenom}"   >
+                                            <f:ajax event="blur" render="prenom"/>
+                                        </p:inputText>  -->
+                                            <p:outputLabel  value="#{msg['personne.datenaissance']}" rendered="#{avenantController.tabShowGroup==false}" />
+<!--                                            <p:datePicker id="datenaissance" value="#{avenantController.assure.date_naissance}" rendered="#{avenantController.tabShowGroup==false}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true" pattern="dd/MM/yyyy"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:datenaissance" />
+                                                  <f:ajax event="dateSelect"  render="datenaissance" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{avenantController.assure.date_naissance}"  mode="popup"   showOn="both"  id="datenaissance" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.PSdate_naissance==false or avenantController.PSdate_naissance==null}" >
+                                                <f:ajax event="dateSelect"  render="datenaissance" />
+                                            </p:calendar>
+                                            <p:outputLabel  value="#{msg['datecreation']}" rendered="#{avenantController.tabShowGroup==true}" />
+<!--                                            <p:datePicker id="dateCreer"  rendered="#{avenantController.tabShowGroup==true}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateCreer" />
+
+                                            </p:datePicker>-->
+
+                                            <p:calendar value="#{avenantController.assure.dateCreation}"  mode="popup"   showOn="both"  id="dateCreer" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{avenantController.tabShowGroup==true}"  disabled="#{avenantController.PSdate_creation==false or avenantController.PSdate_creation==null}">
+                                                <f:ajax event="dateSelect"  render="dateCreer" />
+                                            </p:calendar>
+                                            <p:outputLabel  value="#{msg['personne.sexe']}" rendered="#{avenantController.tabShowGroup==false}" />
+                                            <p:selectOneMenu  converter="#{genericConverter}" id="sexe" value="#{avenantController.assure.sexe}"  rendered="#{avenantController.tabShowGroup==false}"  disabled="#{avenantController.PSsexe==false or avenantController.PSsexe==null}">
+                                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                <f:selectItems  value="#{avenantController.sexe}"  />
+                                                <f:ajax event="change" render="sexe" />
+                                            </p:selectOneMenu>
+
+                                            <p:outputLabel  value="#{msg['personne.lieunaissance']}" rendered="#{avenantController.tabShowGroup==false}" />
+                                            <p:inputText id="lieu"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.lieu_naissance}" rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.PSlieu_naissance==false or avenantController.PSlieu_naissance==null}" >
+                                                <f:ajax event="blur" render="lieu"/>
+                                            </p:inputText>  
+                                            <p:outputLabel  value="#{msg['adresse.bp']}"  />
+                                            <p:inputText id="bp"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.adresse.bp}" disabled="#{avenantController.PSbp==false or avenantController.PSbp==null}"  >
+                                                <f:ajax event="blur" render="bp"/>
+                                            </p:inputText> 
+                                            <p:outputLabel  value="#{msg['patente.nume']}" rendered="#{avenantController.tabShowGroup==true}" />
+                                            <p:inputText id="pantente"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.patente}" rendered="#{avenantController.tabShowGroup==true}" disabled="#{avenantController.PSnumero_pantent==false or avenantController.PSnumero_pantent==null}"  >
+                                                <f:ajax event="blur" render="pantente"/>
+                                            </p:inputText> 
+                                            <p:outputLabel  value="#{msg['adresse.ville']}"  />
+
+                                            <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{avenantController.assure.idVille}"  var="vi" filter="true" filterMatchMode="contains"  disabled="#{avenantController.PSville==false or avenantController.PSville==null}"  >
+                                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                <f:selectItems  value="#{avenantController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                                <f:ajax event="change" render="ville" />
+                                                <p:column>
+                                                    #{vi.code} #{vi.libelle}
+                                                </p:column>
+                                            </p:selectOneMenu>
+                                            <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" />
+                                            <h:panelGroup>
+                                                <h:selectOneMenu  converter="#{genericConverter}" id="indicatif"  value="#{avenantController.assure.adresse.indicatifPays}" disabled="#{avenantController.PStelephone==false or avenantController.PStelephone==null}">
+                                                    <f:selectItems  value="#{avenantController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind.indicatif}" />
+                                                    <f:ajax event="change" render="indicatif" />
+                                                </h:selectOneMenu>
+                                                <p:inputText id="telephone"  title="telephone" value="#{avenantController.assure.adresse.tel}" size="20" validator="requiredValidator"  disabled="#{avenantController.PStelephone==false or avenantController.PStelephone==null}">
+                                                    <f:ajax event="blur" render="telephone"/>
+                                                </p:inputText>
+                                            </h:panelGroup>
+                                            <h:outputLabel value="#{msg['adresse.email']}:" for="email" />
+                                            <p:inputText id="email"  title="#{msg['adresse.email']}" value="#{avenantController.assure.adresse.email}" validatorMessage="#{msg['email.message']}" required="true" disabled="#{avenantController.PSemail==false or avenantController.PSemail==null}">
+                                                <f:ajax event="blur" render="email"/>
+                                            </p:inputText>
+                                            <h:outputLabel value="#{msg['personne.profession']}:" rendered="#{avenantController.tabShowGroup==false}"/>
+                                            <p:selectOneMenu value="#{avenantController.assure.idProfession}" rendered="#{avenantController.tabShowGroup==false}" style="width: 200px"  disabled="#{avenantController.PSprofession==false or avenantController.PSprofession==null}"
+                                                             converter="#{genericConverter}" id="profession" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{avenantController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf}"/>
+
+                                                <p:column>
+                                                    #{p.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="profession" />
+                                            </p:selectOneMenu> 
+
+                                            <p:outputLabel   rendered="#{avenantController.tabShowGroup==false}" />
+                                            <h:panelGroup rendered="#{avenantController.tabShowGroup==false}">
+                                                <p:outputLabel  value="#{msg['personne.type.piece']}" rendered="#{avenantController.tabShowGroup==false}" />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="typePiece" value="#{avenantController.assure.typePieces}" rendered="#{avenantController.tabShowGroup==false}"   disabled="#{avenantController.PStype_pieces==false or avenantController.PStype_pieces==null}" >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{avenantController.typePiece}"  />
+                                                    <f:ajax event="change" render="typePiece" />
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+
+                                            <p:outputLabel  value="#{msg['personne.numero.piece']}" rendered="#{avenantController.tabShowGroup==false}" />
+                                            <p:inputText id="numero_piece"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.numero_piece}"  rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.PSnumero_piece==false or avenantController.PSnumero_piece==null}">
+                                                <f:ajax event="blur" render="bp"/>
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{msg['datedebut']}" rendered="#{avenantController.tabShowGroup==false}" />
+<!--                                            <p:datePicker id="dateeffet" value="#{avenantController.police.date_effet}" rendered="#{avenantController.tabShowGroup==false}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateeffet" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{avenantController.police.date_effet}"    mode="popup"   showOn="both"  id="dateeffet" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.PSdate_effet==false or avenantController.PSdate_effet==null}" >
+                                                <f:ajax event="dateSelect"  render="dateeffet" />
+                                                <p:ajax event="dateSelect"  listener="#{avenantController.chargeDateEcheance()}" update=":form1:tabprincipal" />
+                                            </p:calendar>
+                                            <p:outputLabel  rendered="#{avenantController.tabShowGroup==true}"  />
+                                            <h:panelGroup rendered="#{avenantController.tabShowGroup==true}">
+                                                <p:outputLabel  value="#{msg['datedebut']}"  />
+<!--                                                <p:datePicker id="dateeffet2" value="#{avenantController.police.date_effet}" 
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              >
+                                                    <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateeffet2" />
+
+                                                </p:datePicker>-->
+                                                <p:calendar value="#{avenantController.police.date_effet}"    mode="popup"   showOn="both"  id="dateeffet2" pattern="dd/MM/yyyy"  validator="requiredValidator" disabled="#{avenantController.PSdate_effet==false or avenantController.PSdate_effet==null}" >
+                                                    <f:ajax event="dateSelect"  render="dateeffet2" />
+                                                    <p:ajax event="dateSelect"  listener="#{avenantController.chargeDateEcheance()}" update=":form1:tabprincipal" />
+                                                </p:calendar>
+                                            </h:panelGroup>
+                                            <p:outputLabel  value="#{msg['dateEch']}"  />
+<!--                                            <p:datePicker id="dateecheance" value="#{avenantController.police.date_echeance}" 
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateecheance" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{avenantController.police.date_echeance}"     mode="popup"   showOn="both"  id="dateecheance" pattern="dd/MM/yyyy"  validator="requiredValidator" disabled="#{avenantController.PSdate_echeance==false or avenantController.PSdate_echeance==null}" >
+                                                <f:ajax event="dateSelect"  render="dateecheance" />
+                                            </p:calendar>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="#{msg['autre.infos']}" id="couverture" >
+                                        <p:fieldset  legend="#{msg['couverture']}"  styleClass="fieldset" class="fieldset"   >
+                                            <p:panelGrid   columns="10" layout="flex"   >
+                                                <p:outputLabel  value="#{msg['contract']}" />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="contrat" value="#{avenantController.police.contrat}"  style=" width: 100px" validator="requiredValidator" required="true" disabled="#{avenantController.PAUcontrat==false or avenantController.PAUcontrat==null}" >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{avenantController.contrats}"  />
+                                                    <f:ajax event="change" render="contrat" />
+                                                </p:selectOneMenu>
+
+                                                <p:outputLabel  value="#{msg['nature']}" />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="nature_contrat" value="#{avenantController.police.natureContrat}"  validator="requiredValidator" required="true" disabled="#{avenantController.PAUnature==false or avenantController.PAUnature==null}">
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{avenantController.natureContrats}"  />
+                                                    <f:ajax event="change" render="nature_contrat" />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['duree']}" />
+
+                                                <p:selectOneMenu value="#{avenantController.duree}" 
+                                                                 converter="#{genericConverter}" id="duree" validator="requiredValidator" required="true" var="dd" filter="true" filterMatchMode="contains"  disabled="#{avenantController.PAUduree==false or avenantController.PAUduree==null}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{avenantController.listeDurees}" var="m" itemLabel="#{m.libelle}" itemValue="#{m}"/>
+
+                                                    <p:column>
+                                                        #{dd.libelle}
+                                                    </p:column>
+                                                    <p:ajax event="change"  update=":form1:tabprincipal:tabsecond" listener="#{avenantController.chargeMajoratioDureeByDuree()}" />
+                                                </p:selectOneMenu> 
+
+                                                <h:outputLabel value="#{msg['valeur']}" />
+                                                <p:inputText id="valeurDuree"   value="#{avenantController.police.valeurDuree}"  validator="requiredValidator" required="true"  style="width: 50px" disabled="#{avenantController.PAUvaleur_duree==false or avenantController.PAUvaleur_duree==null}">
+                                                    <f:ajax event="blur" render="valeurDuree"/>
+                                                </p:inputText>
+
+                                                <h:outputLabel value="#{msg['fractionnement']}" />
+                                                <p:selectOneMenu value="#{avenantController.fractionnement}" disabled="#{avenantController.PAUfractionnement==false or avenantController.PAUfractionnement==null}"
+                                                                 converter="#{genericConverter}" id="fractionnement"  var="fr" filter="true" filterMatchMode="contains"  >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{avenantController.listeFractionnement}" var="f" itemLabel="#{f.libelle}" itemValue="#{f}"/>
+
+                                                    <p:column>
+                                                        #{fr.libelle}
+                                                    </p:column>
+                                                    <p:ajax event="change"  update=":form1:tabprincipal:tabsecond" listener="#{avenantController.chargeFractionnementCategoriesByFractionnement()}" />
+                                                </p:selectOneMenu> 
+                                            </p:panelGrid>
+
+
+
+
+                                        </p:fieldset>
+
+                                        <!--<p:toolbarGroup >-->
+                                        <p:fieldset  legend="#{msg['tarif.reduction.commission']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="8" layout="flex"  >
+
+                                                <!--<h:panelGroup >-->
+                                                <h:outputLabel value="#{msg['type.tarif']}" />
+                                                <p:selectOneMenu value="#{avenantController.police.idTypeTarif}" 
+                                                                 converter="#{genericConverter}" id="tarif" validator="requiredValidator" required="true"  disabled="#{avenantController.PAUtype_tarif==false or avenantController.PAUtype_tarif==null}" >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{avenantController.listeTarif}" var="t" itemLabel="#{t.libelle}" itemValue="#{t}"/>
+
+
+                                                    <f:ajax event="change"  render=":form1:tabprincipal:tabsecond:tarif"  />
+                                                </p:selectOneMenu> 
+                                                <!--</h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+
+                                                <h:outputLabel value="#{msg['reduction']}:"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="reduction"  value="#{avenantController.police.idReduction}" disabled="#{avenantController.PAUreduction==false or avenantController.PAUreduction==null}" >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <!--<f:selectItems  value="#{avenantController.listeReduction}" var="r" itemLabel="#{r.libelle}" itemValue="#{r}" />-->
+                                                       <f:selectItems  value="#{avenantController.listeReduction}" var="r" itemLabel="#{r.idRefReduction.code} #{r.idRefReduction.libelle}" itemValue="#{r}" />
+                                                
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:reduction"  />
+                                                </p:selectOneMenu>
+
+                                                <!--</h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+                                                <h:outputLabel value="#{msg['taux.appor']}"  rendered="false" />
+
+
+                                                <p:inputNumber  value="#{avenantController.policeCommissionApporteur.taux_apport}"    decimalPlaces="2" emptyValue="#{null}"   style="width: 50px; float: left; " id="tauxApport"   rendered="false"  >
+                                                    <f:ajax event="blur" render="tauxApport"/>
+                                                </p:inputNumber>
+
+                                                <!--</h:panelGroup>-->
+                                                <!--<h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+
+
+                                                <h:outputLabel value="#{msg['taux.gestion']}"   rendered="false" />
+
+                                                <p:inputNumber  value="#{avenantController.policeCommissionApporteur.taux_gestion}"    decimalPlaces="2" emptyValue="#{null}"   style="width: 50px; float: left; " id="tauxGestion"   rendered="false"  >
+                                                    <f:ajax event="blur" render="tauxGestion"/>
+                                                </p:inputNumber>  
+                                                <!--</h:panelGroup>-->
+
+
+                                                <!--</h:panelGroup>-->
+                                                <!--<h:panelGroup>-->
+                                                <h:outputLabel value="#{msg['apporteur']}" />
+                                                <p:selectOneMenu value="#{avenantController.apporteur}" 
+                                                                 converter="#{genericConverter}" id="apporteur"   var="app" filter="true" filterMatchMode="contains"  disabled="#{avenantController.police.id!=null}"  >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{avenantController.listeApporteur}" var="ap" itemLabel="#{ap.idRefApporteur.code} #{ap.idRefApporteur.raisonSociale}" itemValue="#{ap}"/>
+
+                                                    <p:column>
+                                                        #{app.idRefApporteur.code} #{app.idRefApporteur.raisonSociale}
+                                                    </p:column>
+                                                    <f:ajax event="change"  render=":form1:tabprincipal:tabsecond:apporteur"    />
+                                                </p:selectOneMenu>    
+                                                <!--</h:panelGroup>-->
+
+
+
+                                            </p:panelGrid>
+                                        </p:fieldset>
+
+                                        <!--</p:toolbarGroup>-->
+                                        <p:fieldset  legend="#{msg['devise.convention']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="12" layout="grid" >
+                                                <h:outputLabel value="#{msg['devise']}"  />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="devise"  value="#{avenantController.police.idDevise}" disabled="#{avenantController.PAUdevise==false or avenantController.PAUdevise==null}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{avenantController.listeDevise}" var="d" itemLabel="#{d.code}" itemValue="#{d}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:devise"  />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['cours']}"  />
+
+
+                                                <p:inputNumber  value="#{avenantController.police.coursDevise}"    decimalPlaces="2" emptyValue="#{1}"   style="width: 50px; float: left; " id="cours"  disabled="#{avenantController.PAUmodifier==false or avenantController.PAUmodifier==null}" >
+                                                    <f:ajax event="blur" render="cours"/>
+                                                </p:inputNumber>
+
+                                                <h:outputLabel value="#{msg['cours.applique']}"  />
+
+
+                                                <p:inputNumber value="#{avenantController.police.coursDeviseApplique}"   decimalPlaces="2" emptyValue="#{1}"   style="width: 50px; float: left; " id="coursapplique"  disabled="#{avenantController.PAUmodifier==false or avenantController.PAUmodifier==null}" >
+                                                    <f:ajax event="blur" render="coursapplique"/>
+                                                </p:inputNumber>
+
+                                                <p:outputLabel  value="#{msg['datedebut']}"  />
+                                                <p:datePicker id="dateecoursDevise" value="#{avenantController.police.date_cours_devise}" disabled="#{avenantController.PAUmodifier==false or avenantController.PAUmodifier==null}"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              >
+                                                    <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateecoursDevise" />
+
+                                                </p:datePicker>
+
+
+                                                <!--<h:panelGroup>-->
+                                                <p:spacer width="5"/>
+                                                <h:outputLabel value="#{msg['convention']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="convention"  value="#{avenantController.police.idConvention}" disabled="#{avenantController.PAUconvention==false or avenantController.PAUconvention==null}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{avenantController.listeConvention}" var="c" itemLabel="#{c.libelle}" itemValue="#{c}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:convention"  />
+                                                </p:selectOneMenu>
+                                                <!--</h:panelGroup>-->
+
+
+                                            </p:panelGrid>
+                                        </p:fieldset>
+                                        <p:fieldset  legend="#{msg['timbre.exoneration']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="10" layout="grid" >
+                                                <h:outputLabel value="#{msg['timbre.dimension']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="timbreDimension"  value="#{avenantController.police.idTimbreDimension}" disabled="#{avenantController.PAUtimbre_dimension==false or avenantController.PAUtimbre_dimension==null}" >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{avenantController.listeTimbreDimension}" var="td" itemLabel="#{td.libelle}" itemValue="#{td}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:timbreDimension"  />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['nombre']}"  />
+
+                                                <p:inputText id="nombre"   value="#{avenantController.police.nombre_timbre}"  style="float: left;width: 50px" disabled="#{avenantController.PAUtimbre_dimension==false or avenantController.PAUtimbre_dimension==null}" >
+                                                    <f:ajax event="blur" render="nombre"/>
+                                                </p:inputText>
+                                                <h:outputLabel value="#{msg['valeur']}"  />
+                                                <p:inputNumber value="#{avenantController.police.valeur_timbre}"   decimalPlaces="2" emptyValue="#{0}"   style=" float: left; width: 50px" id="valeur"  disabled="#{avenantController.PAUtimbre_dimension==false or avenantController.PAUtimbre_dimension==null}" >
+                                                    <f:ajax event="blur" render="valeur"/>
+                                                </p:inputNumber>
+                                                <h:outputLabel value="#{msg['exoneration']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="exoneration"  value="#{avenantController.police.idExoneration}" disabled="#{avenantController.PAUexoneration==false or avenantController.PAUexoneration==null}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{avenantController.listeExoneration}" var="ex" itemLabel="#{ex.libelle}" itemValue="#{ex}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:exoneration"  />
+                                                </p:selectOneMenu>    
+                                                <h:outputLabel value="#{msg['accessoir']}"  />
+                                                <p:inputNumber value="#{avenantController.police.montantaccessoir}"   decimalPlaces="3" emptyValue="#{0}"   style="width: 50px; float: left; " id="accessoir"  disabled="#{avenantController.PAUaccessoires==false or avenantController.PAUaccessoires==null}" >
+                                                    <f:ajax event="blur" render="accessoir"/>
+                                                </p:inputNumber>
+                                            </p:panelGrid>
+                                        </p:fieldset>
+
+
+
+                                    </p:tab>
+
+                                </p:tabView>
+
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['groupe']}" rendered="#{avenantController.tabShowGroup}" id="groupe">
+                                <p:panelGrid   columns="8" layout="flex"   >
+                                    <p:outputLabel  value="#{msg['group']}"  />
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="refGroup" value="#{avenantController.refGroupeSelect}"    >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{avenantController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                        <f:ajax event="change" render="refGroup"  />
+                                        <p:ajax event="change"  listener="#{avenantController.chargeContratByGrouselected()}"  update=":form1:tabprincipal" />
+                                    </p:selectOneMenu>
+                                    <p:commandButton  icon="pi pi-plus" onclick="PF('dlgGroup').show()" disabled="#{avenantController.GROAjouter==false or avenantController.GROAjouter==null}"/>
+
+                                    <p:commandButton value="#{msg['charger.file']}"  onclick="PF('fichier').show()"  />
+
+
+
+                                </p:panelGrid>
+
+
+
+
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['Adherent']}" rendered="#{avenantController.tabShowGroup}" id="adherent">
+                                <!--                                <p:panelGrid   columns="8" layout="flex"   >
+                                                                    <p:outputLabel  value="#{msg['group']}"  />
+                                                                    <p:selectOneMenu  converter="#{genericConverter}" id="refGroupSelect" value="#{avenantController.refGroupeSelectForAdherent}"    >
+                                                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                                        <f:selectItems  value="#{avenantController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{avenantController.chargeRisqueByImageRisque()}"/>
+                                                                    </p:selectOneMenu>
+                                
+                                                                    <p:outputLabel  value="#{msg['Adherent']}"  />
+                                                                    <p:selectOneMenu  converter="#{genericConverter}" id="imageRisqueSelect" value="#{avenantController.imageRisqueSelecte}"  rendered="#{avenantController.police.id==null}" >  >
+                                                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                                        <f:selectItems  value="#{avenantController.listeImageRisques}"  var="ad"  itemLabel="#{ad.libelle}" itemValue="#{ad}" />
+                                                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{avenantController.chargeImageRisqueFamilleByImageRisque()}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:selectOneMenu  converter="#{genericConverter}" id="risqueSelect" value="#{avenantController.risque}"   rendered="#{avenantController.police.id!=null}" >
+                                                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                                        <f:selectItems  value="#{avenantController.listeRisque}"  var="ad"  itemLabel="#{ad.libelle}" itemValue="#{ad}" />
+                                                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{avenantController.chargeImageRisqueFamilleByImageRisque()}"/>
+                                                                    </p:selectOneMenu>
+                                                                </p:panelGrid>-->
+
+
+                                <p:dataTable var="ir" value="#{avenantController.listeRisque}"  widgetVar="RisqueTable" 
+                                             scrollable="true" rowIndexVar="index"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idRisqueTable"    rendered="#{avenantController.police.id!=null}"
+
+                                             >
+
+
+                                    <f:facet name="header">
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{ avenantController.ADAjouter==true}"   actionListener="#{avenantController.chrgaLigneForAddRisque}"  >
+
+                                        </p:commandButton>
+
+                                    </f:facet> 
+                                    <p:column rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{ir.id==null and avenantController.ADAjouter==true}"   actionListener="#{avenantController.addRisque(index)}"  >
+<!--                                            <f:setPropertyActionListener value="#{ir}" target="#{avenantController.risque}"   />
+                                            <f:ajax event="click" listener="#{avenantController.showDetailRisque(ir)}" />-->
+                                        </p:commandButton>
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{ir.id!=null and  avenantController.ADmodifier==true}"    actionListener="#{avenantController.updateLigneForRisque(index)}"  >
+<!--                                            <f:setPropertyActionListener value="#{ir}" target="#{avenantController.risque}"   />
+                                            <f:ajax event="click" listener="#{avenantController.showDetailRisque(ir)}" />-->
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem" rendered="#{ir.id!=null and ir.idGroup.id!=null and avenantController.ADsupprimer==true}"     actionListener="#{avenantController.removeLigneForRisque(index)}"   >
+<!--                                            <f:setPropertyActionListener value="#{ir}" target="#{avenantController.imageRisque}"  />
+                                            <f:ajax event="click" listener="#{avenantController.showDetailImageRisque(ir)}" />-->
+                                        </p:commandButton>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg['group']}" rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <!--<p:outputLabel     value="#{ir.idGroup.libelle}" rendered="#{ir.id!=null}"   >-->
+
+                                        <!--</p:outputLabel>-->
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="groupeAvenant" value="#{ir.idGroup}"  disabled="#{avenantController.ADgroup==false and ir.idGroup!=null}" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                            <f:ajax event="change" render="groupeAvenant"  />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.matricule']}"  rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <!--<p:outputLabel    value="#{ir.matricule}" rendered="#{ir.id!=null}"   />-->
+                                        <p:inputText id="matricule"  placeholder="  #{msg['personne.matricule']}"   value="#{ir.matricule}" disabled="#{(avenantController.ADMatricule==false  or avenantController.ADMatricule==null)  and ir.id!=null}"  >
+                                            <f:ajax event="blur"   render="matricule" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nomcomplet']}"  rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <!--<p:outputLabel    value="#{ir.libelle}" rendered="#{ir.id!=null}"   />-->
+                                        <p:inputText id="nomComplet"  placeholder="  #{msg['nomcomplet']}"   value="#{ir.libelle}"  disabled="#{avenantController.ADmembre==false and ir.id!=null}"  >
+                                            <f:ajax event="blur"   render="nomComplet" />
+                                        </p:inputText>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <!--<p:outputLabel    value="#{formatDateController.formatDate(ir.dateNaissance)}" rendered="#{ir.id!=null}"   />-->
+                                        <p:calendar value="#{ir.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy" disabled="#{avenantController.ADdate_naissance==false and ir.id!=null}"   >
+                                            <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.sexe']}"  rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}">
+                                        <!--<p:outputLabel    value="#{formatDateController.valueObject(ir.sexe)}" rendered="#{ir.id!=null}"   />-->
+                                        <p:selectOneMenu value="#{ir.sexe}" style=" float: left; "  disabled="#{avenantController.ADsexe==false and ir.id!=null}" 
+                                                         converter="#{genericConverter}" id="sexePersonne"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.sexe}"  />
+
+                                            <f:ajax event="change"  render="sexePersonne"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+                                    <p:column headerText="#{msg['famille']}"  rendered="#{ir.retire_de_la_police==false or ir.retire_de_la_police==null}" >
+                                        <p:commandLink id="list" action="#{avenantController.chargeFamilleRisqueByRisque(ir,index)}" style="margin-left:20px; color: #01579B" oncomplete="PF('familleRisqueDialog').show()"   >
+                                            <h:outputText value="#{msg['afficher_liste']}" />
+                                            <f:setPropertyActionListener value="#{ir}" target="#{avenantController.risque}"   />
+                                        </p:commandLink> 
+                                    </p:column>
+
+
+                                </p:dataTable>
+
+
+
+
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['assuree']}" rendered="#{avenantController.tabShowIndividuel}" id="assurer">
+                                <p:fieldset  legend="#{msg['indentification']}"  styleClass="fieldset" class="fieldset"  >
+                                    <p:panelGrid   columns="6" layout="grid"  >
+
+                                        <p:outputLabel  value="#{msg['numero.ordre']}"  rendered="#{avenantController.police.id!=null}"/>
+                                        <p:inputText id="numero"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.id }"  disabled="true" style="width: 75px"  rendered="#{avenantController.police.id!=null}">
+                                            <f:ajax event="blur" render="numero"/>
+                                        </p:inputText> 
+
+                                        <p:outputLabel  value="#{msg['nom']}"  />
+                                        <p:inputText id="libelle"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.libelle}"  disabled="#{avenantController.ASSnom==false or avenantController.ASSnom==null}" >
+                                            <f:ajax event="blur" render="libelle"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.datenaissance']}"  />
+    <!--                                    <p:datePicker id="datenaissanceRisque" value="#{avenantController.risque.dateNaissance}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:datenaissanceRisque" />
+    
+                                        </p:datePicker>-->
+                                        <p:calendar value="#{avenantController.risque.dateNaissance}"   mode="popup"   showOn="both"  id="datenaissanceRisque" pattern="dd/MM/yyyy"  validator="requiredValidator" disabled="#{avenantController.ASSdate_naissance==false or avenantController.ASSdate_naissance==null}" >
+                                            <f:ajax event="dateSelect"  render="datenaissanceRisque" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['personne.lieunaissance']}"  />
+                                        <p:inputText id="lieuRisque"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.lieu_naissance}"   disabled="#{avenantController.ASSlieu_naissance==false}">
+                                            <f:ajax event="blur" render="lieuRisque"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.sexe']}" />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRisque" value="#{avenantController.risque.sexe}"  rendered="#{avenantController.tabShowGroup==false}" disabled="#{avenantController.ASSsexe==false or avenantController.ASSsexe==null}" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRisque" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['adresse.bp']}"  />
+                                        <p:inputText id="rbp"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.adresse.bp}"  disabled="#{avenantController.ASSbp==false or avenantController.ASSbp==null}" >
+                                            <f:ajax event="blur" render="rbp"/>
+                                        </p:inputText> 
+                                        <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" />
+                                        <h:panelGroup>
+                                            <h:selectOneMenu  converter="#{genericConverter}" id="indicatifRisque"  value="#{avenantController.risque.adresse.indicatifPays}">
+                                                <f:selectItems  value="#{avenantController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind.indicatif}" />
+                                                <f:ajax event="change" render="indicatifRisque" />
+                                            </h:selectOneMenu>
+                                            <p:inputText id="telephoneRisque"  title="telephone" value="#{avenantController.risque.adresse.tel}" size="20" validator="requiredValidator" disabled="#{avenantController.ASStelephone==false or avenantController.ASStelephone==null}" >
+                                                <f:ajax event="blur" render="telephoneRisque"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                        <h:outputLabel value="#{msg['adresse.ville']}:" for="telephone" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="villeRisque" value="#{avenantController.risque.idVille}"  var="vi" filter="true" filterMatchMode="contains" disabled="#{avenantController.ASSville==false or avenantController.ASSville==null}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                            <f:ajax event="change" render="villeRisque" />
+                                            <p:column>
+                                                #{vi.code} #{vi.libelle}
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+
+                                        <h:outputLabel value="#{msg['adresse.email']}:" for="email" />
+                                        <p:inputText id="emailRisque"  title="#{msg['adresse.email']}" value="#{avenantController.risque.adresse.email}" validatorMessage="#{msg['email.message']}"  required="true" disabled="#{avenantController.ASSemail==false or  venantController.ASSemail==null }" >
+                                            <f:ajax event="blur" render="email"/>
+                                        </p:inputText>
+    <!--                                    <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:selectOneMenu value="#{avenantController.risque.libelleProfession}" 
+                                                         converter="#{genericConverter}" id="professionRisque" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf.libelle}"/>
+    
+                                            <p:column>
+                                        #{p.libelle} 
+                                    </p:column>
+                                    <f:ajax event="change"  render="professionRisque" />
+                                </p:selectOneMenu> -->
+                                        <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:inputText id="professionRisque"   value="#{avenantController.risque.libelleProfession}" disabled="#{avenantController.ASSprofession==false or avenantController.ASSprofession==null}" >
+                                            <f:ajax event="blur"  render="professionRisque" />
+                                        </p:inputText>
+                                        <!--<p:spacer width="10"/>-->
+                                        <h:outputLabel value="#{msg['personne.ativite']}:" />
+    <!--                                    <p:selectOneMenu value="#{avenantController.risque.libelleActivite}" 
+                                                         converter="#{genericConverter}" id="activiteRisque" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act.libelle}"/>
+    
+                                            <p:column>
+                                        #{a.libelle} 
+                                    </p:column>
+                                
+                                </p:selectOneMenu>-->
+                                        <p:inputText id="activiteRisque"   value="#{avenantController.risque.libelleActivite}"  disabled="#{avenantController.ASSactivite==false or avenantController.ASSactivite==null}">
+                                            <f:ajax event="blur"  render="activiteRisque" />
+                                        </p:inputText>
+                                        <!--<p:outputLabel    />-->
+                                        <!--<h:panelGroup >-->
+                                        <p:outputLabel  value="#{msg['personne.type.piece']}"  />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="typePiece2" value="#{avenantController.assure.typePieces}" disabled="#{avenantController.ASStype_pieces==false or avenantController.ASStype_pieces==null}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.typePiece}"  />
+                                            <f:ajax event="change" render="typePiece2" />
+                                        </p:selectOneMenu>
+                                        <!--</h:panelGroup>-->
+
+                                        <p:outputLabel  value="#{msg['personne.numero.piece']}"  />
+                                        <p:inputText id="numero_piece2"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.numero_piece}" disabled="#{avenantController.ASSnumero_piece==false or avenantController.ASSnumero_piece==null}" >
+                                            <f:ajax event="blur" render="numero_piece2"/>
+                                        </p:inputText>
+                                        <p:outputLabel  value="#{msg['entre.le']}"  />
+    <!--                                    <p:datePicker id="dateEntree" value="#{avenantController.risque.dateEntree}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:dateEntree" />
+    
+                                        </p:datePicker>-->
+
+                                        <p:calendar value="#{avenantController.risque.dateEntree}"   mode="popup"   showOn="both"  id="dateEntree" pattern="dd/MM/yyyy"  validator="requiredValidator"  disabled="#{avenantController.ASSdateEntre==false or avenantController.ASSdateEntre==null}">
+                                            <f:ajax event="dateSelect"  render="dateEntree" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['sortie.le']}"  />
+
+
+<!--                                    <p:datePicker id="dateSortie" value="#{avenantController.risque.dateSortie}" 
+                                                  monthNavigator="true"
+                                                  yearNavigator="true"
+                                                  >
+                                        <p:ajax event="dateSelect" update="form1:tabprincipal:dateSortie" />
+
+                                    </p:datePicker>-->
+                                        <p:calendar value="#{avenantController.risque.dateSortie}"    mode="popup"   showOn="both"  id="dateSortie" pattern="dd/MM/yyyy"   disabled="#{avenantController.ASSnom==false or avenantController.ASSnom==null}" >
+                                            <f:ajax event="dateSelect"  render="dateEntree" />
+                                        </p:calendar>
+
+<!--                                        <p:outputLabel  value="#{msg['mode.calcul']}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="nature" value="#{avenantController.risque.modeCalcul}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.modeCalcul}"  />
+                                            <f:ajax event="change" render="nature" />
+                                        </p:selectOneMenu>-->
+
+                                    </p:panelGrid>
+
+                                </p:fieldset>
+
+                            </p:tab> 
+                            <p:tab title="#{msg['famille']}" rendered="#{avenantController.tabShowFamille}" id="famille" >
+                                <p:fieldset  legend="#{msg['indentification']}"  styleClass="fieldset" class="fieldset"   >
+                                    <p:panelGrid   columns="16" layout="flex" >
+                                        <h:panelGroup  >
+                                            <!--<p:outputLabel  value="#{msg['numero.ordre']}" rendered="#{avenantController.police.id!=null}" />-->
+                                            <p:outputLabel id="numerof"    value="#{avenantController.risque.id }"    style="width: 50px" rendered="#{avenantController.police.id!=null}"/>
+                                            <!--                                                <f:ajax event="blur" render="numerof"/>
+                                                                                        </p:inputText> -->
+                                        </h:panelGroup>
+
+
+                                        <p:outputLabel  value="#{msg['nomcomplet']}"  />
+                                        <p:inputText id="libellef"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.libelle}"  disabled="#{avenantController.ASSnom==false or avenantController.ASSnom==null}"   >
+                                            <f:ajax event="blur" render="libellef"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.datenaissance']}" rendered="#{false}" />
+    <!--                                    <p:datePicker id="datenaissanceRisque" value="#{avenantController.risque.dateNaissance}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:datenaissanceRisque" />
+    
+                                        </p:datePicker>-->
+                                        <p:calendar value="#{avenantController.risque.dateNaissance}"   mode="popup"   showOn="both"  id="datenaissanceRisquef" pattern="dd/MM/yyyy"  validator="requiredValidator"  rendered="#{false}" >
+                                            <f:ajax event="dateSelect"  render="datenaissanceRisquef" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['personne.lieunaissance']}" rendered="#{false}"  />
+                                        <p:inputText id="lieuRisquef"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.lieu_naissance}"  rendered="#{false}" >
+                                            <f:ajax event="blur" render="lieuRisquef"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.sexe']}" rendered="#{false}" />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRisquef" value="#{avenantController.risque.sexe}"   rendered="#{false}" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRisquef" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['adresse.bp']}"  rendered="#{false}" />
+                                        <p:inputText id="rbpf"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.risque.adresse.bp}" rendered="#{false}" >
+                                            <f:ajax event="blur" render="rbpf"/>
+                                        </p:inputText> 
+                                        <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" rendered="#{false}" />
+                                        <h:panelGroup rendered="#{false}" >
+                                            <h:selectOneMenu  converter="#{genericConverter}" id="indicatifRisquef"  value="#{avenantController.risque.adresse.indicatifPays}">
+                                                <f:selectItems  value="#{avenantController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind}" />
+                                                <f:ajax event="change" render="indicatifRisquef" />
+                                            </h:selectOneMenu>
+                                            <p:inputText id="telephoneRisquef"  title="telephone" value="#{avenantController.risque.adresse.tel}" size="20" validator="requiredValidator" >
+                                                <f:ajax event="blur" render="telephoneRisquef"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                        <h:outputLabel value="#{msg['adresse.ville']}:" for="telephone" rendered="#{false}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="villeRisquef" value="#{avenantController.risque.idVille}"  var="vi" filter="true" filterMatchMode="contains" rendered="#{false}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                            <f:ajax event="change" render="villeRisquef" />
+                                            <p:column>
+                                                #{vi.code} #{vi.libelle}
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+
+                                        <h:outputLabel value="#{msg['adresse.email']}:" for="email" rendered="#{false}" />
+                                        <p:inputText id="emailRisquef"  title="#{msg['adresse.email']}" value="#{avenantController.risque.adresse.email}" rendered="#{false}" >
+                                            <f:ajax event="blur" render="emailf"/>
+                                        </p:inputText>
+    <!--                                    <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:selectOneMenu value="#{avenantController.risque.libelleProfession}" 
+                                                         converter="#{genericConverter}" id="professionRisque" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf.libelle}"/>
+    
+                                            <p:column>
+                                        #{p.libelle} 
+                                    </p:column>
+                                    <f:ajax event="change"  render="professionRisque" />
+                                </p:selectOneMenu> -->
+
+     <!--<h:outputLabel value="#{msg['personne.profession']}:"  />-->
+                                        <h:outputLabel value="#{msg['personne.profession']}" rendered="#{false}"  />
+                                        <p:inputText id="professionRisquef"   value="#{avenantController.risque.libelleProfession}" rendered="#{false}" >
+                                            <f:ajax event="blur"  render="professionRisquef" />
+                                        </p:inputText>
+                                        <!--<p:spacer width="10"/>-->
+                                        <h:outputLabel value="#{msg['personne.ativite']}:" rendered="#{false}" />
+    <!--                                    <p:selectOneMenu value="#{avenantController.risque.libelleActivite}" 
+                                                         converter="#{genericConverter}" id="activiteRisque" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act.libelle}"/>
+    
+                                            <p:column>
+                                        #{a.libelle} 
+                                    </p:column>
+                                
+                                </p:selectOneMenu>-->
+                                        <p:inputText id="activiteRisquef"   value="#{avenantController.risque.libelleActivite}" rendered="#{false}" >
+                                            <f:ajax event="blur"  render="activiteRisquef" />
+                                        </p:inputText>
+                                        <!--<p:outputLabel    />-->
+                                        <!--<h:panelGroup >-->
+    <!--                                    <p:outputLabel  value="#{msg['personne.type.piece']}"  />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="typePiece2" value="#{avenantController.assure.typePieces}"    >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.typePiece}"  />
+                                            <f:ajax event="change" render="typePiece2" />
+                                        </p:selectOneMenu>
+                                        </h:panelGroup>
+    
+                                        <p:outputLabel  value="#{msg['personne.numero.piece']}"  />
+                                        <p:inputText id="numero_piece2"  placeholder="#{msg['SAISIR']}"  value="#{avenantController.assure.numero_piece}"  >
+                                            <f:ajax event="blur" render="numero_piece2"/>
+                                        </p:inputText>-->
+                                        <p:outputLabel  value="#{msg['entre.le']}"  />
+    <!--                                    <p:datePicker id="dateEntree" value="#{avenantController.risque.dateEntree}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:dateEntree" />
+    
+                                        </p:datePicker>-->
+
+                                        <p:calendar value="#{avenantController.risque.dateEntree}"   mode="popup"   showOn="both"  id="dateEntreef" pattern="dd/MM/yyyy"  validator="requiredValidator" disabled="#{avenantController.ASSdateEntre=false or avenantController.ASSdateEntre==null}" >
+                                            <f:ajax event="dateSelect"  render="dateEntreef" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['sortie.le']}" rendered="false" />
+
+
+<!--                                    <p:datePicker id="dateSortie" value="#{avenantController.risque.dateSortie}" 
+                                                  monthNavigator="true"
+                                                  yearNavigator="true"
+                                                  >
+                                        <p:ajax event="dateSelect" update="form1:tabprincipal:dateSortie" />
+
+                                    </p:datePicker>-->
+                                        <p:calendar value="#{avenantController.risque.dateSortie}"    mode="popup"   showOn="both"  id="dateSortief" pattern="dd/MM/yyyy"   rendered="false"  >
+                                            <f:ajax event="dateSelect"  render="dateEntreef" />
+                                        </p:calendar>
+                                        <br />
+                                        <p:outputLabel  value="#{msg['mode.calcul']}" rendered="false"/>
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="naturef" value="#{avenantController.risque.modeCalcul}" disabled="#{avenantController.police.police!=null and avenantController.police.police.intValue()!=0}" rendered="false">
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.modeCalcul}"  />
+                                            <f:ajax event="change" render="naturef" />
+                                        </p:selectOneMenu>
+
+
+                                    </p:panelGrid>
+
+
+                                </p:fieldset>
+
+                                <p:dataTable var="rf" value="#{avenantController.listeRisqueFamille}"  widgetVar="risqueFamilleTable" 
+                                             scrollable="true"  paginator="true" rows="50"  paginatorAlwaysVisible="true" rowsPerPageTemplate="50,100,500,1000"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idrisqueFamilleTable" rowIndexVar="index"
+
+                                             >
+
+                                    <!--                                    <f:facet name="header">
+                                                                            <center>
+                                                                                <p:commandButton      styleClass="success-button"   icon="pi pi-plus"  actionListener="#{avenantController.ajoutteLigneForListeRisFamily()}"  update="form1:tabprincipal:idrisqueFamilleTable" ajax="false" />
+                                    
+                                                                            </center>
+                                                                        </f:facet> -->
+
+
+                                    <p:column headerText="#{msg['numero.ordre']}"  style="width: 50px" rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}">
+                                        <p:commandButton  icon="pi pi-trash"  styleClass="danger-button" style="margin-right: .5rem"  actionListener="#{avenantController.removeLigneForFamilleRisque(index)}"    rendered="#{rf.idPolice.id!=null}" disabled="#{avenantController.FAMsupprimer==false or avenantController.FAMsupprimer==null}"/>
+                                 
+                                        <p:outputLabel value="#{rf.id}"    style=" float: left; " id="num"  rendered="#{rf.idPolice.id!=null}"  />
+                                        <!--                                            <f:ajax event="blur"   render="num" />
+                                                                                </p:inputNumber>-->
+                                        <p:commandButton  icon="pi pi-plus" actionListener="#{avenantController.addLigneByRisqueFamille()}"    rendered="#{rf.idPolice.id==null}" disabled="#{avenantController.FAMAjouter==false or avenantController.FAMAjouter==null}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nomcomplet']}" rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}" >
+                                        <p:inputText id="nom"    value="#{rf.nom_membre}"  disabled="#{(avenantController.FAMmembre==false or avenantController.FAMmembre==null) and rf.id!=null}"  >
+                                            <f:ajax event="blur"   render="nom"  listener="#{avenantController.editNameForMemberFamille(rf)}" />
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['lien.parente']} " rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}"  >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="lienParante" value="#{rf.lienParente}"   disabled="#{(avenantController.FAMlien_parente==false or avenantController.FAMlien_parente==null) and rf.id!=null}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.leinParente}"  />
+                                            <f:ajax event="change" render="lienParante" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.sexe']} " rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}" >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRF" value="#{rf.sexe}"  disabled="#{(avenantController.FAMsexe==false or avenantController.FAMsexe==null)and rf.id!=null}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRF" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: " rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}" >
+                                        <p:calendar value="#{rf.dateNaissance}" mode="popup"   showOn="both"  id="naissanceRf" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="naissanceRf"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['entre.le']}: " rendered="#{rf.retire_de_la_police==false or rf.retire_de_la_police==null}" >
+                                        <p:calendar value="#{rf.dateEntree}" mode="popup"   showOn="both"  id="entreRF" pattern="dd/MM/yyyy" disabled="#{(avenantController.FAMdateEntre==false or avenantController.FAMdateEntre==null)and rf.id!=null}"  >
+                                            <f:ajax event="dateSelect"  render="entreRF"/>
+                                        </p:calendar>
+                                    </p:column>
+<!--                                    <p:column headerText="#{msg['sortie.le']}: "  >
+                                        <p:calendar value="#{rf.dateSortie}" mode="popup"   showOn="both"  id="sortieRF" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="sortieRF"/>
+                                        </p:calendar>
+                                    </p:column>-->
+
+
+                                </p:dataTable>
+                            </p:tab> 
+
+                            <p:tab title="#{msg['prestation']}"   id="prestation">
+                                <p:fieldset  legend="#{msg['plafond_maladie']}"  styleClass="fieldset" class="fieldset"  >
+                                    <p:panelGrid   columns="10" layout="grid" >
+                                        <h:outputLabel value="#{msg['plafond.Maladie']}" />
+                                        <p:selectOneMenu value="#{avenantController.plafondMaladie}" 
+                                                         converter="#{genericConverter}" id="plafondMadie"   var="pr" filter="true" filterMatchMode="contains" style="width: 300px" disabled="#{avenantController.PREplafond_maladie==false or avenantController.PREplafond_maladie==null}" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listePlafondMaladie}" var="pm" itemLabel="#{formatDateController.valueObject(pm.domaine_application)} - #{pm.montant} - #{pm.nombre_Acte} - #{formatDateController.valueObject(pm.modeControle)}"   itemValue="#{pm}"/>
+
+                                            <p:column>
+                                                #{formatDateController.valueObject(pr.domaine_application)} - #{pr.montant} - #{pr.nombre_Acte} - #{formatDateController.valueObject(pr.modeControle)}
+                                            </p:column>
+                                            <f:ajax event="change"  render=":form1:tabprincipal:plafondMadie,:form1:taprincipal"  listener="#{avenantController.chargePolicePalafond()}" />
+                                        </p:selectOneMenu> 
+
+                                        <h:outputLabel value="#{msg['designation']}"  />
+
+                                        <p:inputText id="designationPlafondMaladie"   value="#{avenantController.police.designationPlafonMaladie}"   style="width: 300px"  disabled="#{avenantController.PREdesignation==false or avenantController.PREdesignation==null}" >
+                                            <f:ajax event="blur" render="designationPlafondMaladie"/>
+                                        </p:inputText>
+
+                                    </p:panelGrid>
+                                </p:fieldset>
+
+                                <p:fieldset  legend="#{msg['rubrique/prestation']}"  styleClass="fieldset" class="fieldset"  >
+                                    <h:panelGroup>
+                                        <h:outputLabel value="#{msg['rubrique']}" />
+                                        <p:spacer width="10"/>
+                                        <p:selectOneMenu value="#{avenantController.rubriqueCategorie}" 
+                                                         converter="#{genericConverter}" id="rubrique"   var="rc" filter="true" filterMatchMode="contains" style="width: 300px" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{avenantController.listeRubriqueCategorie}" var="rb" itemLabel=" #{rb.idRubrique.code} - #{rb.idRubrique.libelle} "   itemValue="#{rb}"/>
+
+                                            <p:column>
+                                                #{rc.idRubrique.code} #{rc.idRubrique.libelle}
+                                            </p:column>
+                                            <f:ajax event="change"  render=":form1:tabprincipal:rubrique,:form1:taprincipal" listener="#{avenantController.chargerPrestionByRubrique()}"  />
+                                        </p:selectOneMenu> 
+
+                                    </h:panelGroup>
+                                    <!--                                    <p:panelGrid   columns="2" layout="grid" >
+                                                                            
+                                                                        </p:panelGrid>-->
+                                    <p:dataTable var="dpm" value="#{avenantController.listeDetailPolicePlafond}"  widgetVar="dpmTable"  paginator="true" rows="100"  paginatorAlwaysVisible="true" rowsPerPageTemplate="50,100,500,1000"
+                                                 filteredValue="#{avenantController.filterDetailPolicePlafond}"    scrollable="true"  rowIndexVar="index" rowStyleClass="#{dpm.retire_de_la_police==true ? red:old}"
+
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="iddpmgTable" 
+
+                                                 >
+
+<!--                                        <f:facet name="header">
+                                            <p:outputPanel>
+                                                <h:outputText value="#{msg['recherche']} : "/>
+
+                                                <p:inputText id="globalFilter"
+                                                             onkeyup="PF('dpmTable').filter()"
+                                                             style="width:150px" placeholder="Search text..."  > 
+
+                                                </p:inputText>  
+
+
+                                            </p:outputPanel>
+
+                                        </f:facet> -->
+                                        <p:column rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"  rendered="#{avenantController.PREsupprimer==true and dpm.id!=null}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"       actionListener="#{avenantController.removeLigneForDetailPolicePlafond(index)}"  >
+                                                <f:setPropertyActionListener value="#{dpm}" target="#{avenantController.detailPolicePlafond}"   />
+                                            </p:commandButton>
+
+                                        </p:column>
+                                        <p:column headerText="#{msg['rubrique']}"  sortBy="#{dpm.idRubrique.code}" filterBy="#{dpm.idRubrique.code}" width="50"  rendered="#{avenantController.PREAjouter==true and (dpm.retire_de_la_police==false or dpm.retire_de_la_police==null)}">
+                                          #{index}
+                                            <p:inputText id="codeRB"     value="#{dpm.idRubrique.code}"  disabled="true"   >
+                                                <p:ajax event="keyup"  oncomplete="PF('managePrestationDialog').show()"   update=":form2" />
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['code']}"  sortBy="#{dpm.idPrestation.code}" filterBy="#{dpm.idPrestation.code}" width="50" rendered="#{avenantController.PREAjouter==true and (dpm.retire_de_la_police==false or dpm.retire_de_la_police==null)}" >
+                                            <p:inputText id="code"     value="#{dpm.idPrestation.code}"  disabled="#{dpm.id!=null}"   >
+                                                <p:ajax event="keyup"  oncomplete="PF('managePrestationDialog').show()"   />
+                                            </p:inputText>
+                                        </p:column>
+                                        <p:spacer width="50"/>
+                                        <p:column headerText="#{msg['prestation']}: " width="250"   rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}">
+                                            <p:inputText id="libelle"     value="#{dpm.idPrestation.libelle}"  style="width:250px" disabled="#{true}" >
+                                                <p:ajax event="blur"   rendered="libelle" />
+                                            </p:inputText>
+                                        </p:column>
+
+
+                                        <p:column headerText="#{msg['taux']} "   rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:inputNumber  value="#{dpm.taux}"    decimalPlaces="2" emptyValue="#{0}"   id="tauxdpm" disabled="#{(avenantController.PREprestation_taux==false or avenantController.PREprestation_taux==null) and dpm.id!=null}" >
+                                                <f:ajax event="blur"   render="tauxdpm" listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}" />
+                                            </p:inputNumber>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['type']}"  rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:selectOneMenu value="#{dpm.typeDetailMaladie}" style=" float: left; " disabled="#{(avenantController.PREprestation_type==false or avenantController.PREprestation_type==null) and dpm.id!=null}"
+                                                             converter="#{genericConverter}"  >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" id="typePrestation" />
+                                                <f:selectItems value="#{avenantController.typeDetailPlafondMaladie}" />
+                                                <f:ajax event="change"  render="typePrestation" listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}"  />
+
+                                            </p:selectOneMenu>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['mode.calcul']}"  rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:selectOneMenu value="#{dpm.modeCalculDetailMaladie}" style=" float: left; "  disabled="#{(avenantController.PREprestation_modecal==false or avenantController.PREprestation_modecal==null) and dpm.id!=null}"
+                                                             converter="#{genericConverter}" id="calculprestation" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{avenantController.modeCalculDetailPlafondMaladie}" />
+
+                                                <f:ajax event="change"  render="calculprestation"  listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['forfait']} "  rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:inputNumber  value="#{dpm.forfait}"    decimalPlaces="0" emptyValue="#{0}"   id="forfaitdpm" disabled="#{(avenantController.PREprestation_forfait==false or avenantController.PREprestation_forfait==null) and dpm.id!=null}" >
+                                                <f:ajax event="blur"   render="forfaitdpm" listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}" />
+                                            </p:inputNumber>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['plafond.Maladie']} "  rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:inputNumber  value="#{dpm.plafond}"    decimalPlaces="0" emptyValue="#{0}"   id="plafondpm" disabled="#{(avenantController.PREprestation_plafon==false or avenantController.PREprestation_plafon==null)  and dpm.id!=null}" >
+                                                <f:ajax event="blur"   render="plafondpm" listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}" />
+                                            </p:inputNumber>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['barem']} "  rendered="#{dpm.retire_de_la_police==false or dpm.retire_de_la_police==null}" >
+                                            <p:inputNumber  value="#{dpm.barem}"    decimalPlaces="0" emptyValue="#{0}"   id="baremdpm" disabled="#{(avenantController.PREprestation_bareme==false or avenantController.PREprestation_bareme==null)  and dpm.id!=null }" >  
+                                                <f:ajax event="blur"   render="baremdpm" listener="#{avenantController.updateLigneForDetailPolicePlafond(index)}" />
+                                            </p:inputNumber>
+                                        </p:column>
+
+
+                                    </p:dataTable>
+                                </p:fieldset>
+                            </p:tab> 
+                            <p:tab title="#{msg['caracteristique']}"  id="caracteristique"  >
+                                <p:fieldset    styleClass="fieldset"   >
+                                    <p:dataTable var="caract" value="#{avenantController.listePoliceCaracteristique}"  widgetVar="pTable"  paginator="true" rows="50"  paginatorAlwaysVisible="true" rowsPerPageTemplate="5,10,15,50,100,500,1000"
+                                                 filteredValue="#{avenantController.filterPoliceCaracteristique}"    scrollable="true" rowIndexVar="index"
+
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="idpTable"
+
+                                                 >
+
+                                        <f:facet name="header">
+                                            <!--                                            <p:outputPanel>
+                                                                                            <h:outputText value="#{msg['recherche']} : "/>
+                                            
+                                                                                            <p:inputText id="globalFilter"
+                                                                                                         onkeyup="PF('pTable').filter()"
+                                                                                                         style="width:150px" placeholder="Search text..."  > 
+                                            
+                                                                                            </p:inputText>  
+                                            
+                                            
+                                                                                        </p:outputPanel>-->
+
+                                        </f:facet> 
+                                        <p:column rendered="#{caract.retire_de_la_police==false or caract.retire_de_la_police==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" rendered="#{avenantController.CARsupprimer==true and caract.id!=null}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"      actionListener="#{avenantController.removeLigneForCaracterisquePolice(index)}"  >
+                                                <!--<f:setPropertyActionListener value="#{dpm}" target="#{avenantController.detailPolicePlafond}"   />-->
+                                            </p:commandButton>
+
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['caracteristique']}"    rendered="#{caract.retire_de_la_police==false or caract.retire_de_la_police==null}" >
+                                            <p:inputText id="libelle"     value="#{caract.valeurCode}"   style="width:250px" rendered="#{caract.idCaracteristiques.id==null}" >
+                                                <p:ajax event="keyup"  oncomplete="PF('manageCaracteristiqueDialog').show()"   />
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{caract.idCaracteristiques.libelle}" rendered="#{caract.idCaracteristiques.id!=null}" />
+
+                                        </p:column>
+                                        <p:spacer width="50"/>
+                                        <p:column headerText="#{msg['designation']}: "   rendered="#{caract.retire_de_la_police==false or caract.retire_de_la_police==null}"  >
+                                            <p:inputText id="valeurTest"     value="#{caract.valeurTexte}"  rendered="#{avenantController.checkValeurTYpeCaracterisitique(1, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}" >
+                                                <p:ajax event="blur"   rendered="libelle" />
+                                            </p:inputText>
+                                            <p:inputNumber  value="#{caract.valeurNumerique}"    decimalPlaces="2" emptyValue="#{0}"   id="valeur" rendered="#{avenantController.checkValeurTYpeCaracterisitique(2, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}" >
+                                                <f:ajax event="blur"   render="valeur"/>
+                                            </p:inputNumber>
+                                            <p:inputNumber  value="#{caract.valeurNumerique}"    decimalPlaces="2" emptyValue="#{0}"   id="valeurEntier" rendered="#{avenantController.checkValeurTYpeCaracterisitique(5, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}">
+                                                <f:ajax event="blur"   render="valeurEntier"/>
+                                            </p:inputNumber>
+
+                                            <p:selectOneMenu value="#{caract.valeurCode}" style=" float: left; " id="liste"
+                                                             converter="#{genericConverter}"  rendered="#{avenantController.checkValeurTYpeCaracterisitique(3, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{avenantController.listeElement_Liste_Caracteristique}" var="list"  itemLabel="#{list.libelle}" itemValue="#{list.libelle}"/>
+                                                <f:ajax event="change"   render="liste"/>
+
+                                            </p:selectOneMenu>
+                                            <p:calendar value="#{caract.dateValeur}" mode="popup"   showOn="both"  id="date" pattern="dd/MM/yyyy" rendered="#{avenantController.checkValeurTYpeCaracterisitique(4, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}" >
+                                                <f:ajax event="dateSelect"  render="date"/>
+                                            </p:calendar>
+
+                                            <h:outputLabel  rendered="#{avenantController.checkValeurTYpeCaracterisitique(0, null)}"/>
+
+                                            <p:selectBooleanButton onLabel="Yes" offLabel="No" value="#{caract.valeurBoolean}" rendered="#{avenantController.checkValeurTYpeCaracterisitique(6, caract)}" disabled="#{avenantController.CARdesignation==false or avenantController.CARdesignation==null}"
+                                                                   id="valeurBoolean"           onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" >
+                                                <f:ajax event="change"  render="valeurBoolean"/>
+                                            </p:selectBooleanButton>
+                                        </p:column>
+
+
+
+                                    </p:dataTable>   
+                                </p:fieldset>
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['garantie']}"   id="garantie" >
+                                <p:panelGrid   columns="8" layout="grid"  >
+                                    <h:outputLabel value="#{msg['force.mode.calcul']} " />
+                                    <p:selectBooleanButton  onLabel=" #{msg['manuel']}" offLabel=" #{msg['Automatique']}" onIcon="ui-icon-check" offIcon="ui-icon-close" id="calcul"  value="#{avenantController.modecalculForcerManuel}">
+                                        <f:ajax event="change" render="actif"/>
+                                        <p:ajax event="change" listener="#{avenantController.forceModeCalulPrimeManuelle()}" update=":form1:tabprincipal"  />
+
+                                    </p:selectBooleanButton>
+                                </p:panelGrid>
+
+                                <p:fieldset    styleClass="fieldset"   class="fieldset" >
+                                    <p:dataTable var="pg" value="#{avenantController.listePoliceGarantie}" widgetVar="pgTable" 
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="idpgTable"  rowIndexVar="index" >
+                                        <!--                                        <f:facet name="header">
+                                        #{msg['type.tarif']} #{avenantController.police.idTypeTarif.libelle}
+                                    </f:facet>-->
+                                        <p:columnGroup type="header">
+
+                                            <p:row >
+                                                <p:column headerText="option"/>
+                                                <p:column headerText="#{msg['garantie']}" />
+                                                <p:column headerText="#{msg['capital']} " />
+                                                <p:column headerText="#{msg['taux']} " />
+                                                <p:column headerText="#{msg['pourcentage']} " />
+                                                <p:column headerText="#{msg['prime']} " />
+                                                <p:column headerText="#{msg['proarata']} " />
+
+                                            </p:row>
+                                        </p:columnGroup>
+                                        <p:column  rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"  rendered="#{avenantController.GARsupprimer==true and pg.id!=null}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"       actionListener="#{avenantController.removeLigneForGarantiePolice(index)}"  >
+                                                <!--<f:setPropertyActionListener value="#{dpm}" target="#{avenantController.detailPolicePlafond}"   />-->
+                                            </p:commandButton>
+
+                                        </p:column>
+
+                                        <p:column rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}">
+                                            <p:inputText id="libelle"     value="#{pg.idGarantie.id}"   style="width:50px"  rendered="#{pg.idGarantie.id==null and avenantController.GARAjouter==true}" >
+                                                <p:ajax event="keyup"  oncomplete="PF('manageGarantieDialog').show()"   />
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{pg.idGarantie.idRefGaranties.libelle}" rendered="#{pg.idGarantie.id!=null}"  style="width:350px"/>
+
+                                        </p:column>
+
+                                        <p:column rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}"  >
+
+                                            <p:inputNumber  value="#{pg.capital}"    decimalPlaces="2" emptyValue="#{null}"   id="capital"  disabled="#{avenantController.GARgarantie_capital==false or avenantController.GARgarantie_capital==null}"   >
+                                                <f:ajax event="blur"   render="capital"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:column  rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}" >
+
+                                            <p:inputNumber  value="#{pg.taux}"    decimalPlaces="2" emptyValue="#{null}"   id="taux" disabled="#{avenantController.GARgarantie_taux==false or avenantController.GARgarantie_taux==null}"   >
+                                                <f:ajax event="blur"   render="taux"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+
+                                        <p:column  rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}" >
+
+                                            <p:inputNumber  value="#{pg.pourcentage}"    decimalPlaces="0" emptyValue="#{1}"   id="pour"  disabled="#{avenantController.GARgarantie_pourcentage==false or avenantController.GARgarantie_pourcentage==null}"  >
+                                                <f:ajax event="blur"   render="pour"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:column  rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}" >
+
+                                            <p:inputNumber  value="#{pg.prime}"    decimalPlaces="3" emptyValue="#{0}"   id="prime"   disabled="#{!avenantController.modecalculForcerManuel or avenantController.GARgarantie_prime==false}" >
+                                                <f:ajax event="blur"   render="prime" listener="#{avenantController.caculTotalPrime()}"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+
+                                        <p:column  rendered="#{pg.retire_de_la_police==false or pg.retire_de_la_police==null}" >
+
+                                            <p:inputNumber  value="#{pg.prorata}"    decimalPlaces="3" emptyValue="#{0}"   id="prorata"   disabled="#{avenantController.GARgarantie_proarata==false or avenantController.GARgarantie_proarata==null}"   >
+                                                <f:ajax event="blur"  render="prorata"  listener="#{avenantController.calculTotalProrata()}"  />
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:columnGroup type="footer">
+                                            <p:row>
+                                                <p:column colspan="5" style="text-align:center" footerText="Totals:" />
+
+                                                <p:column footerText="#{formatDateController.formatNumberGeneral(avenantController.totalPrime.longValue())}" style="text-align:left" id="totalPrime" />
+                                                <p:column footerText="#{formatDateController.formatNumberGeneral(avenantController.totalProrata.longValue())}" style="text-align:left" id="totalProrata"/>
+                                            </p:row>
+                                        </p:columnGroup>
+                                    </p:dataTable>
+
+
+                                </p:fieldset>
+                            </p:tab> 
+
+                            <p:tab title="#{msg['quittance.police']}"  id="quittance" >
+                                <center>
+                                    <p:commandButton  value="#{msg['bouton.valider']}"  icon="pi pi-check"    styleClass="success-button"  actionListener="#{avenantController.addAvenant()}"  rendered="#{avenantController.typeAvenant.id!=null}" />   
+                                    <p:spacer width="10"/>
+                                    <p:commandButton  value="#{msg['bouton.imprimer']}"  icon="pi pi-print"  styleClass="secondary-button"  ajax="false"  actionListener="#{avenantController.addAvenantPrint()}" onclick=" target = '_blank';
+                                            return true;" rendered="#{avenantController.typeAvenant.id!=null}" />   
+                                </center>
+
+                                <p:spacer width="10"/>
+
+
+                                <br/>
+                                <br/>
+                                <p:fieldset  legend="#{msg['devise']} #{avenantController.police.idDevise.libelle} | #{avenantController.police.idDevise.code}"  styleClass="fieldset"   class="fieldset" >
+
+
+                                    <p:separator  style=" border-color: #01579B"/>
+
+                                    <p:panelGrid   columns="10"   >
+                                        <p:outputLabel  value="#{msg['type.quittance']}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="emission" value="#{avenantController.quitance.typQuittance}"  style="float: left"  disabled="#{avenantController.QUItype_quittance==false or avenantController.QUItype_quittance==null}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{avenantController.emissions}"  />
+                                            <f:ajax event="change" render="emission" />
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel  value="#{msg['date.emission']}"  />
+
+                                        <p:calendar value="#{avenantController.quitance.dateEmission}"  mode="popup"   showOn="both"  id="dateEmission" pattern="dd/MM/yyyy"  disabled="#{avenantController.QUIdate_emission==false  or avenantController.QUIdate_emission==null}"  >
+                                            <f:ajax event="dateSelect"  render="dateEmission" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['datedebut']}"  />
+
+                                        <p:calendar value="#{avenantController.quitance.date_effet}"  mode="popup"   showOn="both"  id="dateEffet" pattern="dd/MM/yyyy"    >
+                                            <f:ajax event="dateSelect"  render="dateEffet" />
+                                        </p:calendar>
+
+                                        <p:outputLabel  value="#{msg['dateEch']}" style="float: left" />
+
+                                        <p:calendar value="#{avenantController.quitance.date_echeance}"  mode="popup"   showOn="both"  id="dateEcheance" pattern="dd/MM/yyyy"    style="float: left" >
+                                            <f:ajax event="dateSelect"  render="dateEcheance" />
+                                        </p:calendar>
+
+                                    </p:panelGrid>
+                                    <p:separator  style=" border-color: #D20005"/>
+                                    <p:panel header="#{msg['detail.quittance']}" >
+                                        <p:panelGrid   columns="6" layout="flex"   >
+                                            <p:outputLabel  value="#{msg['prime.nette']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.primeNette}"    decimalPlaces="3" emptyValue="#{0}"   id="Quittanceprime"  disabled="true" >
+                                                <f:ajax event="blur"   render="Quittanceprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['taxes.prime']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.taxePrime}"    decimalPlaces="3" emptyValue="#{0}"   id="taxeprime"  disabled="#{avenantController.police.id!=null}"   >
+                                                <f:ajax event="blur"   render="taxeprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['prime.nette.taxe']}"  style="color: #D20005" />
+                                            <p:inputNumber  value="#{avenantController.quitance.primeTaxe}"    decimalPlaces="3" emptyValue="#{0}"   id="Primetaxequittanceprime"  disabled="#{avenantController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="Primetaxequittanceprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['accessoir']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.montant_Accessoire}"    decimalPlaces="3" emptyValue="#{0}"   id="accessoirQuittance"   >
+                                                <f:ajax event="blur"   render="accessoirQuittance" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['taxe.acc']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.taxeAccessoir}"    decimalPlaces="3" emptyValue="#{0}"   id="TaxeaccessoirQuittance" disabled="#{avenantController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="TaxeaccessoirQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['accessoir.taxe']}" style="color: #D20005"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.accessoirTaxe}"    decimalPlaces="3" emptyValue="#{0}"   id="accessoirTaxeQuittance"   >
+                                                <f:ajax event="blur"   render="accessoirTaxeQuittance" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['timbre.dimension']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.timbreDimension}"   minValue="#{-9999}"  decimalPlaces="3" emptyValue="#{0}"   id="timDimensionQuittance"  disabled="#{avenantController.police.id!=null}" >
+                                                <f:ajax event="blur"   render="timDimensionQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['timbre.gradue']}"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.timbreGradue}"  minValue="#{-9999}"   decimalPlaces="3" emptyValue="#{0}"   id="timGradueQuittance" disabled="#{avenantController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="timGradueQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['total.timbre']}" style="color: #D20005"  />
+                                            <p:inputNumber  value="#{avenantController.quitance.totalTimb}"   minValue="#{-9999}"  decimalPlaces="3" emptyValue="#{0}"   id="timGradueTotalQuittance" disabled="#{avenantController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="timGradueTotalQuittance" />
+                                            </p:inputNumber>
+
+
+                                        </p:panelGrid> 
+                                    </p:panel>
+                                    <p:separator  style=" border-color: #D20005"/>
+                                    <p:panelGrid   columns="6" layout="flex"  >
+                                        <p:outputLabel  value="#{msg['total.a.paye']}"  />
+                                        <p:inputNumber  value="#{avenantController.quitance.total_a_paye}"    decimalPlaces="3" emptyValue="#{0}"   id="totalpayeQuittance" disabled="#{avenantController.police.id!=null}"  >
+                                            <f:ajax event="blur"   render="totalpayeQuittance" />
+                                        </p:inputNumber>
+
+                                        <p:outputLabel  value="#{msg['total.taxe']}"  />
+                                        <p:inputNumber  value="#{avenantController.quitance.totalTaxes}"    decimalPlaces="3" emptyValue="#{0}"   id="totalTaxepayeQuittance"  disabled="#{avenantController.police.id!=null}" >
+                                            <f:ajax event="blur"   render="totalTaxepayeQuittance" />
+                                        </p:inputNumber>
+                                        <p:outputLabel  value="#{msg['tva']}"  />
+                                        <p:inputNumber  value="#{avenantController.tva}"    decimalPlaces="2" emptyValue="#{0}"   id="tva"  disabled="#{avenantController.QUITva==false  or avenantController.QUITva==null}" >
+                                            <f:ajax event="blur"   render="tva"  listener="#{avenantController.changeValueTva()}" />
+                                        </p:inputNumber>
+
+
+                                    </p:panelGrid>
+
+                                    <!--<p:separator  style=" border-color: #01579B"/>-->
+                                    <!--                                    <p:panelGrid   columns="6" layout="flex"  id="gridCom"  >
+                                                                            <p:outputLabel  value="#{msg['apport']}"  />
+                                                                            <p:inputNumber  value="#{avenantController.prime_Apporteur.taux_apport}"    decimalPlaces="3" emptyValue="#{0}"   id="apport"   >
+                                                                                <p:ajax event="keyup"    update=":form1:tabprincipal:apport,:form1:tabprincipal:totacom"   />
+                                                                            </p:inputNumber>
+                                    
+                                                                            <p:outputLabel  value="#{msg['gestion']}"  />
+                                                                            <p:inputNumber  value="#{avenantController.prime_Apporteur.taux_gestion}"    decimalPlaces="3" emptyValue="#{0}"   id="gestion"   >
+                                                                                <f:ajax event="keyup"   render="gestion,totacom" />
+                                                                            </p:inputNumber>
+                                                                            <p:outputLabel  value="#{msg['total.com']}"  />
+                                                                            <p:inputNumber  value="#{avenantController.commission_Prime_Apporteur.taux_gestion.add(avenantController.commission_Prime_Apporteur.taux_gestion)}"    decimalPlaces="3" emptyValue="#{0}"   id="totacom" disabled="true"  >
+                                                                                <f:ajax event="blur"   render="totacom"  />
+                                                                            </p:inputNumber>
+                                    
+                                                                        </p:panelGrid>-->
+                                </p:fieldset>
+
+                            </p:tab> 
+
+                        </p:tabView>
+                    </h:form>  
+                    <h:form id="form2">  
+                        <p:dialog header="#{msg['prestation']}" width="650" showEffect="fade" modal="true" widgetVar="managePrestationDialog" responsive="true">
+
+                            <p:dataTable id="idprestationableTable" var="prestation" value="#{avenantController.listePrestation}" 
+                                         selection="#{avenantController.selectePrestations}" rowKey="#{prestation.id}"
+                                         style="margin-bottom:0" paginator="true" rows="100"  widgetVar="prestationableTable" >
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('prestationableTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column selectionMode="multiple" style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="Code" sortBy="#{prestation.code}" filterBy="#{prestation.code}" >
+                                    <h:outputText value="#{prestation.code}" />
+                                </p:column>
+
+                                <p:column headerText="Name" sortBy="#{prestation.libelle}" filterBy="#{prestation.libelle}">
+                                    <h:outputText value="#{prestation.libelle}" />
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <center>
+                                        <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.chargePrestaionForRubriqueCategorie()}" oncomplete=" PF('managePrestationDialog').hide()" update=":form1:tabprincipal" process="@this" ajax="false" />
+                                        <p:spacer width="10"/>
+                                        <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('managePrestationDialog').hide" ajax="false" />
+                                    </center>
+                                </f:facet>
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['caracteristique']}" width="650" showEffect="fade" modal="true" widgetVar="manageCaracteristiqueDialog" responsive="true">
+
+                            <p:dataTable var="rb" value="#{avenantController.listeRubriqueCaracteristique}" paginator="true" rows="100" widgetVar="rbTable"  id="idrbTable"
+                                         filterEvent="enter" filteredValue="#{avenantController.filterRubriqueCaracteristique}"
+                                         paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         scrollHeight="300" 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rb.id}" selectionMode="single"  selection="#{avenantController.rubriqueCaracteristique.idCaracteristiques}"
+
+                                         scrollable="true"  >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{avenantController.showDetailsRubrique(rb)}"  
+                                        oncomplete="PF('manageCaracteristiqueDialog').hide()"   update="form1:tabprincipal" process="@this" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rbTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rb.code}" filterBy="#{rb.code}"  style="width: 50px">
+                                    <h:outputText value="#{rb.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rb.libelle}" filterBy="#{rb.libelle}"  style="width: 150px">
+                                    <span class="flag flag-#{rb.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText 
+                                        value="#{rb.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['garantie']}" width="650" showEffect="fade" modal="true" widgetVar="manageGarantieDialog" responsive="true">
+
+                            <p:dataTable var="rg" value="#{avenantController.listeRubriqueGarantie}" paginator="true" rows="10" widgetVar="rgTable"  id="idrgTable"
+                                         filterEvent="enter" filteredValue="#{avenantController.filterRubriqueGarantie}"
+                                         paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         scrollHeight="300" 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rg.id}" selectionMode="single"  selection="#{avenantController.rubriqueGarantie.idGarantie}"
+
+                                         scrollable="true"  >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{avenantController.showDetailsRubriqueGarantie(rg)}"  
+                                        oncomplete="PF('manageGarantieDialog').hide()"   update="form1:tabprincipal" process="@this" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rgTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rg.idRefGaranties.code}" filterBy="#{rb.code}"  style="width: 50px">
+                                    <h:outputText value="#{rg.idRefGaranties.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rg.idRefGaranties.libelle}" filterBy="#{rg.idRefGaranties.libelle}"  >
+                                    <span class="flag flag-#{rg.idRefGaranties.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText 
+                                        value="#{rg.idRefGaranties.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['sante']} / #{msg['liste.contrat']}   " width="1100" height="800" showEffect="fade" modal="true" widgetVar="managePoliceDialog" responsive="true">
+
+                            <p:dataTable id="idcontractTable" var="p" value="#{avenantController.listeOrclassContrats}" 
+                                         selection="#{avenantController.policeSelect}" rowKey="#{p.id}"
+                                         style="margin-bottom:0" paginator="true" rows="5"  selectionMode="single"   widgetVar="contractTable"  rowStyleClass="#{p.validation==false ? 'red':'old'}" >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{avenantController.chargeContractSelecte()}"     
+                                        process="@this" update=":form1,form11"  oncomplete="PF('managePoliceDialog').hide()"  />
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('contractTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column  style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="#{msg['police']}" sortBy="#{p.numero_police}" filterBy="#{pnumero_police}" rendered="#{p.police==null or  p.police.intValue()==0}" >
+                                    <h:outputText value="#{p.numero_police}" />
+                                </p:column>
+                                <p:column headerText="#{msg['police']}" sortBy="#{p.police}" filterBy="#{p.police}" rendered="#{p.police!=null and  p.police.intValue()!=0}">
+                                    <h:outputText value="#{p.police}" />
+                                </p:column>
+                                <p:column headerText="#{msg['ref.police']}" sortBy="#{p.ref_intermediaire}" filterBy="#{p.ref_intermediaire}">
+                                    <h:outputText value="#{p.ref_intermediaire}" />
+
+                                </p:column>
+
+                                <p:column headerText="#{msg['intermediaire']}" sortBy="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}" filterBy="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}">
+                                    <h:outputText value="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}" />
+
+                                </p:column>
+
+
+                                <p:column headerText="#{msg['categorie']}" sortBy="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}" filterBy="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}">
+                                    <h:outputText value="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['assure']}"  >
+                                    <h:outputText value="#{p.idAssure.nom.toUpperCase()}"  />
+                                    <h:outputText value="#{p.idAssure.raison_social.toUpperCase()}"  />
+                                </p:column>
+
+                                <p:column headerText="#{msg['date_effet']} "  >
+                                    <h:outputText value="#{formatDateController.formatDate(p.date_effet)}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['date_echeance']} "  >
+                                    <h:outputText value="#{formatDateController.formatDate(p.date_echeance)}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['avenant']} "  >
+                                    <p:commandLink id="listeAv" action="#{avenantController.listeAvenantByPolices(p)}" style="margin-right:20px;"  >
+                                        <h:outputText value="#{msg['liste.avenant']} " />
+                                    </p:commandLink>   
+
+                                </p:column>
+<!--                                <p:column headerText="#{msg['bouton.valider']} #{msg['par']}"  >
+                                    <h:outputText value="#{p.valider_par}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['date.valider']} "  >
+                                    <h:outputText value="#{formatDateController.formatDate(p.date_validation)}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['total.a.paye']} "  >
+                                    <h:outputText value="#{avenantController.quittanceByPolice(p)}"  />
+
+                                </p:column>-->
+
+
+
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+
+
+                        <p:dialog header="#{msg['sante']} / #{msg['liste.avenant']} / #{msg['police']} : #{avenantController.police.police} "  showEffect="fade" modal="true" widgetVar="manageAvenantDialog" responsive="true">
+
+                            <p:dataTable id="idAvenantTable" var="av" value="#{avenantController.listeAvenantByPolice}" 
+
+                                         style="margin-bottom:0" paginator="true" rows="1000"     widgetVar="avenantTable"  >
+
+                                <p:column  style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="#{msg['avenant.numero']}"  >
+                                    <h:outputText value="#{av.numero_avenant}" />
+                                </p:column>
+                                <p:column headerText="#{msg['date_effet']}" >
+                                    <h:outputText value="#{formatDateController.formatDate(av.date_effet==null ? av.idPolice.date_effet: av.date_effet )}" />
+                                </p:column>
+                                <p:column headerText="#{msg['dateEch']}" >
+                                    <h:outputText value="#{formatDateController.formatDate(av.date_echeance==null ? av.idPolice.date_echeance : av.date_echeance )}" />
+                                </p:column>
+                                <p:column headerText="#{msg['assure']}" >
+                                    <h:outputText value="#{av.raison_social==null ? av.raison_social.toUpperCase() :av.raison_social.toUpperCase()}" />
+                                    <h:outputText value="#{av.nom==null ? av.idPolice.idAssure.nom.toUpperCase() : av.idPolice.idAssure.nom.toUpperCase()}" />
+
+                                </p:column>
+                                <p:column headerText="#{msg['categorie']}" sortBy="#{formatDateController.valueObject(av.idPolice.idCategories.libelle,av.idPolice.idCategories)}" filterBy="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}">
+                                    <h:outputText value="#{formatDateController.valueObject(av.idPolice.idCategories.libelle,av.idPolice.idCategories)}" />
+                                </p:column>
+                                <p:column headerText="#{msg['consultation']} / #{msg['bouton.imprimer']}" >
+
+
+
+                                    <p:commandButton  id="printAvenat"  icon="pi pi-print"  styleClass="secondary-button"  ajax="false"  actionListener="#{avenantController.consultationAvenantPrint(av)}" onclick=" target = '_blank';
+                                        return true;"  >
+                                    
+                                     <f:setPropertyActionListener value="#{av}" target="#{avenantController.avenantConsultation}"/>
+                                    </p:commandButton>   
+
+                                   
+                                </p:column>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation.action']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.annullationContrat()}" oncomplete=" PF('managDeleteDialog').hide()" update="form1"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation.action']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.removeLigneForDetailPolicePlafond()}" oncomplete=" PF('managDeleteDialog2').hide()" update="form1"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.updateContrat()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="500" showEffect="fade" modal="true" widgetVar="dlg" responsive="true">
+                            <center>
+
+                                <h4>#{msg['assure.check']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.chargerAssurCheck()}" oncomplete=" PF('dlg').hide()"   ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['cest.pas.lui']}" onclick="PF('dlg').hide()"  styleClass="danger-button p-mr-2 p-mb-2" />
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="500" showEffect="fade" modal="true" widgetVar="agence" responsive="true" closable="false">
+                            <center>
+                                <h:outputText value="#{msg['intermediaire']}" />
+                                <p:spacer width="10"/>
+                                <p:selectOneMenu value="#{avenantController.intermediairesSelect}" 
+                                                 converter="#{genericConverter}" id="agence"   var="in" filter="true" filterMatchMode="contains" style="width: 300px" >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{avenantController.listeIntermediaires}" var="i" itemLabel=" #{i.idRefIntermediaire.code} - #{i.idRefIntermediaire.raisonSociale} "   itemValue="#{rb}"/>
+
+                                    <p:column>
+                                        #{in.idRefIntermediaire.code} #{in.idRefIntermediaire.raisonSociale}
+                                    </p:column>
+                                    <f:ajax event="change"  render="agence" listener="#{avenantController.chargerPrestionByRubrique()}"  />
+                                </p:selectOneMenu> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.chargeAgenceSelect()}"  update=":form1"  />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+<!--                        <p:dialog header="#{msg['edition.groupe']}" width="500" showEffect="fade" modal="true" widgetVar="dlgGroup" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['libelle']}" />
+                                <p:spacer width="10"/>
+                                <p:autoComplete id="libelleGroupe" value="#{avenantController.refGroupe.libelle}" completeMethod="#{avenantController.completeTextReferenceGroup}" >
+                                    <f:ajax event="blur" render="libelleGroupe"/>
+
+                                </p:autoComplete>
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.addReferenceGroupe()}"  update=":form1:tabprincipal" ajax="false" />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>-->
+                        
+                        <p:dialog header="#{msg['edition.groupe']}"  showEffect="fade" modal="true" widgetVar="dlgGroup" responsive="true">
+                            <center>
+
+                                <p:spacer width="10"/>
+
+                            </center>
+                            <p:panelGrid columns="2" layout="flex" columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4" styleClass="customPanelGrid" contentStyleClass="ui-fluid">
+                                <h:outputText value="#{msg['libelle']}" /> 
+                                <p:autoComplete id="libelleGroupe" value="#{avenantController.refGroupe.libelle}" completeMethod="#{avenantController.completeTextReferenceGroup}" >
+                                    <f:ajax event="select" render="libelleGroupe"/>
+
+                                </p:autoComplete>
+                                <p:outputLabel  value="#{msg['adresse.bp']}" />
+                                <p:inputText value="#{avenantController.refGroupe.adresseGroup}" />
+                                <p:outputLabel  value="#{msg['adresse.ville']}"  />
+
+                                <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{avenantController.refGroupe.ville}"  var="vi" filter="true" filterMatchMode="contains"   >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{avenantController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                    <f:ajax event="change" render="ville" />
+                                    <p:column>
+                                        #{vi.code} #{vi.libelle}
+                                    </p:column>
+                                </p:selectOneMenu>
+                                <p:outputLabel  value="#{msg['observation']}" />
+                                <p:inputTextarea value="#{avenantController.refGroupe.observation}" rows="5" cols="30" counter="display" maxlength="250" counterTemplate="{0} characters remaining." autoResize="false" />
+                                <p:outputLabel />
+                                <p:outputLabel  /> 
+                                <p:outputLabel  />
+                                <h:outputText id="display" />
+
+                            </p:panelGrid>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.addReferenceGroupe()}"  update=":form1:tabprincipal" ajax="false" />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageAddDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.addRisque()}" oncomplete=" PF('manageAddDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.deleteImageRisque()}" oncomplete=" PF('manageRemoveDialog').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.updateImageRisque()}" oncomplete=" PF('manageUpdateDialog').hide()" update=":form1:tabprincipal,:form1:msg"  ajax="false" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.deleteImageFamilleRisque()}" oncomplete=" PF('manageRemoveDialog2').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.updateImageFamilleRisque()}" oncomplete=" PF('manageUpdateDialog2').hide()" update=":form1:tabprincipal,:form1:msg"  ajax="false" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageAddDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.addImageFamilleRisque()}" oncomplete=" PF('manageAddDialog2').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['importation']}" width="1000" showEffect="fade" modal="true" widgetVar="fichier" responsive="true">
+                            <center>
+                                <p:fileUpload listener="#{avenantController.handleFileUpload}" 
+                                              auto="true"  
+                                              sizeLimit="500000"
+                                              update="@this"
+
+                                              allowTypes="/(\.|\/)(xls)$/"
+                                              uploadLabel="Confirm"
+                                              invalidSizeMessage="Please Choose File which size is less than 500Kb "
+                                              />
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.chargeRisqueByGroup()}" oncomplete=" PF('fichier').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('fichier').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="validationDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['validation.contrat']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{avenantController.validationProjet()}"   oncomplete=" PF('validationDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('validationDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['liste.famille']}/#{avenantController.risque.libelle}" width="1000" showEffect="fade" modal="true" widgetVar="familleRisqueDialog" responsive="true" closable="false">
+                            <p:dataTable var="irf" value="#{avenantController.listeRisqueFamille}"  widgetVar="risqueFamilleTable" 
+                                         scrollable="true" 
+                                         rowIndexVar="index"
+                                         emptyMessage="#{msg['emptyMessage']}"    id="idrisqueFamilleTable"
+
+                                         >
+
+
+                                <p:column  >
+                                    <p:commandButton  icon="pi pi-plus"  
+                                                      styleClass="success-button" style="margin-right: .5rem"  rendered="#{irf.id==null and irf.typeAvenant.id!=null }"   actionListener="#{avenantController.showDetailImageFamilleRisque(irf,index)}"  >
+                                        <f:setPropertyActionListener value="#{irf}" target="#{avenantController.risqueFamille}"   />
+                                        <!--<f:ajax event="click" listener="#{avenantController.showDetailImageFamilleRisque(irf)}" />-->
+                                    </p:commandButton>
+
+
+                                    <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                      styleClass="secondary-button" style="margin-right: .5rem"   rendered="#{irf.id!=null and irf.typeAvenant.id!=null}"     actionListener="#{avenantController.updateFamilleByListe(irf,index)}"  >
+                                        <f:setPropertyActionListener value="#{irf}" target="#{avenantController.risqueFamille}"   />
+
+                                    </p:commandButton>
+                                    <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" 
+                                                      styleClass="danger-button" style="margin-right: .5rem" rendered="#{irf.id!=null and irf.typeAvenant.id!=null}"     actionListener="#{avenantController.removeRisqueFamilleByListe(irf,index)}"   >
+                                        <f:setPropertyActionListener value="#{irf}" target="#{avenantController.risqueFamille}"  />
+
+                                    </p:commandButton>
+
+                                </p:column>
+
+
+                                <p:column headerText="#{msg['membre']}" >
+                                    <!--<p:outputLabel value="#{irf.nom_membre}"  rendered="#{irf.id!=null}" />-->
+                                    <p:inputText id="nomComplet"  placeholder="  #{msg['membre']}"   value="#{irf.nom_membre}"  disabled="#{(avenantController.FAMmembre==false or avenantController.FAMmembre==null) and irf.id!=null}" >
+                                        <f:ajax event="blur"   render="nomComplet" />
+                                    </p:inputText>
+
+                                </p:column>
+                                <p:column headerText="#{msg['lien.parente']} "  >
+                                    <!--<p:outputLabel value="#{formatDateController.valueObject(irf.lienParente)}"  rendered="#{irf.id!=null}" />-->
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="lienParanteirf" value="#{irf.lienParente}"  disabled="#{(avenantController.FAMlien_parente==false or avenantController.FAMlien_parente==null) and irf.id!=null}" >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{avenantController.leinParente}"  />
+                                        <f:ajax event="change" render="lienParanteirf" />
+                                    </p:selectOneMenu>
+                                </p:column>
+                                <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                    <!--<p:outputLabel value="#{formatDateController.formatDate(irf.dateNaissance)}"  rendered="#{irf.id!=null}" />-->
+                                    <p:calendar value="#{irf.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"  disabled="#{(avenantController.FAMdate_naissance==false or avenantController.FAMdate_naissance==null) and irf.id!=null}" >
+                                        <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                    </p:calendar>
+                                </p:column>
+
+                                <p:column headerText="#{msg['personne.sexe']}" >
+                                    <!--<p:outputLabel value="#{formatDateController.valueObject(irf.sexe)}"  rendered="#{irf.id!=null}" />-->
+                                    <p:selectOneMenu value="#{irf.sexe}" style=" float: left; " disabled="#{(avenantController.FAMsexe==false or avenantController.FAMsexe==null) and irf.id!=null}"
+                                                     converter="#{genericConverter}" id="sexePersonneirf"   >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{avenantController.sexe}" />
+
+                                        <f:ajax event="change"  render="sexePersonne"/>
+                                    </p:selectOneMenu>
+                                </p:column>
+
+
+
+
+
+                            </p:dataTable>  
+                            
+                               <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.fermer']}"     actionListener="#{avenantController.fermeListeRisqueFamille()}"   oncomplete=" PF('familleRisqueDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <!--<p:spacer width="10"/>-->
+                                    <!--<p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('validationDialog').hide()"/>-->
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+
+
+
+
+                    </h:form> 
+
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

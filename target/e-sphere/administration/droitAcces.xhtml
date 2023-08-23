@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/droitAcces">#{msg['droit.access']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <f:view locale="#{languageController.localeCode}">
+
+                        <h4>#{msg['droit.access']}</h4>
+                        <h:form id="form1">
+                            <p:growl id="grwFile" showDetail="true" />
+                            <p:growl id="msg" showDetail="true" escape="false"/>
+                            <!--<h:panelGrid id="grid1"  columns="4" styleClass="noBorders">-->
+                            <div class="ui-g">
+                                <div ><h:outputLabel value="#{msg['utilisateur']}*: " for="user"/></div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:selectOneMenu filter="true"  filterMatchMode="contains" id="user" value="#{utilisateurController.utilisateurs}"   converter="#{genericConverter}"  >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems var="u" value="#{utilisateurController.datasource}" itemLabel="#{u.nom}  #{u.prenom} " />
+                                    <p:ajax event="change"  listener="#{utilisateurController.getprofilByUser()}" update="tabprincipal:pickListAction,tabprincipal:pickListfonctionnalite,:form1:profil,:form1:tabprincipal:pickListmodule,:form1:tabprincipal:action" oncomplete="PF('accordTab').select(0);"/>
+                                    <!--<f:ajax event="change" render="user" />-->
+                                </p:selectOneMenu></div>
+                                <div > <h:outputLabel value="#{msg['profil']}*: " for="profil" /> </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:selectOneMenu filter="true"  filterMatchMode="contains" id="profil" value="#{utilisateurController.profilsByUser}"   converter="#{genericConverter}" >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems var="p" value="#{utilisateurController.colProfil}" itemLabel="#{p.code} | #{p.libelle} " />
+                                    <p:ajax event="change"   update="tabprincipal:pickListAction,tabprincipal:pickListfonctionnalite,:form1:profil,:form1:tabprincipal:pickListmodule" oncomplete="PF('accordTab').select(0);"/>
+                                </p:selectOneMenu></div>
+                            </div>
+                            
+                               
+
+                               
+
+                               
+
+                            <!--</h:panelGrid>-->
+                            <p:tabView id="tabprincipal" style="height: 300px"  widgetVar="accordTab">
+                                <p:ajax event="tabChange" listener="#{utilisateurController.onTabChange}" update="tabprincipal:pickListmodule,tabprincipal:pickListfonctionnalite,tabprincipal:moduleid,:form1:msg,tabprincipal:action"/>
+                                <p:tab id="tab1" title="#{msg['entite.module']}">
+
+                                    <h:panelGrid  id="grid2"  >
+                                        <f:facet name="header">
+                                            <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{utilisateurController.saveUserModule()}" update="tabprincipal:pickListfonctionnalite,:form1:msg" process="@this" style="float: right;"/>  
+
+                                        </f:facet>
+                                        <p:pickList id="pickListmodule" value="#{utilisateurController.modulesModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}"
+                                                    showSourceControls="true"  responsive="true"  
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}"> 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{utilisateurController.onTransfer}" update=":form1:msg"/>
+                                            <p:ajax event="select" listener="#{utilisateurController.onSelect}" update=":form1:msg"/>
+                                            <p:ajax event="unselect" listener="#{utilisateurController.onUnselect}" update=":form1:msg"/>
+                                            <p:ajax event="reorder" listener="#{utilisateurController.onReorder}" update=":form1:msg"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 30px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]}"/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+                                    </h:panelGrid>
+                                </p:tab>  
+
+
+                                <p:tab id="tab2" title="#{msg['fonctionnalite']}" >
+                                    <h:panelGrid>
+                                        <f:facet name="header">
+
+                                            <h:outputLabel value="#{msg['entite.module']}* : " for="moduleid" style="float: left;"/>
+                                            <p:selectOneMenu value="#{utilisateurController.modules}" style=" float: left; width: 250px;" 
+                                                             converter="#{genericConverter}" id="moduleid">
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{utilisateurController.moduleUser}" var="modules" itemLabel="#{msg[modules.code]} " itemValue="#{modules}"/>
+                                                <p:ajax event="change" listener="#{utilisateurController.populateMenus}" update="tabprincipal:pickListfonctionnalite"/>
+
+                                            </p:selectOneMenu>   
+
+                                            <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{utilisateurController.saveUserMenu()}"  update="tabprincipal:pickListAction,:form1:msg" style="float: right;"/>  
+
+
+                                        </f:facet>
+                                        <p:pickList id="pickListfonctionnalite" value="#{utilisateurController.menusModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}"
+                                                    showSourceControls="true"  responsive="true"
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}"> 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{utilisateurController.onTransfer}" update=":form1:msg"/>
+                                            <p:ajax event="select" listener="#{utilisateurController.onSelect}" update=":form1:msg"/>
+                                            <p:ajax event="unselect" listener="#{utilisateurController.onUnselect}" update=":form1:msg"/>
+                                            <p:ajax event="reorder" listener="#{utilisateurController.onReorder}" update=":form1:msg"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 50px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]}"/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+
+                                    </h:panelGrid>
+                                </p:tab>
+                                <p:tab id="action_tab" title="#{msg['action']}"    >
+                                    <h:panelGrid>
+                                        <f:facet name="header">
+
+                                            <h:outputLabel value="#{msg['fonctionnalite']}* : "  style="float: left;"/>
+                                            <p:selectOneMenu value="#{utilisateurController.fonctionnaliteByUser}" style=" float: left; width: 250px;" 
+                                                             converter="#{genericConverter}" id="action">
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{utilisateurController.colFonctionnaliteByUser}" var="modules" itemLabel="#{msg[modules.code]} " itemValue="#{modules}"/>
+                                                <p:ajax event="change" listener="#{utilisateurController.populateAction()}" update="tabprincipal:pickListAction"/>
+
+                                            </p:selectOneMenu>   
+
+                                            <p:commandButton icon="ajouter" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{utilisateurController.saveUserAction()}" update=":form1:msg,tabprincipal:pickListAction" style="float: right;"/>  
+
+
+                                        </f:facet>
+
+                                        <p:pickList id="pickListAction" value="#{utilisateurController.actionModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}"
+                                                    showSourceControls="true"  responsive="true"  
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}"> 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{utilisateurController.onTransfer}" update=":form1:msg"/>
+                                            <p:ajax event="select" listener="#{utilisateurController.onSelect}" update=":form1:msg"/>
+                                            <p:ajax event="unselect" listener="#{utilisateurController.onUnselect}" update=":form1:msg"/>
+                                            <p:ajax event="reorder" listener="#{utilisateurController.onReorder}" update=":form1:msg"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 30px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]} "/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+
+                                    </h:panelGrid> 
+
+
+                                </p:tab>
+
+                            </p:tabView>
+                        </h:form>
+                    </f:view>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

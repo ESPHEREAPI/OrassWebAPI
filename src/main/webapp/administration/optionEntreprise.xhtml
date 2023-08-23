@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/optionEntreprise">#{msg['optionEtab']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1">
+
+
+                        <p:panel header="#{msg['optionEtab']}">
+                            <p:messages  showDetail="true" closable="true"/>
+                            <p:accordionPanel id="accord" widgetVar="accordP" activeIndex="false" dynamic="true" cache="true" >
+                                <p:tab title="#{msg['infogene']}" id="infogeneral">
+                                    <p:tabView id="grid" style="height: 300px" >
+
+                                        <p:tab id="tabEtab" title="#{msg['entite.entreprise']}">
+
+                                            <div class="ui-g">
+                                                <div class="ui-g-12 ui-md-2">
+
+                                                    <p:fileUpload listener="#{optionEntrepriseController.handleFileUpload}"  style="width:150px;"  
+                                                                  auto="true"  
+                                                                  sizeLimit="200000" 
+                                                                  label="Choose Logo"
+                                                                  allowTypes="/(\.|\/)(gif|jpe?g)$/"
+                                                                  uploadLabel="Confirm"
+                                                                  update=":form1:accord:grid:idlogo"
+                                                                  /> 
+                                                   <!--<p:graphicImage value="#{entrepriseController.logoimages}" alt="#{msg['photo.indisponible']}" id="idlogo" style="width:150px; height:125px"/>-->
+                                                    <p:graphicImage id="idlogo" 
+                                                                    value="#{optionEntrepriseController.absolutePathImages}"  width="150px" alt="#{msg['photo.indisponible']}" />    
+
+
+
+                                                </div>
+                                                <div class="ui-g-12 ui-md-10 ui-g-nopad">
+
+
+                                                    <div class="ui-g-12 ui-g-nopad">
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <h:outputLabel value="#{msg['etabglo.label.codification']}*:" for="code" /></div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"><p:inputText id="code" value="#{optionEntrepriseController.entreprise.code}" title="code"  validator="requiredValidator"  style="text-transform: uppercase;"  />
+                                                            </div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:message for="code" /></div>
+                                                        </div>
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['raison.social']}*: " for="raison_social" /></div>     
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"><p:inputText id="raison_social" value="#{optionEntrepriseController.entreprise.raisonSociale}" title="nom" validator="requiredValidator"  style="text-transform: uppercase;" /></div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"><p:message for="raison_social" /> </div>
+                                                        </div>
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['numero_contribuable']}:" for="numero"/></div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"> <p:inputText id="numero" value="#{optionEntrepriseController.entreprise.noContribuable}" title="#{msg['numero_contribuable']}"  validator="requiredValidator"/></div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:message for="numero" /> </div>
+
+                                                        </div>
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3">   <h:outputLabel value="#{msg['immatricule']}:" for="immatricule"/> </div>    
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3 ui-fluid"> <p:inputText id="immatricule" value="#{optionEntrepriseController.entreprise.immatriculation}" title="#{msg['immatricule']}"  validator="requiredValidator" /></div>
+                                                            <div class="ui-g-12 ui-md-6 ui-lg-3"><p:message for="immatricule" /></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+                                        </p:tab>
+                                        <p:tab id="tabEtab2" title="#{msg['infogene']}">
+
+
+
+                                            <div class="card ui-fluid ">
+
+
+
+                                                <div class="ui-g">
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3"><p:outputLabel for="nomRespo" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.nomRespo']}:</p:outputLabel></div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:inputText id="nomRespo" value="#{optionEntrepriseController.entreprise.responsable}" title="#{msg['etabglo.label.nomRespo']}" />
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="typeResponsabilite" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.responsableType']}:</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:inputText id="typeResponsabilite"  value="#{optionEntrepriseController.entreprise.typeResponsabilite}"  title="#{msg['etabglo.label.responsableType']}" />
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="tel" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.telephone']}:*</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="tel" value="#{optionEntrepriseController.entreprise.adresse.tel}"    validator="requiredValidator" />
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="email" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['email']}:*</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+
+                                                        <p:inputText id="email" value="#{optionEntrepriseController.entreprise.adresse.email}"  validator="emailValidator" />
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="bp" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.bp']}:</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="bp" value="#{optionEntrepriseController.entreprise.adresse.bp}"    />
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="fax" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.fax']}:</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="fax" value="#{optionEntrepriseController.entreprise.adresse.fax}"   />
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="Site" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['etabglo.label.Site']}: http://wwww.</p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="Site" value="#{optionEntrepriseController.entreprise.siteWeb}" title="#{msg['etabglo.label.Site']}" />
+
+                                                    </div>
+
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="pays" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['pays']}*: </p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:selectOneMenu id="pays" value="#{optionEntrepriseController.entreprise.codePays}" validator="requiredValidator" converter="#{genericConverter}" >
+
+                                                            <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                                            <f:selectItems value="#{optionEntrepriseController.paysDao.allPays}" var="p" itemLabel="#{p.libelle}" itemValue="#{p}"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="ville" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['adresse.ville']}*: </p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="ville" value="#{optionEntrepriseController.entreprise.adresse.ville}"  title="#{msg['adresse.ville']}"  validator="requiredValidator" />
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:outputLabel for="quat" styleClass="p-col-12 p-mb-2 p-md-2 p-mb-md-0">#{msg['quartier']}: </p:outputLabel>
+
+                                                    </div>
+                                                    <div class="ui-g-12 ui-md-6 ui-lg-3">
+                                                        <p:inputText id="quat" value="#{optionEntrepriseController.entreprise.adresse.quartier}" />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+                                        </p:tab>  
+
+
+
+
+
+
+
+                                    </p:tabView>
+
+                                </p:tab>
+                                <p:tab title="#{msg['notification']}" id="notification">
+                                    <p:fieldset legend="Options Passerelle" id="passerelle_sms">
+                                        <p:panelGrid columns="8" id="paln33" rendered="#{optionEntrepriseController.entreprise.sms}" layout="flex"  >
+                                            <h:outputLabel value="login"/>
+                                            <h:inputText value="#{optionEntrepriseController.entreprise.login}"/>
+                                            <h:outputLabel value="pwd"/>
+                                            <h:inputText value="#{optionEntrepriseController.entreprise.pwd}"/>
+
+                                            <h:outputLabel value="SenderId"/>
+                                            <h:inputText value="#{optionEntrepriseController.entreprise.senderId}"   />
+                                        </p:panelGrid>
+                                    </p:fieldset>
+                                    <br/>
+
+                                    <p:panelGrid  columns="2" id="paln4" layout="flex" >
+
+                                        <h:outputLabel value="Serveur de messagerie SMTP"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/>
+
+
+                                        <h:selectOneMenu   id="serveurSTMP" value="#{optionEntrepriseController.entreprise.serveurSTMP}" converter="#{genericConverter}"   style="width:  300px" validator="requiredValidator" rendered="#{optionEntrepriseController.entreprise.envoiMail}">
+                                            <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                            <f:selectItems value="#{optionEntrepriseController.severMessagerieDao.findAll()}"  var="ser" itemLabel="#{ser.smtp}|#{ser.port}|#{ser.descrition} " itemValue="#{ser.smtp}" />
+
+
+                                        </h:selectOneMenu>
+
+                                        <h:outputLabel value="Port de messagerie SMTP"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/>
+                                        <p:inputText id="portSTMP" value="#{optionEntrepriseController.entreprise.portSTMP}"  validator="requiredValidator"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/> 
+
+                                        <h:outputLabel value="Nom d' utilisateur de messagerie SMTP"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/>
+                                        <p:inputText id="userSTMP" value="#{optionEntrepriseController.entreprise.username}"  validator="requiredValidator"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/> 
+                                        <h:outputLabel value="Mot de Passe de messagerie STMP"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/>
+                                        <p:inputText id="password" value="#{optionEntrepriseController.entreprise.password}"  validator="requiredValidator"  rendered="#{optionEntrepriseController.entreprise.envoiMail}"/> 
+
+
+                                    </p:panelGrid>
+                                    <p:panelGrid styleClass="noBorders" columns="2" id="paln5" layout="flex" >
+                                        <h:outputLabel value="Activer le service Microsolft exchange(office365,outlook)"/>
+                                        <p:selectBooleanCheckbox value="#{optionEntrepriseController.entreprise.serviceMicrosoft}"  >
+                                            <p:ajax event="change"  update=":form1:accord" async="true" partialSubmit="true"   oncomplete="accordP.select(1);" process="@this" listener="#{optionEntrepriseController.chargeChoicNotification()}"/>
+
+                                        </p:selectBooleanCheckbox>
+
+                                        <h:outputLabel value="Activer l'envoit Du Login et mot de passe par mail"/>
+                                        <p:selectBooleanCheckbox value="#{optionEntrepriseController.entreprise.envoiMail}"  >
+                                            <p:ajax event="change"  update=":form1:accord" async="true" partialSubmit="true"   oncomplete="accordP.select(1);" listener="#{optionEntrepriseController.chargeChoicNotification()}"/>
+
+                                        </p:selectBooleanCheckbox>
+
+                                        <h:outputLabel value="Activer l'envoit des sms Du Login et mot de passe "  />
+                                        <p:selectBooleanCheckbox value="#{optionEntrepriseController.entreprise.sms}"  >
+                                            <!--                                            <p:ajax event="chaCnge"  update=":form1:accord:paln33"  async="true" partialSubmit="true" oncomplete="accordP.select(1);"/>-->
+                                            <p:ajax event="change"  update=":form1:accord" async="true" partialSubmit="true"   oncomplete="accordP.select(1);" process="@this"/>
+
+                                        </p:selectBooleanCheckbox>
+                                        <br/>
+
+                                    </p:panelGrid>
+
+                                </p:tab>
+                                <p:tab title="#{msg['securite']}" id="securite">
+                                    <p:fieldset legend="Creations Automatiques " id="create_auto">
+                                        <p:panelGrid styleClass="noBorders" columns="2"  layout="flex" >
+                                            <h:outputLabel value="Creer le Code Profile Automatique"/>
+                                            <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="codeprofil" value="#{optionEntrepriseController.entreprise.profil_code_automatique}"  >
+                                                <f:ajax event="change" render="codeprofil"/>
+
+                                            </p:selectBooleanButton>
+                                            <h:outputLabel value="Prefixe"/>
+
+                                            <p:inputText id="prefixecodeprofil"  value="#{optionEntrepriseController.entreprise.prefix_code_profile}"  >
+                                                <f:ajax event="blur" render="prefixecodeprofil"/>
+                                            </p:inputText>
+                                            
+                                           <h:outputLabel value="Creer le login Automatique"/>
+                                           <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="loginuser" value="#{optionEntrepriseController.entreprise.login_user_automatique}"  >
+                                                <f:ajax event="change" render="loginuser"/>
+
+                                            </p:selectBooleanButton>
+                                            <h:outputLabel value="Prefixe Login"/>
+
+                                            <p:inputText id="prefixelogin"  value="#{optionEntrepriseController.entreprise.prefix_login_user}"  >
+                                                <f:ajax event="blur" render="prefixelogin"/>
+                                            </p:inputText>
+
+                                        </p:panelGrid>
+
+                                    </p:fieldset>
+                                </p:tab>
+                                <p:tab title="#{msg['impot']}" id="impot">
+
+                                </p:tab>
+                                <p:tab title="#{msg['Backup.Data']}" id="backup_data">
+
+                                </p:tab>
+                            </p:accordionPanel>
+
+                            <br/>
+                            <p:separator/>
+                            <p:commandButton id="reset" value="#{msg['bouton.annuler']}" style="size: 20; font-family: Verdana; font-size:  1.1em; margin-left: 20%" type="Reset" icon="pi pi-times" />
+
+                            <p:commandButton value="#{msg['Bouton.Sauvegarde']}" style="font-family: Verdana; font-size:  1.1em; margin-left: 100px" actionListener="#{optionEntrepriseController.updateEntreprise}" ajax="false" icon="pi pi-check" update=":form1"/>
+
+
+                        </p:panel>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

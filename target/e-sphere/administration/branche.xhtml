@@ -1,0 +1,171 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/branche">#{msg['branche']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   rendered="#{brancheController.accessCree()}"
+                                     styleClass="success-button" style="margin-right: .5rem"  onclick="PF('manageBrancheDialog').show()" />
+
+                    <h:form id="form2">
+
+                        <p:growl id="msg" showDetail="true" escape="false"/>
+                        <p:dataTable var="cl" value="#{brancheController.lisBranche}" paginator="true" rows="10" widgetVar="brancheTable"  id="table"
+                                     paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{brancheController.filterBranche}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                     emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cl.idBranche}" selectionMode="single"  selection="#{brancheController.branchesSelect}"
+
+                                     scrollable="true"  >
+
+                            <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{brancheController.showDetails(cl)}"  
+                                    process="@this" update=":form1"  oncomplete="PF('manageBrancheDialog').show();"/>
+
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('brancheTable').filter()"
+                                                 style="width:150px" placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+
+                            <p:column style="width: 50px;">
+                                <f:facet name="header">
+                                    <h:outputText value="Options"/>
+                                </f:facet>
+
+
+
+                                <p:commandButton  icon="pi pi-trash"  
+                                                  styleClass="danger-button" style="margin-right: .5rem"  disabled="#{cl.showAllCompagnies or cl.code==null }"  onclick="PF('manageDeleteDialog').show()">
+                                    <f:setPropertyActionListener value="#{cl}" target="#{brancheController.branches}"   />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column headerText="id"    >
+                                <h:outputText value="#{cl.idBranche}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['code']}" sortBy="#{cl.code}" filterBy="#{cl.code}"  >
+                                <h:outputText value="#{cl.code}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['libelle']}" sortBy="#{cl.libelle}" filterBy="#{cl.libelle}" >
+                                <h:outputText value="#{brancheController.valueObjectByLibelleAutres(cl)}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg['classe']}" sortBy="#{cl.idClasse.libelle}" filterBy="#{cl.idClasse.libelle}"  >
+                                <h:outputText value=" #{formatDateController.valueObject(cl.idClasse.libelle,cl.idClasse)}"/>
+
+                            </p:column>
+
+                        </p:dataTable>
+
+                    </h:form>
+                    <h:form id="form1">
+
+
+
+                        <p:dialog header="#{msg['edition.branche']}"  showEffect="fade" modal="true" widgetVar="manageBrancheDialog" responsive="true">
+                            <p:fieldset  id="fieldset1" >
+                                <p:panelGrid styleClass="noBorders" columns="4" style="border: 0px; border-bottom: 0px" layout="grid" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4">
+                                    <p:outputLabel value="#{msg['code']}: " for="code"  /> 
+                                    <p:inputText id="code"  title="code" validator="requiredValidator" required="true"  value="#{brancheController.branches.code}"  disabled="#{brancheController.branches.showAllCompagnies}"  >
+                                        <f:ajax event="blur" render="code"/>
+                                    </p:inputText>
+                                    <!--<p:message for="code" />-->
+                                    <p:outputLabel value="#{msg['libelle']}: *" for="libelle" /> 
+        <!--                            <p:inputText id="libelle"  title="libelle" validator="requiredValidator" value="#{brancheController.branches.libelle}" >
+                                        <f:ajax event="blur" render="libelle"/>
+                                    </p:inputText>-->
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="libelle" value="#{brancheController.branches.libelle}"  validator="requiredValidator" placeholder="#{msg['select']}" disabled="#{brancheController.branches.showAllCompagnies}" >
+                                        <f:selectItem itemLabel="#{msg['select']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{brancheController.typeLibelleBrancheForCreer}"   />
+
+                                        <f:ajax event="change" render=":form1"    listener="#{brancheController.chargeDialog()}" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel value="#{msg['Autre']}: *"  rendered="#{brancheController.chargLibelleBranche()}" /> 
+                                    <p:inputText id="libelleAutres"  title="libelleAutres" validator="requiredValidator" value="#{brancheController.branches.libelleAutre}"   rendered="#{brancheController.chargLibelleBranche()}" required="true"  >
+                                        <f:ajax event="blur" render=":form1:libelleAutres"/>
+                                    </p:inputText>
+                                    <!--<p:message for="libelle" />-->
+                                    <h:outputLabel value="#{msg['classe']}*: " for="classe"/>
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="classe" value="#{brancheController.branches.idClasse}"  validator="requiredValidator" required="true" disabled="#{brancheController.branches.showAllCompagnies}" var="cl" filter="true"  filterMatchMode="contains"  >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{brancheController.lisClass}" var="int" itemLabel="#{int.code} #{brancheController.valueObjectByLibelleAutresClasse(int)}" itemValue="#{int}" />
+                                        <f:ajax event="change" render="classe"/>
+                                        <p:column>
+                                            #{brancheController.valueObjectByLibelleAutresClasse(cl)}
+
+                                        </p:column>
+
+                                    </p:selectOneMenu>
+
+
+
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update=":form2:table,:form1,:form2:msg" process="@this" rendered="#{brancheController.accessCree() and brancheController.branches.idBranche==null}"
+                                                     styleClass="success-button" style="margin-right: .5rem"    actionListener="#{brancheController.addBranche()}" oncomplete="PF('manageBrancheDialog').show()"/>
+
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form2:table,:form1,:form2:msg" process="@this" rendered="#{brancheController.accessModifier() and brancheController.branches.idBranche!=null}"
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"    actionListener="#{brancheController.updateBranche()}" oncomplete="PF('manageBrancheDialog').hide()" />
+
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageBrancheDialog').hide()" styleClass="danger-button" actionListener="#{brancheController.reset()}" icon="pi pi-times" />  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+
+
+
+                    </h:form>
+                </div>
+
+                <h:form id="form4">
+                    <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                        <center>
+                            <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                        </center>
+
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="OK" actionListener="#{brancheController.deleteBranche()}" update=":form1,:form2" onclick="PF('manageDeleteDialog').hide()" />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                            </center>
+                        </f:facet>
+                    </p:dialog>
+
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

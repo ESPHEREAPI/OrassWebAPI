@@ -1,0 +1,361 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/avenant/accessTypeAvenant">#{msg['access.droit.typeAvenant']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"  escape="false"/>       
+                        <p:panel header="#{msg['access.droit.typeAvenant']} "  >
+                            <p:panelGrid   columns="8" layout="grid" >
+                                <h:outputLabel value="#{msg['branche']}* : "  style="float: left;"/>
+                                <p:selectOneMenu value="#{accessDroitAvenatController.branches}" 
+                                                 converter="#{genericConverter}" id="branche" validator="requiredValidator" required="true" var="b" filter="true" filterMatchMode="contains"  >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{accessDroitAvenatController.listeBranches}" var="br" itemLabel="#{br.code} #{formatDateController.valueObject(br.libelle,br)}" itemValue="#{br}"/>
+
+                                    <p:column>
+                                        #{b.code} #{formatDateController.valueObject(b.libelle,b)}
+                                    </p:column>
+                                    <!--<p:ajax event="change"  listener="#{productionController.chargeByCategorieSelct()}" update=":form1,:form1:tabprincipal,form11" oncomplete="PF('accordP').select(0);" />-->
+                                </p:selectOneMenu>   
+                                <h:outputLabel value="#{msg['categorie']} : "  style="float: left;"/>
+                                <p:selectOneMenu value="#{accessDroitAvenatController.categories}" 
+                                                 converter="#{genericConverter}" id="categories"  var="c" filter="true" filterMatchMode="contains"   >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{accessDroitAvenatController.listeCategories}" var="cat" itemLabel="#{cat.code} #{formatDateController.valueObject(cat.libelle,cat)}" itemValue="#{cat}"/>
+
+                                    <p:column>
+                                        #{c.code} #{formatDateController.valueObject(c.libelle,c)}
+                                    </p:column>
+                                    <!--<p:ajax event="change"  listener="#{productionController.chargeByCategorieSelct()}" update=":form1,:form1:tabprincipal,form11" oncomplete="PF('accordP').select(0);" />-->
+                                </p:selectOneMenu> 
+
+
+                            </p:panelGrid>
+                        </p:panel>
+                        <p:tabView  id="tabprincipal" widgetVar="accordP"    >
+
+                            <p:ajax event="tabChange" listener="#{accessDroitAvenatController.onTabChange}" />
+
+                            <p:tab title="#{msg['consultation']}" id="consultation">
+                                <p:dataTable var="acc" value="#{accessDroitAvenatController.listeAccess_Avenant}"  widgetVar="accessAvenantTable" 
+                                             filteredValue="#{accessDroitAvenatController.filterAccessAvenat}"      paginatorAlwaysVisible="false" rowsPerPageTemplate="50,100,500,1000" filterEvent="enter"
+                                             id="idaccessAvenantTable"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             >
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('accessAvenantTable').filter()"
+                                                         style="width:150px" placeholder="Search text..."  > 
+
+                                            </p:inputText>  
+
+
+                                        </p:outputPanel>
+
+                                    </f:facet> 
+                                    <p:column  >
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{acc.id!=null}"  onclick="PF('manageConfirmeDialog').show()"  >
+                                            <f:setPropertyActionListener value="#{acc}" target="#{accessDroitAvenatController.access_Avenant}"   />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"  rendered="#{acc.id!=null}"   onclick="PF('manageDeleteDialog').show()"  >
+                                            <f:setPropertyActionListener value="#{acc}" target="#{accessDroitAvenatController.access_Avenant}"   />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['code']}" style="width: 50px">
+                                        <h:outputText id="code"    value="#{acc.idTypeAvenant.idRefAvenant.code}"    >
+                                            <!--<p:ajax event="keyup"   oncomplete="PF('manageRefGarantieDialog').show()"  update=":form2_2:idtableCategorie"/>-->
+                                        </h:outputText>
+                                    </p:column >
+                                    <p:column headerText="#{msg['libelle']}" sortBy="#{acc.idTypeAvenant.idRefAvenant.libelle}" filterBy="#{acc.idTypeAvenant.idRefAvenant.libelle}">
+                                        <h:outputText value="#{acc.idTypeAvenant.idRefAvenant.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['objet']}" >
+                                        <h:outputText value="#{formatDateController.valueObject(acc.idObjet.classeObjet)}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['bouton.ajouter']}" >
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="ajouter" value="#{acc.ajouter}">
+                                            <f:ajax event="change" render="ajouter"/>
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+                                    <p:column headerText="#{msg['bouton.supprimer']}" >
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="supprimer" value="#{acc.supprimer}">
+                                            <f:ajax event="change" render="supprimer"/>
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['bouton.modifier']}" >
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="modifier" value="#{acc.modifier}">
+                                            <f:ajax event="change" render="modifier" />
+                                              <p:ajax event="change" update="form1" />
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['zone.modification']}" >
+                                        <p:commandLink id="list" action="#{accessDroitAvenatController.chargeCaracteristiqueObjetByAccessAvenant(acc)}" style="margin-left:20px; color: #01579B"  rendered="#{accessDroitAvenatController.afficherListe(acc)}" update=":form12" >
+                                            <h:outputText value="#{msg['afficher_liste']}" />
+                                            <f:setPropertyActionListener value="#{acc}" target="#{accessDroitAvenatController.access_Avenant}"   />
+                                        </p:commandLink> 
+                                    </p:column>
+
+
+                                </p:dataTable>
+
+
+
+                            </p:tab>
+                            <p:tab title="#{msg['edition.access.avenant']}" id="edition">
+
+                                <p:dataTable var="access" value="#{accessDroitAvenatController.listeAccessAvenat_Caracteristique}"  widgetVar="accessTable" 
+                                             filteredValue="#{accessDroitAvenatController.filterAccessAvenat_Caracteristique}"   
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idaccessTable"
+
+                                             >
+
+                                    <!--                                    <f:facet name="header">
+                                                                            <p:outputPanel>
+                                                                                <h:outputText value="#{msg['recherche']} : "/>
+                                    
+                                                                                <p:inputText id="globalFilter"
+                                                                                             onkeyup="PF('rubriqueCategorieTable').filter()"
+                                                                                             style="width:150px" placeholder="Search text..."  > 
+                                    
+                                                                                </p:inputText>  
+                                    
+                                    
+                                                                            </p:outputPanel>
+                                    
+                                                                        </f:facet> -->
+                                    <p:column  style="width: 50px">
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"   onclick="PF('manageAddDialog').show()" actionListener="#{accessDroitAvenatController.showAccessDroitAvenant(access)}"  >
+                                            <f:setPropertyActionListener value="#{access}" target="#{accessDroitAvenatController.accessAvenat_Caracteristique}"   />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-times"  
+                                                          styleClass="danger-button" style="margin-right: .5rem"   onclick="PF('manageRemoveDialog').show()"   >
+
+                                        </p:commandButton>
+
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['code']}"  style="width: 20px">
+                                        <h:outputText value="#{access.idAccess_Avenant.idTypeAvenant.idRefAvenant.code}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['designation']}" >
+                                        <p:selectOneMenu value="#{access.idAccess_Avenant.idTypeAvenant}" 
+                                                         converter="#{genericConverter}" id="typeAvenant"  var="tpa" filter="true" filterMatchMode="contains"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{accessDroitAvenatController.listeTypeAvenant}" var="av" itemLabel=" #{av.idRefAvenant.libelle}" itemValue="#{av}"/>
+
+                                            <p:column>
+                                                #{tpa.idRefAvenant.libelle}
+                                            </p:column>
+                                            <p:ajax event="change"  listener="#{accessDroitAvenatController.chargeObjetByBrancheAndTypeAvenat(access)}" update=":form1,:form1:tabprincipal" oncomplete="PF('accordP').select(1);" />
+                                        </p:selectOneMenu> 
+                                    </p:column>
+                                    <p:column headerText="#{msg['objet']}" >
+                                        <p:selectOneMenu value="#{access.idAccess_Avenant.idObjet}" 
+                                                         converter="#{genericConverter}" id="objetclass"  var="ob" filter="true" filterMatchMode="contains"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{accessDroitAvenatController.listeObjet}" var="obj" itemLabel=" #{formatDateController.valueObject(obj.classeObjet)}" itemValue="#{obj}"/>
+
+                                            <p:column>
+                                                #{formatDateController.valueObject(ob.classeObjet)}
+                                            </p:column>
+                                            <f:ajax event="change" render="objetclass"/>
+                                        </p:selectOneMenu> 
+                                    </p:column>
+                                    <p:column headerText="#{msg['bouton.ajouter']}"  >
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="ajouter" value="#{access.idAccess_Avenant.ajouter}">
+                                            <f:ajax event="change" render="ajouter"/>
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+                                    <p:column headerText="#{msg['bouton.supprimer']}" >
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="supprimer" value="#{access.idAccess_Avenant.supprimer}">
+                                            <f:ajax event="change" render="supprimer"/>
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['bouton.modifier']}">
+                                        <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="modifier" value="#{access.idAccess_Avenant.modifier}"  style="float: left">
+                                            <f:ajax event="change" render="modifier"/>
+                                            <p:ajax event="change"  listener="#{accessDroitAvenatController.chargeCaracteristiqueByObjetAndbranche(access)}" update=":form1,:form1:tabprincipal" oncomplete="PF('accordP').select(1);" />
+
+
+                                        </p:selectBooleanButton>
+                                    </p:column>
+                                    <p:column headerText="#{msg['zone.modification']}"  >
+                                        <p:selectCheckboxMenu id="caracteristique" value="#{access.listeCaracteristiqueSelect}" label="caracteristique" style=" float: left" 
+                                                              rendered="#{access.idAccess_Avenant.modifier}"       multiple="true" filter="true" filterMatchMode="startsWith" panelStyle="width: 30rem" scrollHeight="250">
+                                            <p:ajax event="itemUnselect" listener="#{accessDroitAvenatController.onItemUnselect}"/>
+                                            <f:selectItems value="#{accessDroitAvenatController.listeCaracteristiques}" var="ca" itemLabel="#{formatDateController.valueObject(ca.libelle)}"/>
+                                        </p:selectCheckboxMenu>
+                                    </p:column>
+
+                                </p:dataTable>
+
+
+                            </p:tab>
+
+
+
+                        </p:tabView>
+
+                    </h:form>
+
+                    <h:form id="form12">
+                        <p:dialog header="#{msg['afficher_liste']} | #{formatDateController.valueObject(accessDroitAvenatController.access_Avenant.idObjet.classeObjet)}" width="500" showEffect="fade" modal="true" widgetVar="listDialog" responsive="true">
+
+                            <!--<h:panelGroup >-->
+
+                                <p:selectOneMenu value="#{accessDroitAvenatController.caracteristiques}" 
+                                                 converter="#{genericConverter}" id="zone_modif"  var="zm" filter="true" filterMatchMode="contains"  >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{accessDroitAvenatController.listeCaracteristiqueObjetNotHaveAccess}" var="br" itemLabel=" #{formatDateController.valueObject(br.libelle,br)}" itemValue="#{br}"/>
+
+                                    <p:column>
+                                        #{formatDateController.valueObject(zm.libelle,b)}
+                                    </p:column>
+                                    <f:ajax event="change" listener="#{accessDroitAvenatController.shwoDetailElementList(elt)}" />
+                                </p:selectOneMenu> <p:spacer width="10" />
+                                <p:commandButton  icon="pi pi-plus" 
+                                                  styleClass="success-button" style="margin-right: .5rem; width: 50px;float: bottom"  rendered="#{elt.id==null }"   actionListener="#{accessDroitAvenatController.addElemntList()}"    >
+                                    <!--<f:setPropertyActionListener value="#{elt}" target="#{accessDroitAvenatController.accessAvenat_Caracteristique}"   />-->
+                                    <!--<f:ajax event="click" listener="#{accessDroitAvenatController.shwoDetailElementList(elt)}" />-->
+                                </p:commandButton>
+
+                                
+                            <!--</h:panelGroup>-->
+                            <p:dataTable var="elt" value="#{accessDroitAvenatController.listeElement_Liste_Caracteristique}"  widgetVar="eltTable" 
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="5,15,50,100,500,1000"  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         paginator="true" rows="5"   currentPageReportTemplate=" Total :{totalRecords} "
+
+                                         emptyMessage="#{msg['emptyMessage']}"    id="idEltTable"
+
+                                         >
+
+
+                                <p:column  >
+
+
+
+
+                                    <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                      styleClass="danger-button" style="margin-right: .5rem" rendered="#{elt.id!=null }"    actionListener="#{accessDroitAvenatController.deleteElementListe()}"   ajax="false" >
+
+                                        <f:ajax event="click" listener="#{accessDroitAvenatController.shwoDetailElementList(elt)}" />
+                                    </p:commandButton>
+
+                                </p:column>
+
+
+                                <p:column headerText="#{msg['zone.modification']}" >
+
+
+                                    <p:outputLabel  value="#{formatDateController.valueObject(elt.idCaracteristiques.libelle)}"  />
+
+                                </p:column>
+
+
+
+
+                            </p:dataTable>
+                        </p:dialog>
+                        <p:dialog widgetVar="manageAddDialog" header="#{msg['welcome.bienvenue']}" closable="true" width="500" height="75" showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['confirmation.action']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{accessDroitAvenatController.addAccessAvenant()}" update=":form1,:form1:tabprincipal" onclick="PF('manageAddDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>    
+                        <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true" width="500" height="75" showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{accessDroitAvenatController.deleteAccessAvenant()}" update=":form1,:form1:tabprincipal" onclick="PF('manageDeleteDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>  
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{accessDroitAvenatController.updateAccessAvenant()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1,:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.supprimer']}"     actionListener="#{accessDroitAvenatController.removetableAccessCaracteristique()}" oncomplete=" PF('manageRemoveDialog').hide()" update="form1"  />
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

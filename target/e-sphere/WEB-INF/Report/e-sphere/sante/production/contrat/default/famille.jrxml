@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c7a7f576-1888-4208-b46f-8ec2bdc76713">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="183"/>
+	<property name="ireport.y" value="0"/>
+	<field name="lienParente" class="java.lang.Object"/>
+	<field name="sexe" class="java.lang.Object"/>
+	<field name="nom_membre" class="java.lang.String"/>
+	<field name="dateNaissance" class="java.util.Date"/>
+	<field name="idRisque.libelle" class="java.lang.String"/>
+	<field name="idRisque.idGroup.id" class="java.lang.Long"/>
+	<group name="adherent">
+		<groupExpression><![CDATA[]]></groupExpression>
+	</group>
+	<group name="groupe" isStartNewColumn="true" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{idRisque.idGroup.id}]]></groupExpression>
+		<groupHeader>
+			<band height="4"/>
+		</groupHeader>
+	</group>
+	<group name="membre">
+		<groupExpression><![CDATA[$F{idRisque.libelle}]]></groupExpression>
+		<groupHeader>
+			<band height="29">
+				<staticText>
+					<reportElement x="0" y="16" width="208" height="13" uuid="b5e880d2-a6ba-4844-9563-e2c0679cec82"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="SansSerif"/>
+					</textElement>
+					<text><![CDATA[Membre]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="208" y="16" width="100" height="13" uuid="d1518b60-ba55-4bb9-aace-2843f9b4beec"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="SansSerif"/>
+					</textElement>
+					<text><![CDATA[Lien Parenté]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="308" y="16" width="100" height="13" uuid="67d38797-d94c-4b07-9651-3823921c4af4"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="SansSerif"/>
+					</textElement>
+					<text><![CDATA[Naissance]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="408" y="16" width="100" height="13" uuid="b8a6c11a-ec14-409c-8396-863638054395"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="SansSerif"/>
+					</textElement>
+					<text><![CDATA[Sexe]]></text>
+				</staticText>
+				<textField>
+					<reportElement mode="Opaque" x="184" y="0" width="281" height="16" forecolor="#009999" backcolor="#CCFFFF" uuid="0d0e938e-bb36-4c33-b3e5-eea20f690ea1"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="12" isBold="true" isUnderline="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["  ASSURES   : "+$F{idRisque.libelle}.toUpperCase()]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="208" y="0" width="100" height="13" uuid="38f59c34-17de-4acb-a0b2-a025c4e07a8f"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{lienParente}.toString()=="ascendant") ? "Ascendant":($F{lienParente}.toString()=="conjoint") ? "Conjoint(e)":"Enfant"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="308" y="0" width="100" height="13" uuid="405cad66-fe41-4e03-a5bb-cf04b7ffad31"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dateNaissance}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="408" y="0" width="100" height="13" uuid="69be4b5f-fc8d-473e-83a8-893aab6ef786"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{sexe}.toString()=="M") ? "Homme":"Femme"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="208" height="13" uuid="10fb53ba-052f-4f8f-8cb8-fa5e46e70b83"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{nom_membre}.toUpperCase()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

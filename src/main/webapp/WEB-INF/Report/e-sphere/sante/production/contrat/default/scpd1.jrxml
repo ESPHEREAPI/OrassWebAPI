@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="db6af00a-5bbc-4c8e-ad62-6bd29916d3f1">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\projet\\svn_Esphere\\src\\main\\webapp\\WEB-INF\\Report\\e-sphere\\sante\\production\\contrat\\default\\"]]></defaultValueExpression>
+	</parameter>
+	<field name="libelle" class="java.lang.String"/>
+	<field name="valeur" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement uuid="bf6d8c5d-ebe2-431c-86d9-5ab87163234c" mode="Opaque" x="0" y="0" width="236" height="15" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" isBold="false" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" "+$F{libelle}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="7d8cd505-4c07-4ccf-b0da-31c0e229603d" mode="Transparent" x="214" y="1" width="60" height="14" backcolor="#CCCCCC"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valeur}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

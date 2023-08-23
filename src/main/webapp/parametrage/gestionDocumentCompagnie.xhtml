@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/typeDocument">#{msg['gestionDocument']}</p:link>
+        </li>
+    </ui:define>
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                     styleClass="warning-button" style="margin-right: .5rem"       actionListener="#{gestionStockController .reload()}" update=":form1" /> 
+
+
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+                        <p:tabView  id="tabprincipal" widgetVar="principal">
+                            <!--<p:ajax event="tabChange"  listener="#{gestionStockController.onTabChange}" update=":form1:tabprincipal" process="@this"/>-->
+                            <p:tab title="#{msg['gestionDocument.stock']}" id="gestino_document" rendered="#{gestionStockController.accessValidation()==true}" >
+                                <p:toolbarGroup>
+
+                                    <p:commandButton value="#{msg['bouton.valider']}" icon="pi pi-check"   
+                                                     styleClass="success-button" style="margin-right: .5rem"  rendered="#{gestionStockController.accessValidation()==true}"    actionListener="#{gestionStockController.validationGestionStock()}" update=":form1:msg,:form1:tabprincipal" oncomplete="PF('principal').select(0);" />
+
+
+                                </p:toolbarGroup>
+                                <p:panelGrid columns="4" layout="grid" >
+                                    <p:outputLabel  value="#{msg['type.operation']}" style="float: top" />
+                                    <p:selectOneMenu value="#{gestionStockController.operationStock}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="operation" validator="requiredValidator" required="true" var="to" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionStockController.listeOperationStock}" var="op" itemLabel=" #{formatDateController.valueObject(op.typeOperation)} " itemValue="#{op}"/>
+
+                                        <p:column>
+                                            #{formatDateController.valueObject(to.typeOperation)} 
+                                        </p:column>
+                                        <f:ajax event="change"  render=":operation" />
+
+                                        <p:ajax event="change"  listener="#{gestionStockController.choixOperationStock()}" update=":form1:tabprincipal" process="@this"/>
+                                    </p:selectOneMenu>
+
+
+                                    <p:outputLabel  value="#{msg['document']}" style="float: top" />
+                                    <p:selectOneMenu value="#{gestionStockController.typeDocument}" 
+                                                     converter="#{genericConverter}" id="document" validator="requiredValidator" required="true" var="td" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionStockController.listeTypeDocument}" var="tdoc" itemLabel="#{tdoc.code}  -  #{tdoc.libelle} " itemValue="#{tdoc}"/>
+
+                                        <p:column>
+                                            #{td.code}  -  #{td.libelle} 
+                                        </p:column>
+                                        <f:ajax event="change" render=":document" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['nature.doc']}" style="float: top" />
+                                    <p:selectOneMenu value="#{gestionStockController.natureDocument}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="nature_document" validator="requiredValidator" required="true" var="nd" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionStockController.listeNatureDocument}" var="ndoc" itemLabel="#{ndoc.code}  -  #{ndoc.libelle} " itemValue="#{ndoc}"/>
+
+                                        <p:column>
+                                            #{nd.code}  -  #{nd.libelle} 
+                                        </p:column>
+                                        <f:ajax event="change" render="nature_document" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['date_effet']}" style="float: top" />
+                                    <p:calendar value="#{gestionStockController.date_effet}" mode="popup"  title="#{msg['date_effet']}" showOn="both"  id="date_effet" pattern="dd/MM/yyyy"  >
+                                        <f:ajax event="dateSelect"  render="date_effet"/>
+                                    </p:calendar>
+                                    <p:outputLabel  value="#{msg['entite.emettrice']}" style="float: top" />
+                                    <p:inputText id="emettrice_default"  rendered="#{gestionStockController.entite_externe==false and gestionStockController.choix0perations==0}"  disabled="true"/>
+
+                                    <p:outputLabel id="emettrice_externe" value="#{formatDateController.valueObject(gestionStockController.entite_Emmettrice)}" rendered="#{gestionStockController.entite_externe==true and gestionStockController.choix0perations==1}" />
+                                    <p:outputLabel id="emettrice_Interne" value="#{gestionStockController.gestionStockCompagnie.idEntreprise.code}- #{gestionStockController.gestionStockCompagnie.idEntreprise.raisonSociale}" rendered="#{gestionStockController.entite_externe==false and gestionStockController.choix0perations==2}" />
+                                    <p:selectOneMenu value="#{gestionStockController.intermediairesEmetrice}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="emettrice_Interne_agence" validator="requiredValidator" required="true" var="ag" filter="true" filterMatchMode="contains" rendered="#{gestionStockController.entite_externe==false and gestionStockController.choix0perations==3}" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionStockController.listeIntermediaires}" var="age" itemLabel="#{age.idRefIntermediaire.code}  -  #{age.idRefIntermediaire.raisonSociale} " itemValue="#{age}"/>
+
+                                        <p:column>
+                                            #{ag.idRefIntermediaire.code}  -   #{ag.idRefIntermediaire.raisonSociale}
+                                        </p:column>
+                                        <f:ajax event="change" render="emettrice_Interne_agence" />
+                                        <p:ajax event="change" update=":form1:tabprincipal"   listener="#{gestionStockController.controleGestionStockByEmmetrice()}"/>
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['entite.receptrice']}" style="float: top" />
+                                    <!--<p:inputText id="emettrice_recetrice_compagnie" value="#{formatDateController.valueObject(gestionStockController.entite_Emmettrice)}" rendered="#{gestionStockController.entite_externe==true and gestionStockController.choix0perations==1}" />-->
+                                    <p:inputText id="emettrice_default2"  rendered="#{gestionStockController.entite_externe==false and gestionStockController.choix0perations==0}"  disabled="true"/>
+
+                                    <p:outputLabel  id="recetrice_compagnie" value="#{gestionStockController.gestionStockCompagnie.idEntreprise.code}- #{gestionStockController.gestionStockCompagnie.idEntreprise.raisonSociale}" rendered="#{gestionStockController.entite_externe==true and gestionStockController.choix0perations==1}" />
+                                    <p:selectOneMenu value="#{gestionStockController.intermediairesReceptrice}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="receptrice_agence" validator="requiredValidator" required="true" var="ag" filter="true" filterMatchMode="contains" rendered="#{gestionStockController.entite_externe==false and (gestionStockController.choix0perations==2 or gestionStockController.choix0perations==3) }" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{gestionStockController.listeIntermediaires}" var="age" itemLabel="#{age.idRefIntermediaire.code}  -  #{age.idRefIntermediaire.raisonSociale} " itemValue="#{age}"/>
+
+                                        <p:column>
+                                            #{ag.idRefIntermediaire.code}  -   #{ag.idRefIntermediaire.raisonSociale}
+                                        </p:column>
+                                        <f:ajax event="change" render="emettrice_Interne_agence" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['debut.serie']}" style="float: top" />
+                                    <p:inputNumber value="#{gestionStockController.debut_serie}"   decimalPlaces="0" emptyValue="#{0}" maxValue="#{9999999999}" minValue="#{0}"   id="debut_serie"  >
+                                        <f:ajax event="blur" render="debut_serie"/>
+                                        <f:ajax event="input" render="total_serie"/>
+                                        <f:ajax event="blur" render="total_serie"/>
+                                    </p:inputNumber>
+                                    <p:outputLabel  value="#{msg['fin.serie']}" style="float: top" />
+                                    <p:inputNumber value="#{gestionStockController.fin_serie}"   decimalPlaces="0" emptyValue="#{0}"   maxValue="#{9999999999}" minValue="#{0}"  id="fin_serie"  >
+                                        <f:ajax event="blur" render="fin_serie"/>
+                                        <f:ajax event="input" render="total_serie"/>
+                                        <f:ajax event="blur" render="total_serie"/>
+                                        <!--<p:ajax event="input" update=":form1:tabprincipal"/>-->
+                                    </p:inputNumber>
+                                    <p:outputLabel  value="#{msg['nombre']}" style="float: top" />
+                                    <p:inputNumber value="#{gestionStockController.totalNombre_serie}"  disabled="true" decimalPlaces="0" emptyValue="#{0}"      id="total_serie"  >
+                                        <f:ajax event="blur" render="total_serie"/>
+
+                                    </p:inputNumber>
+
+                                </p:panelGrid>
+
+
+                            </p:tab>  
+                            <p:tab title="#{msg['gestionDocument.compagne.detail']}" id="gestino_document_compagnies" rendered="#{gestionStockController.accessModifierCompagnieEntiteExterne()==true or gestionStockController.accessDeleteCompagnieEntiteExterne()==true}" >
+                                <p:dataTable var="sc" value="#{gestionStockController.listeGestionStockCompagnie}" paginator="true" rows="100" widgetVar="stockCompagnieTable"  id="idStockCompagnieTable"
+                                             paginatorAlwaysVisible="true" rowsPerPageTemplate="50,100,500,1000" filterEvent="enter" filteredValue="#{gestionStockController.filterTypeGestionStockCompagnie}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{sc.id}" 
+
+                                             >
+
+
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('stockCompagnieTable').filter()"
+                                                         style="width:350px" placeholder="Search text"  />
+                                        </p:outputPanel>
+
+                                    </f:facet>
+
+
+
+
+                                    <p:column >
+                                        <!--                                        <p:commandButton icon="pi pi-pencil" 
+                                                                                                 styleClass="edit-button rounded-button success-button"   title="#{msg['bouton.modifier']}" style="margin-right: .5rem" actionListener="#{gestionStockController.showDetailsStcokCompagnie(sc)}" oncomplete="PF('principal').select(0);" 
+                                                                                                 rendered="#{gestionStockController.accessModifierCompagnieEntiteExterne() and sc.permission_modifier==true}"    >
+                                                                                    <f:setPropertyActionListener value="#{sc}" target="#{gestionStockController.gestionStockCompagnie}"   />
+                                                                                </p:commandButton>-->
+
+                                        <p:commandButton class="danger-button rounded-button" icon="pi pi-trash" process="@this" update="form1,:form1:msg" onclick="PF('manageDeleteStockCompagnieDialog').show()" style="margin-right: .5rem"  title="#{msg['bouton.supprimer']}" rendered="#{gestionStockController.accessDeleteCompagnieEntiteExterne()}" >
+                                            <f:setPropertyActionListener value="#{sc}" target="#{gestionStockController.gestionStockCompagnie}"   />
+                                        </p:commandButton>
+
+
+
+                                    </p:column>
+                                    <!--</p:column>-->
+                                    <p:column headerText="#{msg['document']}" sortBy="#{sc.idTypeDocument.libelle}" filterBy="#{sc.idTypeDocument.libelle}">
+                                        <h:outputText value="#{sc.idTypeDocument.code} - #{sc.idTypeDocument.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nature.doc']}" sortBy="#{sc.idNatureDocument.libelle}" filterBy="#{sc.idNatureDocument.libelle}">
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{sc.idNatureDocument.code} - #{sc.idNatureDocument.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['entite.emettrice']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.valueObject(sc.entite_Emmettrice)}  "/>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['entite.receptrice']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{sc.idEntreprise.code} - #{sc.idEntreprise.raisonSociale}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['date_effet']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatDate(sc.dateEffet)} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.initial']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.stockInitial.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.entre']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.stockEntree.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.sortie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.stockSortie.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.final']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.stockFinal.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['debut.serie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.debut_serie.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['fin.serie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sc.fin_serie.longValue())} " />
+                                    </p:column>
+
+
+                                </p:dataTable>
+
+                            </p:tab> 
+                            <p:tab title="#{msg['gestionDocument.agence.detail']}" id="gestino_document_agence" rendered="#{ gestionStockController.accessDeleterCompagnieAgence()==true}" >
+                                <p:dataTable var="sca" value="#{gestionStockController.listeGestionCompagnieAgence}" paginator="true" rows="100" widgetVar="stockCompagnieAgenceTable"  id="idStockCompagnieAgenceTable"
+                                             paginatorAlwaysVisible="true" rowsPerPageTemplate="50,100,500,1000" filterEvent="enter" filteredValue="#{gestionStockController.filterGestionCompagnieAgence}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "
+                                             emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{sca.id}" 
+
+                                             >
+
+
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('stockCompagnieAgenceTable').filter()"
+                                                         style="width:350px" placeholder="Search text"  />
+                                        </p:outputPanel>
+
+                                    </f:facet>
+
+
+
+
+                                    <p:column >
+
+
+                                        <p:commandButton class="danger-button rounded-button" icon="pi pi-trash" process="@this" update="form1,:form1:msg" onclick="PF('manageDeleteStockCompagnieAgenceDialog').show()" style="margin-right: .5rem"  title="#{msg['bouton.supprimer']}" rendered="#{gestionStockController.accessDeleterCompagnieAgence()}" >
+                                            <f:setPropertyActionListener value="#{sca}" target="#{gestionStockController.gestionCompagnieAgence}"   />
+                                        </p:commandButton>
+
+
+
+                                    </p:column>
+                                    <!--</p:column>-->
+                                    <p:column headerText="#{msg['document']}" sortBy="#{sca.idTypeDocument.libelle}" filterBy="#{sca.idTypeDocument.libelle}">
+                                        <h:outputText value="#{sca.idTypeDocument.code} - #{sca.idTypeDocument.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nature.doc']}" sortBy="#{sca.idNatureDocument.libelle}" filterBy="#{sca.idNatureDocument.libelle}">
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{sca.idNatureDocument.code} - #{sca.idNatureDocument.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['entite.emettrice']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{sca.idGestionStockCompagnie.idEntreprise.code} - #{sca.idGestionStockCompagnie.idEntreprise.raisonSociale} "/>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['entite.receptrice']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{sca.idIntermediaire.idRefIntermediaire.code} - #{sca.idIntermediaire.idRefIntermediaire.raisonSociale}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['date_effet']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatDate(sca.dateEffet)} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.initial']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.stockInitial.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.entre']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.stockEntree.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.sortie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.stockSortie.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['stock.final']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.stockFinal.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['debut.serie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.debut_serie.longValue())} "/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['fin.serie']}" >
+
+                                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                      value="#{formatDateController.formatNumberGeneral(sca.fin_serie.longValue())} " />
+                                    </p:column>
+
+
+                                </p:dataTable>
+
+                            </p:tab> 
+
+                        </p:tabView>
+                    </h:form>
+                    <h:form id="form2">
+                        <p:dialog widgetVar="manageDeleteStockCompagnieDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{gestionStockController.deleteStcokCompagnie()}" update=":form1:tabprincipal" onclick="PF('manageDeleteStockCompagnieDialog').hide()" oncomplete="PF('principal').select(1);"/>
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('manageDeleteStockCompagnieDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:dialog widgetVar="manageDeleteStockCompagnieAgenceDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{gestionStockController.deleteStcokCompagnieAgence()}" update=":form1:tabprincipal" onclick="PF('manageDeleteStockCompagnieAgenceDialog').hide()" oncomplete="PF('principal').select(2);"/>
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('manageDeleteStockCompagnieAgenceDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                        
+                    </h:form>
+
+
+                </div>     
+            </div>  
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

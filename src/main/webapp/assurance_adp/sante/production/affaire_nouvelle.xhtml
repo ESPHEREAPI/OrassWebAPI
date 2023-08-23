@@ -1,0 +1,2318 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+    <style type="text/css">
+        .old{
+            background-color: #6CE26C !important;
+            background-image: none !important;
+            color: black !important;
+        }
+        .red{
+            background-color: #D20005 !important;
+            background-image: none !important;
+            color: black !important;
+
+        }
+        fieldset {
+            border:1px solid green !important;
+            -webkit-border-radius: 8px !important;
+            -moz-border-radius: 8px !important;
+            border-radius: 8px !important;
+        }
+        new{
+            background-color: highlight !important;
+        }
+
+    </style>
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/sante/production/affaire_nouvelle">#{msg['affaire_nouvelle']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+
+                <div class="card">
+                    <h:form id="form11">
+                        <p:commandButton value="#{msg['nouveau.contrat']}" icon="pi pi-plus"   
+                                         styleClass="secondary-button" style="margin-right: .5rem"       actionListener="#{productionController.reload()}" />
+                        <p:commandButton value="#{msg['liste.contrat']}" icon="pi pi-sliders-h"  onclick="PF('managePoliceDialog').show()" 
+                                         styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  />
+                        <p:commandButton  value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  styleClass="secondary-button" onclick="PF('manageConfirmeDialog').show()" rendered="#{productionController.police.id!=null and productionController.police.validation==false }"  process="@this"  />
+                        <p:spacer width="10"/>
+                        <p:commandButton value="#{msg['annuler.contrat']}" icon="pi pi-eye-slash"  onclick="PF('managDeleteDialog').show()" 
+                                         styleClass="danger-button p-mr-2 p-mb-2" style="margin-right: .5rem" rendered="#{productionController.police.id!=null and productionController.police.validation==true}" />
+                        <p:commandButton value="#{msg['devalider']}" icon="pi pi-thumbs-down"  onclick="PF('managDeleteDialogDV').show()" 
+                                         styleClass="danger-button p-mr-2 p-mb-2" style="margin-right: .5rem" rendered="#{productionController.police.id!=null and productionController.police.validation==true}" />
+
+                        <p:commandButton value="#{msg['format.fichier']}" icon="pi pi-download" styleClass="ui-button-outlined"  actionListener="#{productionController.chargeFile()}" ajax="false" rendered="#{productionController.tabShowGroup}" >
+                            <p:fileDownload value="#{productionController.chargeFile()}"/>
+                        </p:commandButton>
+                        <p:spacer width="10"/>
+
+
+                    </h:form>
+
+                    <h:form id="form1">
+
+
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"  escape="false"/>   
+                        <p:panel header="#{msg['sante']} / #{msg['affaire_nouvelle']} / #{productionController.intermediaires.idRefIntermediaire.code} #{productionController.intermediaires.idRefIntermediaire.raisonSociale} / #{msg['avenant.numero']} : #{productionController.avenant==null ? null : productionController.avenant.numero_avenant} "  >
+                            <p:panelGrid   columns="7" layout="grid" >
+
+                                <p:outputLabel  value="#{msg['numero.police']}" rendered="#{productionController.categories.idCategorie!=null}"  /> 
+                                <p:outputLabel  value="#{productionController.numero_police}"  rendered="#{productionController.categories.idCategorie!=null}"  styleClass="#{productionController.police.validation==false ? 'red':'old'}"   />  
+                                <p:outputLabel  value="#{msg['Ref']}"   rendered="#{productionController.categories.idCategorie!=null}" />
+                                <p:inputText id="ref"  placeholder="#{msg['SAISIR']}"  value="#{productionController.police.ref_intermediaire}"  style="text-transform: uppercase; " rendered="#{productionController.categories.idCategorie!=null}"  >
+                                    <f:ajax event="blur" render="ref"/>
+                                </p:inputText>
+                                <p:outputLabel  value="#{msg['numero.bordereau']}"  rendered="#{productionController.categories.idCategorie!=null}" />
+                                <p:inputText id="bordereau"  placeholder="#{msg['SAISIR']}"  value="#{productionController.police.numero_Borderau}"  rendered="#{productionController.categories.idCategorie!=null}"  >
+                                    <f:ajax event="blur" render="bordereau"/>
+                                </p:inputText>   
+                                <p:outputLabel  value="#{msg['categorie']}" rendered="#{productionController.categories.idCategorie==null}" />
+
+
+                                <p:selectOneMenu value="#{productionController.categories}" 
+                                                 converter="#{genericConverter}" id="categories" validator="requiredValidator" required="true" var="c" filter="true" filterMatchMode="contains"  disabled="#{productionController.police.id!=null  }" >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{productionController.lisCategoriesBySante}" var="cat" itemLabel="#{cat.code} #{formatDateController.valueObject(cat.libelle,cat)}" itemValue="#{cat}"/>
+
+                                    <p:column>
+                                        #{c.code} #{formatDateController.valueObject(c.libelle,c)}
+                                    </p:column>
+                                    <p:ajax event="change"  listener="#{productionController.chargeByCategorieSelct()}" update=":form1,:form1:tabprincipal,form11" oncomplete="PF('accordP').select(0);" />
+                                </p:selectOneMenu> 
+
+
+
+
+                            </p:panelGrid>
+
+                        </p:panel>
+                        <p:tabView  id="tabprincipal" widgetVar="accordP"    >
+                            <p:ajax event="tabChange" listener="#{productionController.onTabChange}" update=":form1:msg,:form1:tabprincipal" />
+                            <p:tab title="#{msg['police']}">
+                                <p:tabView  id="tabsecond" widgetVar="accordPSecond">
+                                    <p:ajax event="tabChange" listener="#{productionController.onTabChange}" update=":form1:msg,form1:tabprincipal:tabsecond" />
+                                    <p:tab title="#{msg['souscripteur']}" id="souscripteur">
+                                        <p:panelGrid   columns="6" layout="flex"    >
+                                            <p:outputLabel  value="#{msg['code']}" rendered="#{productionController.police.id!=null}" /> 
+                                            <p:outputLabel  value="#{productionController.assure.code}" rendered="#{productionController.police.id!=null}" />  
+                                            <p:outputLabel  value="#{msg['qualite']}"  />
+                                            <p:selectOneMenu value="#{productionController.assure.idQualite}" 
+                                                             converter="#{genericConverter}" id="qualite" validator="requiredValidator" required="true" var="q" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{productionController.listQualite}" var="ql" itemLabel="#{ql.libelle}" itemValue="#{ql}"/>
+
+                                                <p:column>
+                                                    #{q.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="qualite" />
+                                            </p:selectOneMenu>  
+
+                                            <p:outputLabel  value="#{msg['nom']}" rendered="#{productionController.tabShowGroup==false}" />
+<!--                                            <p:inputText id="nom"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.nom}" rendered="#{productionController.tabShowGroup==false}"  autocomplete="on"  >
+                                                <f:ajax event="blur" render="nom"/>
+                                            </p:inputText>  -->
+                                            <p:autoComplete id="nom" value="#{productionController.assure.nom}" completeMethod="#{productionController.completeText}" rendered="#{productionController.tabShowGroup==false}"  >
+                                                <f:ajax event="blur" render="nom"/>
+                                                <p:ajax event="itemSelect" listener="#{productionController.onItemSelect}"  />
+                                            </p:autoComplete>
+                                            <p:outputLabel  value="#{msg['raison.social']}" rendered="#{productionController.tabShowGroup==true}" />
+                                            <p:autoComplete id="raisonSociale" value="#{productionController.assure.raison_social}" completeMethod="#{productionController.completeText}" rendered="#{productionController.tabShowGroup==true}">
+                                                <f:ajax event="blur" render="raisonSociale"/>
+                                                <p:ajax event="itemSelect" listener="#{productionController.onItemSelect}" update=":form1:tabprincipal" />
+                                            </p:autoComplete>
+
+<!--                                            <p:inputText id="raisonSociale"  placeholder="#{msg['raison.social']}"  value="#{productionController.assure.raison_social}"  rendered="#{productionController.tabShowGroup==true}" autocomplete="on" >
+    <f:ajax event="blur" render="raisonSociale"/>
+</p:inputText>  -->
+                                            <p:outputLabel  value="#{msg['prenom']}" rendered="#{productionController.tabShowGroup==false}" />
+                                            <p:inputText id="prenom"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.prenom}"  rendered="#{productionController.tabShowGroup==false}" >
+                                                <f:ajax event="blur" render="prenom"/>
+                                            </p:inputText>  
+                                            <h:outputLabel value="#{msg['personne.ativite']}:" style="float: right" />
+                                            <p:selectOneMenu value="#{productionController.assure.idActivite}" 
+                                                             converter="#{genericConverter}" id="activite" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" style="width: 200px" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{productionController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act}"/>
+
+                                                <p:column>
+                                                    #{a.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="activite" />
+                                            </p:selectOneMenu> 
+
+<!--                                        <p:outputLabel  value="#{msg['prenom']}"  />
+                                        <p:inputText id="prenom"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.prenom}"   >
+                                            <f:ajax event="blur" render="prenom"/>
+                                        </p:inputText>  -->
+                                            <p:outputLabel  value="#{msg['personne.datenaissance']}" rendered="#{productionController.tabShowGroup==false}" />
+<!--                                            <p:datePicker id="datenaissance" value="#{productionController.assure.date_naissance}" rendered="#{productionController.tabShowGroup==false}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true" pattern="dd/MM/yyyy"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:datenaissance" />
+                                                  <f:ajax event="dateSelect"  render="datenaissance" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{productionController.assure.date_naissance}"  mode="popup"   showOn="both"  id="datenaissance" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{productionController.tabShowGroup==false}" >
+                                                <f:ajax event="dateSelect"  render="datenaissance" />
+                                            </p:calendar>
+                                            <p:outputLabel  value="#{msg['datecreation']}" rendered="#{productionController.tabShowGroup==true}" />
+<!--                                            <p:datePicker id="dateCreer"  rendered="#{productionController.tabShowGroup==true}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateCreer" />
+
+                                            </p:datePicker>-->
+
+                                            <p:calendar value="#{productionController.assure.dateCreation}"  mode="popup"   showOn="both"  id="dateCreer" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{productionController.tabShowGroup==true}" >
+                                                <f:ajax event="dateSelect"  render="dateCreer" />
+                                            </p:calendar>
+                                            <p:outputLabel  value="#{msg['personne.sexe']}" rendered="#{productionController.tabShowGroup==false}" />
+                                            <p:selectOneMenu  converter="#{genericConverter}" id="sexe" value="#{productionController.assure.sexe}"  rendered="#{productionController.tabShowGroup==false}"  >
+                                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                <f:selectItems  value="#{productionController.sexe}"  />
+                                                <f:ajax event="change" render="sexe" />
+                                            </p:selectOneMenu>
+
+                                            <p:outputLabel  value="#{msg['personne.lieunaissance']}" rendered="#{productionController.tabShowGroup==false}" />
+                                            <p:inputText id="lieu"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.lieu_naissance}" rendered="#{productionController.tabShowGroup==false}"  >
+                                                <f:ajax event="blur" render="lieu"/>
+                                            </p:inputText>  
+                                            <p:outputLabel  value="#{msg['adresse.bp']}"  />
+                                            <p:inputText id="bp"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.adresse.bp}"   >
+                                                <f:ajax event="blur" render="bp"/>
+                                            </p:inputText> 
+                                            <p:outputLabel  value="#{msg['patente.nume']}" rendered="#{productionController.tabShowGroup==true}" />
+                                            <p:inputText id="pantente"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.patente}" rendered="#{productionController.tabShowGroup==true}"  >
+                                                <f:ajax event="blur" render="pantente"/>
+                                            </p:inputText> 
+                                            <p:outputLabel  value="#{msg['adresse.ville']}"  />
+
+                                            <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{productionController.assure.idVille}"  var="vi" filter="true" filterMatchMode="contains"   >
+                                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                <f:selectItems  value="#{productionController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                                <f:ajax event="change" render="ville" />
+                                                <p:column>
+                                                    #{vi.code} #{vi.libelle}
+                                                </p:column>
+                                            </p:selectOneMenu>
+                                            <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" />
+                                            <h:panelGroup>
+                                                <h:selectOneMenu  converter="#{genericConverter}" id="indicatif"  value="#{productionController.assure.adresse.indicatifPays}">
+                                                    <f:selectItems  value="#{productionController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind.indicatif}" />
+                                                    <f:ajax event="change" render="indicatif" />
+                                                </h:selectOneMenu>
+                                                <p:inputText id="telephone"  title="telephone" value="#{productionController.assure.adresse.tel}" size="20" validator="requiredValidator" >
+                                                    <f:ajax event="blur" render="telephone"/>
+                                                </p:inputText>
+                                            </h:panelGroup>
+                                            <h:outputLabel value="#{msg['adresse.email']}:" for="email" />
+                                            <p:inputText id="email"  title="#{msg['adresse.email']}" value="#{productionController.assure.adresse.email}" validatorMessage="#{msg['email.message']}" required="true" >
+                                                <f:ajax event="blur" render="email"/>
+                                            </p:inputText>
+                                            <h:outputLabel value="#{msg['personne.profession']}:" rendered="#{productionController.tabShowGroup==false}"/>
+                                            <p:selectOneMenu value="#{productionController.assure.idProfession}" rendered="#{productionController.tabShowGroup==false}" style="width: 200px"
+                                                             converter="#{genericConverter}" id="profession" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{productionController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf}"/>
+
+                                                <p:column>
+                                                    #{p.libelle} 
+                                                </p:column>
+                                                <f:ajax event="change"  render="profession" />
+                                            </p:selectOneMenu> 
+
+                                            <p:outputLabel   rendered="#{productionController.tabShowGroup==false}" />
+                                            <h:panelGroup rendered="#{productionController.tabShowGroup==false}">
+                                                <p:outputLabel  value="#{msg['personne.type.piece']}" rendered="#{productionController.tabShowGroup==false}" />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="typePiece" value="#{productionController.assure.typePieces}" rendered="#{productionController.tabShowGroup==false}"   >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{productionController.typePiece}"  />
+                                                    <f:ajax event="change" render="typePiece" />
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+
+                                            <p:outputLabel  value="#{msg['personne.numero.piece']}" rendered="#{productionController.tabShowGroup==false}" />
+                                            <p:inputText id="numero_piece"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.numero_piece}"  rendered="#{productionController.tabShowGroup==false}" >
+                                                <f:ajax event="blur" render="bp"/>
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{msg['datedebut']}" rendered="#{productionController.tabShowGroup==false}" />
+<!--                                            <p:datePicker id="dateeffet" value="#{productionController.police.date_effet}" rendered="#{productionController.tabShowGroup==false}"
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateeffet" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{productionController.police.date_effet}"    mode="popup"   showOn="both"  id="dateeffet" pattern="dd/MM/yyyy"  validator="requiredValidator" rendered="#{productionController.tabShowGroup==false}" >
+                                                <f:ajax event="dateSelect"  render="dateeffet" />
+                                                <p:ajax event="dateSelect"  listener="#{productionController.chargeDateEcheance()}" update=":form1:tabprincipal" />
+                                            </p:calendar>
+                                            <p:outputLabel  rendered="#{productionController.tabShowGroup==true}"  />
+                                            <h:panelGroup rendered="#{productionController.tabShowGroup==true}">
+                                                <p:outputLabel  value="#{msg['datedebut']}"  />
+<!--                                                <p:datePicker id="dateeffet2" value="#{productionController.police.date_effet}" 
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              >
+                                                    <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateeffet2" />
+
+                                                </p:datePicker>-->
+                                                <p:calendar value="#{productionController.police.date_effet}"    mode="popup"   showOn="both"  id="dateeffet2" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                                    <f:ajax event="dateSelect"  render="dateeffet2" />
+                                                    <p:ajax event="dateSelect"  listener="#{productionController.chargeDateEcheance()}" update=":form1:tabprincipal" />
+                                                </p:calendar>
+                                            </h:panelGroup>
+                                            <p:outputLabel  value="#{msg['dateEch']}"  />
+<!--                                            <p:datePicker id="dateecheance" value="#{productionController.police.date_echeance}" 
+                                                          monthNavigator="true"
+                                                          yearNavigator="true"
+                                                          >
+                                                <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateecheance" />
+
+                                            </p:datePicker>-->
+                                            <p:calendar value="#{productionController.police.date_echeance}"     mode="popup"   showOn="both"  id="dateecheance" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                                <f:ajax event="dateSelect"  render="dateecheance" />
+                                            </p:calendar>
+                                        </p:panelGrid>
+                                    </p:tab>
+                                    <p:tab title="#{msg['autre.infos']}" id="couverture" >
+                                        <p:fieldset  legend="#{msg['couverture']}"  styleClass="fieldset" class="fieldset"   >
+                                            <p:panelGrid   columns="10" layout="flex"   >
+                                                <p:outputLabel  value="#{msg['contract']}" />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="contrat" value="#{productionController.police.contrat}"  style=" width: 100px" validator="requiredValidator" required="true"  >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{productionController.contrats}"  />
+                                                    <f:ajax event="change" render="contrat" />
+                                                </p:selectOneMenu>
+
+                                                <p:outputLabel  value="#{msg['nature']}" />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="nature_contrat" value="#{productionController.police.natureContrat}"  validator="requiredValidator" required="true" >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{productionController.natureContrats}"  />
+                                                    <f:ajax event="change" render="nature_contrat" />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['duree']}" />
+
+                                                <p:selectOneMenu value="#{productionController.duree}" 
+                                                                 converter="#{genericConverter}" id="duree" validator="requiredValidator" required="true" var="dd" filter="true" filterMatchMode="contains"  >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{productionController.listeDurees}" var="m" itemLabel="#{m.libelle}" itemValue="#{m}"/>
+
+                                                    <p:column>
+                                                        #{dd.libelle}
+                                                    </p:column>
+                                                    <p:ajax event="change"  update=":form1:tabprincipal:tabsecond" listener="#{productionController.chargeMajoratioDureeByDuree()}" />
+                                                </p:selectOneMenu> 
+
+                                                <h:outputLabel value="#{msg['valeur']}" />
+                                                <p:inputText id="valeurDuree"   value="#{productionController.police.valeurDuree}"  validator="requiredValidator" required="true"  style="width: 50px" >
+                                                    <f:ajax event="blur" render="valeurDuree" listener="#{productionController.controleDureeVariable()}"/>
+                                                </p:inputText>
+
+                                                <h:outputLabel value="#{msg['fractionnement']}" />
+                                                <p:selectOneMenu value="#{productionController.fractionnement}" 
+                                                                 converter="#{genericConverter}" id="fractionnement"  var="fr" filter="true" filterMatchMode="contains"  >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{productionController.listeFractionnement}" var="f" itemLabel="#{f.libelle}" itemValue="#{f}"/>
+
+                                                    <p:column>
+                                                        #{fr.libelle}
+                                                    </p:column>
+                                                    <p:ajax event="change"  update=":form1:tabprincipal:tabsecond" listener="#{productionController.chargeFractionnementCategoriesByFractionnement()}" />
+                                                </p:selectOneMenu> 
+                                            </p:panelGrid>
+
+
+
+
+                                        </p:fieldset>
+
+                                        <!--<p:toolbarGroup >-->
+                                        <p:fieldset  legend="#{msg['tarif.reduction.commission']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="8" layout="flex"  >
+
+                                                <!--<h:panelGroup >-->
+                                                <h:outputLabel value="#{msg['type.tarif']}" />
+                                                <p:selectOneMenu value="#{productionController.police.idTypeTarif}" 
+                                                                 converter="#{genericConverter}" id="tarif" validator="requiredValidator" required="true"   >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{productionController.listeTarif}" var="t" itemLabel="#{t.libelle}" itemValue="#{t}"/>
+
+
+                                                    <f:ajax event="change"  render=":form1:tabprincipal:tabsecond:tarif"  />
+                                                </p:selectOneMenu> 
+                                                <!--</h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+
+                                                <h:outputLabel value="#{msg['reduction']}:"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="reduction"  value="#{productionController.police.idReduction}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{productionController.listeReduction}" var="r" itemLabel="#{r.idRefReduction.code} #{r.idRefReduction.libelle}" itemValue="#{r}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:reduction"  />
+                                                </p:selectOneMenu>
+
+                                                <!--</h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+                                                <h:outputLabel value="#{msg['taux.appor']}"  rendered="false" />
+
+
+                                                <p:inputNumber  value="#{productionController.policeCommissionApporteur.taux_apport}"    decimalPlaces="2" emptyValue="#{null}"   style="width: 50px; float: left; " id="tauxApport"   rendered="false"  >
+                                                    <f:ajax event="blur" render="tauxApport"/>
+                                                </p:inputNumber>
+
+                                                <!--</h:panelGroup>-->
+                                                <!--<h:panelGroup>-->
+
+                                                <!--<h:panelGroup>-->
+
+
+                                                <h:outputLabel value="#{msg['taux.gestion']}"   rendered="false" />
+
+                                                <p:inputNumber  value="#{productionController.policeCommissionApporteur.taux_gestion}"    decimalPlaces="2" emptyValue="#{null}"   style="width: 50px; float: left; " id="tauxGestion"   rendered="false"  >
+                                                    <f:ajax event="blur" render="tauxGestion"/>
+                                                </p:inputNumber>  
+                                                <!--</h:panelGroup>-->
+
+
+                                                <!--</h:panelGroup>-->
+                                                <!--<h:panelGroup>-->
+                                                <h:outputLabel value="#{msg['apporteur']}" />
+                                                <p:selectOneMenu value="#{productionController.apporteur}" 
+                                                                 converter="#{genericConverter}" id="apporteur"   var="app" filter="true" filterMatchMode="contains"  disabled="#{productionController.police.id!=null}" >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{productionController.listeApporteur}" var="ap" itemLabel="#{ap.idRefApporteur.code} #{ap.idRefApporteur.raisonSociale}" itemValue="#{ap}"/>
+
+                                                    <p:column>
+                                                        #{app.idRefApporteur.code} #{app.idRefApporteur.raisonSociale}
+                                                    </p:column>
+                                                    <f:ajax event="change"  render=":form1:tabprincipal:tabsecond:apporteur"    />
+                                                </p:selectOneMenu>    
+                                                <!--</h:panelGroup>-->
+
+
+
+                                            </p:panelGrid>
+                                        </p:fieldset>
+
+                                        <!--</p:toolbarGroup>-->
+                                        <p:fieldset  legend="#{msg['devise.convention']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="12" layout="grid" >
+                                                <h:outputLabel value="#{msg['devise']}"  />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="devise"  value="#{productionController.police.idDevise}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{productionController.listeDevise}" var="d" itemLabel="#{d.code}" itemValue="#{d}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:devise"  />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['cours']}"  />
+
+
+                                                <p:inputNumber  value="#{productionController.police.coursDevise}"    decimalPlaces="2" emptyValue="#{1}"   style="width: 50px; float: left; " id="cours"   >
+                                                    <f:ajax event="blur" render="cours"/>
+                                                </p:inputNumber>
+
+                                                <h:outputLabel value="#{msg['cours.applique']}"  />
+
+
+                                                <p:inputNumber value="#{productionController.police.coursDeviseApplique}"   decimalPlaces="2" emptyValue="#{1}"   style="width: 50px; float: left; " id="coursapplique"   >
+                                                    <f:ajax event="blur" render="coursapplique"/>
+                                                </p:inputNumber>
+
+                                                <p:outputLabel  value="#{msg['datedebut']}"  />
+                                                <p:datePicker id="dateecoursDevise" value="#{productionController.police.date_cours_devise}" 
+                                                              monthNavigator="true"
+                                                              yearNavigator="true" 
+                                                              >
+                                                    <p:ajax event="dateSelect" update="form1:tabprincipal:tabsecond:dateecoursDevise" />
+
+                                                </p:datePicker>
+
+
+                                                <!--<h:panelGroup>-->
+                                                <p:spacer width="5"/>
+                                                <h:outputLabel value="#{msg['convention']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="convention"  value="#{productionController.police.idConvention}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{productionController.listeConvention}" var="c" itemLabel="#{c.libelle}" itemValue="#{c}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:convention"  />
+                                                </p:selectOneMenu>
+                                                <!--</h:panelGroup>-->
+
+
+                                            </p:panelGrid>
+                                        </p:fieldset>
+                                        <p:fieldset  legend="#{msg['timbre.exoneration']}"  styleClass="fieldset" class="fieldset"  >
+                                            <p:panelGrid   columns="10" layout="grid" >
+                                                <h:outputLabel value="#{msg['timbre.dimension']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="timbreDimension"  value="#{productionController.police.idTimbreDimension}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{productionController.listeTimbreDimension}" var="td" itemLabel="#{td.libelle}" itemValue="#{td}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:timbreDimension"  />
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['nombre']}"  />
+
+                                                <p:inputText id="nombre"   value="#{productionController.police.nombre_timbre}"  style="float: left;width: 50px"  >
+                                                    <f:ajax event="blur" render="nombre"/>
+                                                </p:inputText>
+                                                <h:outputLabel value="#{msg['valeur']}"  />
+                                                <p:inputNumber value="#{productionController.police.valeur_timbre}"   decimalPlaces="2" emptyValue="#{0}"   style=" float: left; width: 50px" id="valeur"   >
+                                                    <f:ajax event="blur" render="valeur"/>
+                                                </p:inputNumber>
+                                                <h:outputLabel value="#{msg['exoneration']}"  />
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="exoneration"  value="#{productionController.police.idExoneration}">
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems  value="#{productionController.listeExoneration}" var="ex" itemLabel="#{ex.libelle}" itemValue="#{ex}" />
+                                                    <f:ajax event="change" render=":form1:tabprincipal:tabsecond:exoneration"  />
+                                                </p:selectOneMenu>    
+                                                <h:outputLabel value="#{msg['accessoir']}"  />
+                                                <p:inputNumber value="#{productionController.police.montantaccessoir}"   decimalPlaces="3" emptyValue="#{0}"   style="width: 50px; float: left; " id="accessoir"   >
+                                                    <f:ajax event="blur" render="accessoir"/>
+                                                </p:inputNumber>
+                                            </p:panelGrid>
+                                        </p:fieldset>
+
+
+
+                                    </p:tab>
+
+                                </p:tabView>
+
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['groupe']}" rendered="#{productionController.tabShowGroup}" id="groupe">
+                                <p:panelGrid   columns="8" layout="flex"   >
+                                    <p:outputLabel  value="#{msg['group']}"  />
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="refGroup" value="#{productionController.refGroupeSelect}"    >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{productionController.listeRefGroup}"  var="rlisteRefGroupef"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeRisqueByGroup()}"/>
+                                    </p:selectOneMenu>
+                                    <p:commandButton  icon="pi pi-plus" onclick="PF('dlgGroup').show()"/>
+
+                                    <p:commandButton value="#{msg['charger.file']}"  onclick="PF('fichier').show()"  />
+                                    <p:outputLabel  value="#{msg['assure']}"  /> <p:outputLabel  value="#{productionController.nombre_assure}"  />
+                                    <p:outputLabel  value="#{msg['membre']}"  /> <p:outputLabel  value="#{productionController.nombre_membre}"  />
+                                    <p:outputLabel  value="#{msg['enfant']}"  /> <p:outputLabel  value="#{productionController.nombre_enfant}"  />
+                                    <p:outputLabel  value="#{msg['total.person']}"  /> <p:outputLabel  value="#{productionController.total_personne}"  />
+
+
+                                </p:panelGrid>
+
+
+                                <p:dataTable var="ir" value="#{productionController.listeImageRisques}"  widgetVar="imageRisqueTable" 
+                                             scrollable="true" rendered="#{productionController.police.id==null}"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idimageRisqueTable"
+                                             paginatorAlwaysVisible="true" rowsPerPageTemplate="500,1000" filterEvent="enter" 
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate=" Total :{totalRecords} "  rowIndexVar="index"
+
+                                             >
+
+
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{ir.id==null and ir.idGroup.id!=null}" onclick="PF('manageAddDialog').show()"  actionListener="#{productionController.showDetailImageRisque(ir)}"  >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.imageRisque}"   />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />
+                                        </p:commandButton>
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{ir.id!=null and ir.idGroup.id!=null}"   onclick="PF('manageUpdateDialog').show()" actionListener="#{productionController.showDetailImageRisque(ir)}"  >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.imageRisque}"   />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem" rendered="#{ir.id!=null and ir.idGroup.id!=null}"   onclick="PF('manageRemoveDialog').show()"  actionListener="#{productionController.showDetailImageRisque(ir)}"   >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.imageRisque}"  />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.matricule']}" >
+                                        #{index}
+                                        <p:inputText id="matricule"  placeholder="  #{msg['personne.matricule']}"   value="#{ir.matricule}"   >
+                                            <f:ajax event="blur"   render="matricule" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nomcomplet']}" >
+                                        <p:inputText id="nomComplet"  placeholder="  #{msg['nomcomplet']}"   value="#{ir.libelle}"   >
+                                            <f:ajax event="blur"   render="nomComplet" />
+                                        </p:inputText>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                        <p:calendar value="#{ir.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.sexe']}" >
+                                        <p:selectOneMenu value="#{ir.sexe}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="sexePersonne"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.sexe}" />
+
+                                            <f:ajax event="change"  render="sexePersonne"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+                                </p:dataTable>
+                                <p:dataTable var="ir" value="#{productionController.listeRisque}"  widgetVar="RisqueTable" 
+                                             scrollable="true" 
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idRisqueTable"    rendered="#{productionController.police.id!=null}"
+
+                                             >
+
+
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{ir.id==null and productionController.police.validation==false }" onclick="PF('manageAddDialogRisque').show()"    >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.risqueselecte}"   />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />-->
+                                        </p:commandButton>
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{ir.id!=null and productionController.police.validation==false}"   onclick="PF('manageUpdateDialogRisque').show()"   >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.risqueselecte}"   />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />-->
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem" rendered="#{ir.id!=null and productionController.police.validation==false}"   onclick="PF('manageRemoveDialogRisque').show()"     >
+                                            <f:setPropertyActionListener value="#{ir}" target="#{productionController.risqueselecte}"  />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageRisque(ir)}" />-->
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.matricule']}" >
+                                        <p:inputText id="matricule"  placeholder="  #{msg['personne.matricule']}"   value="#{ir.matricule}"   >
+                                            <f:ajax event="blur"   render="matricule" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nomcomplet']}" >
+                                        <p:inputText id="nomComplet"  placeholder="  #{msg['nomcomplet']}"   value="#{ir.libelle}"   >
+                                            <f:ajax event="blur"   render="nomComplet" />
+                                        </p:inputText>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                        <p:calendar value="#{ir.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.sexe']}" >
+                                        <p:selectOneMenu value="#{ir.sexe}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="sexePersonne"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.sexe}" />
+
+                                            <f:ajax event="change"  render="sexePersonne"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+                                </p:dataTable>
+
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['Adherent']}" rendered="#{productionController.tabShowGroup}" id="adherent">
+                                <p:panelGrid   columns="8" layout="flex"   >
+                                    <p:outputLabel  value="#{msg['group']}"  />
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="refGroupSelect" value="#{productionController.refGroupeSelectForAdherent}"    >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{productionController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeRisqueByImageRisque()}"/>
+
+                                    </p:selectOneMenu>
+
+                                    <p:outputLabel  value="#{msg['Adherent']}"  />
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="imageRisqueSelect" value="#{productionController.imageRisqueSelecte}"  rendered="#{productionController.police.id==null}"  var="ri" filter="true"  filterMatchMode="contains">  >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{productionController.listeImageRisques}"  var="ad"  itemLabel="#{ad.libelle}" itemValue="#{ad}" />
+                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeImageRisqueFamilleByImageRisque()}"/>
+                                        <p:column>
+                                            #{ri.libelle} 
+                                        </p:column>
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="risqueSelect" value="#{productionController.risque}"   rendered="#{productionController.police.id!=null}" var="r" filter="true"  filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{productionController.listeRisque}"  var="ad"  itemLabel="#{ad.libelle}" itemValue="#{ad}" />
+                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeImageRisqueFamilleByImageRisque()}"/>
+                                        <p:column>
+                                            #{r.libelle} 
+                                        </p:column>
+                                    </p:selectOneMenu>
+                                </p:panelGrid>
+
+                                <p:dataTable var="irf" value="#{productionController.listeImageFamilleRisque}"  widgetVar="FamilleRisqueTable" 
+                                             scrollable="true"  rendered="#{productionController.police.id==null }"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idFamilleRisqueTable" rowIndexVar="#{index}"
+
+                                             >
+
+
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{irf.id==null }" onclick="PF('manageAddImageFamilleRisqueDialog').show()"    >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.imageFamilleRisqueSelecte}"   />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf,index)}" />
+                                        </p:commandButton>
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{ir.id!=null }"   onclick="PF('manageUpdateDialog2').show()" >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.imageFamilleRisqueSelecte}"   />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf,index)}" />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem" rendered="#{ir.id!=null }"   onclick="PF('manageRemoveDialog2').show()"     >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.imageFamilleRisqueSelecte}"  />
+                                            <f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf,index)}" />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+
+                                    <p:column headerText="#{msg['membre']}" >
+                                        <p:inputText id="nomComplet"  placeholder="  #{msg['membre']}"   value="#{irf.nom_membre}"   >
+                                            <f:ajax event="blur"   render="nomComplet" />
+                                        </p:inputText>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg['lien.parente']} "  >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="lienParanteirf" value="#{irf.lienParente}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.leinParente}"  />
+                                            <f:ajax event="change" render="lienParanteirf" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                        <p:calendar value="#{irf.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.sexe']}" >
+                                        <p:selectOneMenu value="#{irf.sexe}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="sexePersonneirf"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.sexe}" />
+
+                                            <f:ajax event="change"  render="sexePersonne"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+                                </p:dataTable>
+
+
+                                <p:dataTable var="irf" value="#{productionController.listeRisqueFamille}"  widgetVar="imageFamilleRisqueTable" 
+                                             scrollable="true" rendered="#{productionController.police.id!=null}"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idimageFamilleRisqueTable"
+
+                                             >
+
+
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"   onclick="PF('manageAddDialog2').show()"   rendered="#{irf.id==null and productionController.police.validation==false}" >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.risqueFamilleSelect}"   />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf)}" />-->
+                                        </p:commandButton>
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{irf.id!=null and productionController.police.validation==false}"   onclick="PF('manageUpdateDialog2').show()"   >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.risqueFamilleSelect}"   />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf)}" />-->
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem" rendered="#{irf.id!=null and productionController.police.validation==false}"   onclick="PF('manageRemoveDialog2').show()"    >
+                                            <f:setPropertyActionListener value="#{irf}" target="#{productionController.risqueFamilleSelect}"  />
+                                            <!--<f:ajax event="click" listener="#{productionController.showDetailImageFamilleRisque(irf)}" />-->
+                                        </p:commandButton>
+
+                                    </p:column>
+
+
+                                    <p:column headerText="#{msg['membre']}" >
+                                        <p:inputText id="nomComplet"  placeholder="  #{msg['membre']}"   value="#{irf.nom_membre}"   >
+                                            <f:ajax event="blur"   render="nomComplet" />
+                                        </p:inputText>
+
+                                    </p:column>
+                                    <p:column headerText="#{msg['lien.parente']} "  >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="lienParanteirf" value="#{irf.lienParente}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.leinParente}"  />
+                                            <f:ajax event="change" render="lienParanteirf" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                        <p:calendar value="#{irf.dateNaissance}" mode="popup"  title="#{msg['personne.datenaissance']}" showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="dateNaissance"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['personne.sexe']}" >
+                                        <p:selectOneMenu value="#{irf.sexe}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="sexePersonneirf"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.sexe}" />
+
+                                            <f:ajax event="change"  render="sexePersonne"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+                                </p:dataTable>  
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['assuree']}" rendered="#{productionController.tabShowIndividuel}" id="assurer">
+                                <p:fieldset  legend="#{msg['indentification']}"  styleClass="fieldset" class="fieldset"  >
+                                    <p:panelGrid   columns="6" layout="grid"  >
+
+                                        <p:outputLabel  value="#{msg['numero.ordre']}"  rendered="#{productionController.police.id!=null}"/>
+                                        <p:inputText id="numero"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.id }"  disabled="true" style="width: 50px"  rendered="#{productionController.police.id!=null}">
+                                            <f:ajax event="blur" render="numero"/>
+                                        </p:inputText> 
+
+                                        <p:outputLabel  value="#{msg['nom']}"  />
+                                        <p:inputText id="libelle"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.libelle}"   >
+                                            <f:ajax event="blur" render="libelle"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.datenaissance']}"  />
+    <!--                                    <p:datePicker id="datenaissanceRisque" value="#{productionController.risque.dateNaissance}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:datenaissanceRisque" />
+    
+                                        </p:datePicker>-->
+                                        <p:calendar value="#{productionController.risque.dateNaissance}"   mode="popup"   showOn="both"  id="datenaissanceRisque" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                            <f:ajax event="dateSelect"  render="datenaissanceRisque" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['personne.lieunaissance']}"  />
+                                        <p:inputText id="lieuRisque"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.lieu_naissance}"   >
+                                            <f:ajax event="blur" render="lieuRisque"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.sexe']}" />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRisque" value="#{productionController.risque.sexe}"  rendered="#{productionController.tabShowGroup==false}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRisque" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['adresse.bp']}"  />
+                                        <p:inputText id="rbp"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.adresse.bp}"   >
+                                            <f:ajax event="blur" render="rbp"/>
+                                        </p:inputText> 
+                                        <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" />
+                                        <h:panelGroup>
+                                            <h:selectOneMenu  converter="#{genericConverter}" id="indicatifRisque"  value="#{productionController.risque.adresse.indicatifPays}">
+                                                <f:selectItems  value="#{productionController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind.indicatif}" />
+                                                <f:ajax event="change" render="indicatifRisque" />
+                                            </h:selectOneMenu>
+                                            <p:inputText id="telephoneRisque"  title="telephone" value="#{productionController.risque.adresse.tel}" size="20" validator="requiredValidator" >
+                                                <f:ajax event="blur" render="telephoneRisque"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                        <h:outputLabel value="#{msg['adresse.ville']}:" for="telephone" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="villeRisque" value="#{productionController.risque.idVille}"  var="vi" filter="true" filterMatchMode="contains"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                            <f:ajax event="change" render="villeRisque" />
+                                            <p:column>
+                                                #{vi.code} #{vi.libelle}
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+
+                                        <h:outputLabel value="#{msg['adresse.email']}:" for="email" />
+                                        <p:inputText id="emailRisque"  title="#{msg['adresse.email']}" value="#{productionController.risque.adresse.email}" validatorMessage="#{msg['email.message']}"  required="true" >
+                                            <f:ajax event="blur" render="email"/>
+                                        </p:inputText>
+    <!--                                    <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:selectOneMenu value="#{productionController.risque.libelleProfession}" 
+                                                         converter="#{genericConverter}" id="professionRisque" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf.libelle}"/>
+    
+                                            <p:column>
+                                        #{p.libelle} 
+                                    </p:column>
+                                    <f:ajax event="change"  render="professionRisque" />
+                                </p:selectOneMenu> -->
+                                        <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:inputText id="professionRisque"   value="#{productionController.risque.libelleProfession}"  >
+                                            <f:ajax event="blur"  render="professionRisque" />
+                                        </p:inputText>
+                                        <!--<p:spacer width="10"/>-->
+                                        <h:outputLabel value="#{msg['personne.ativite']}:" />
+    <!--                                    <p:selectOneMenu value="#{productionController.risque.libelleActivite}" 
+                                                         converter="#{genericConverter}" id="activiteRisque" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act.libelle}"/>
+    
+                                            <p:column>
+                                        #{a.libelle} 
+                                    </p:column>
+                                
+                                </p:selectOneMenu>-->
+                                        <p:inputText id="activiteRisque"   value="#{productionController.risque.libelleActivite}"  >
+                                            <f:ajax event="blur"  render="activiteRisque" />
+                                        </p:inputText>
+                                        <!--<p:outputLabel    />-->
+                                        <!--<h:panelGroup >-->
+                                        <p:outputLabel  value="#{msg['personne.type.piece']}"  />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="typePiece2" value="#{productionController.assure.typePieces}"    >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.typePiece}"  />
+                                            <f:ajax event="change" render="typePiece2" />
+                                        </p:selectOneMenu>
+                                        <!--</h:panelGroup>-->
+
+                                        <p:outputLabel  value="#{msg['personne.numero.piece']}"  />
+                                        <p:inputText id="numero_piece2"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.numero_piece}"  >
+                                            <f:ajax event="blur" render="numero_piece2"/>
+                                        </p:inputText>
+                                        <p:outputLabel  value="#{msg['entre.le']}"  />
+    <!--                                    <p:datePicker id="dateEntree" value="#{productionController.risque.dateEntree}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:dateEntree" />
+    
+                                        </p:datePicker>-->
+
+                                        <p:calendar value="#{productionController.risque.dateEntree}"   mode="popup"   showOn="both"  id="dateEntree" pattern="dd/MM/yyyy"  validator="requiredValidator"  >
+                                            <f:ajax event="dateSelect"  render="dateEntree" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['sortie.le']}"  />
+
+
+<!--                                    <p:datePicker id="dateSortie" value="#{productionController.risque.dateSortie}" 
+                                                  monthNavigator="true"
+                                                  yearNavigator="true"
+                                                  >
+                                        <p:ajax event="dateSelect" update="form1:tabprincipal:dateSortie" />
+
+                                    </p:datePicker>-->
+                                        <p:calendar value="#{productionController.risque.dateSortie}"    mode="popup"   showOn="both"  id="dateSortie" pattern="dd/MM/yyyy"    >
+                                            <f:ajax event="dateSelect"  render="dateEntree" />
+                                        </p:calendar>
+
+                                        <p:outputLabel  value="#{msg['mode.calcul']}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="nature" value="#{productionController.risque.modeCalcul}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.modeCalcul}"  />
+                                            <f:ajax event="change" render="nature" />
+                                        </p:selectOneMenu>
+
+                                    </p:panelGrid>
+
+                                </p:fieldset>
+
+                            </p:tab> 
+                            <p:tab title="#{msg['famille']}" rendered="#{productionController.tabShowFamille}" id="famille" >
+                                <p:fieldset  legend="#{msg['indentification']}"  styleClass="fieldset" class="fieldset"   >
+                                    <p:panelGrid   columns="16" layout="flex" >
+                                        <h:panelGroup  >
+                                            <!--<p:outputLabel  value="#{msg['numero.ordre']}" rendered="#{productionController.police.id!=null}" />-->
+                                            <p:inputText id="numerof"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.id }"  disabled="true"  style="width: 50px" rendered="#{productionController.police.id!=null}">
+                                                <f:ajax event="blur" render="numerof"/>
+                                            </p:inputText> 
+                                        </h:panelGroup>
+
+
+                                        <p:outputLabel  value="#{msg['nomcomplet']}"  />
+                                        <p:inputText id="libellef"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.libelle}"   >
+                                            <f:ajax event="blur" render="libellef"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.datenaissance']}" rendered="#{false}" />
+    <!--                                    <p:datePicker id="datenaissanceRisque" value="#{productionController.risque.dateNaissance}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:datenaissanceRisque" />
+    
+                                        </p:datePicker>-->
+                                        <p:calendar value="#{productionController.risque.dateNaissance}"   mode="popup"   showOn="both"  id="datenaissanceRisquef" pattern="dd/MM/yyyy"  validator="requiredValidator"  rendered="#{false}" >
+                                            <f:ajax event="dateSelect"  render="datenaissanceRisquef" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['personne.lieunaissance']}" rendered="#{false}"  />
+                                        <p:inputText id="lieuRisquef"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.lieu_naissance}"  rendered="#{false}" >
+                                            <f:ajax event="blur" render="lieuRisquef"/>
+                                        </p:inputText>  
+                                        <p:outputLabel  value="#{msg['personne.sexe']}" rendered="#{false}" />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRisquef" value="#{productionController.risque.sexe}"   rendered="#{false}" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRisquef" />
+                                        </p:selectOneMenu>
+                                        <p:outputLabel  value="#{msg['adresse.bp']}"  rendered="#{false}" />
+                                        <p:inputText id="rbpf"  placeholder="#{msg['SAISIR']}"  value="#{productionController.risque.adresse.bp}" rendered="#{false}" >
+                                            <f:ajax event="blur" render="rbpf"/>
+                                        </p:inputText> 
+                                        <h:outputLabel value="#{msg['adresse.telephone']}:" for="telephone" rendered="#{false}" />
+                                        <h:panelGroup rendered="#{false}" >
+                                            <h:selectOneMenu  converter="#{genericConverter}" id="indicatifRisquef"  value="#{productionController.risque.adresse.indicatifPays}">
+                                                <f:selectItems  value="#{productionController.indicatifPaysDao.allIndicatif}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind}" />
+                                                <f:ajax event="change" render="indicatifRisquef" />
+                                            </h:selectOneMenu>
+                                            <p:inputText id="telephoneRisquef"  title="telephone" value="#{productionController.risque.adresse.tel}" size="20" validator="requiredValidator" >
+                                                <f:ajax event="blur" render="telephoneRisquef"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                        <h:outputLabel value="#{msg['adresse.ville']}:" for="telephone" rendered="#{false}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="villeRisquef" value="#{productionController.risque.idVille}"  var="vi" filter="true" filterMatchMode="contains" rendered="#{false}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                            <f:ajax event="change" render="villeRisquef" />
+                                            <p:column>
+                                                #{vi.code} #{vi.libelle}
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+
+                                        <h:outputLabel value="#{msg['adresse.email']}:" for="email" rendered="#{false}" />
+                                        <p:inputText id="emailRisquef"  title="#{msg['adresse.email']}" value="#{productionController.risque.adresse.email}" rendered="#{false}" >
+                                            <f:ajax event="blur" render="emailf"/>
+                                        </p:inputText>
+    <!--                                    <h:outputLabel value="#{msg['personne.profession']}:"  />
+                                        <p:selectOneMenu value="#{productionController.risque.libelleProfession}" 
+                                                         converter="#{genericConverter}" id="professionRisque" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listProfessionnel}" var="pf" itemLabel="#{pf.libelle}" itemValue="#{pf.libelle}"/>
+    
+                                            <p:column>
+                                        #{p.libelle} 
+                                    </p:column>
+                                    <f:ajax event="change"  render="professionRisque" />
+                                </p:selectOneMenu> -->
+
+     <!--<h:outputLabel value="#{msg['personne.profession']}:"  />-->
+                                        <h:outputLabel value="#{msg['personne.profession']}" rendered="#{false}"  />
+                                        <p:inputText id="professionRisquef"   value="#{productionController.risque.libelleProfession}" rendered="#{false}" >
+                                            <f:ajax event="blur"  render="professionRisquef" />
+                                        </p:inputText>
+                                        <!--<p:spacer width="10"/>-->
+                                        <h:outputLabel value="#{msg['personne.ativite']}:" rendered="#{false}" />
+    <!--                                    <p:selectOneMenu value="#{productionController.risque.libelleActivite}" 
+                                                         converter="#{genericConverter}" id="activiteRisque" validator="requiredValidator" required="true" var="a" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listActivite}" var="act" itemLabel="#{act.libelle}" itemValue="#{act.libelle}"/>
+    
+                                            <p:column>
+                                        #{a.libelle} 
+                                    </p:column>
+                                
+                                </p:selectOneMenu>-->
+                                        <p:inputText id="activiteRisquef"   value="#{productionController.risque.libelleActivite}" rendered="#{false}" >
+                                            <f:ajax event="blur"  render="activiteRisquef" />
+                                        </p:inputText>
+                                        <!--<p:outputLabel    />-->
+                                        <!--<h:panelGroup >-->
+    <!--                                    <p:outputLabel  value="#{msg['personne.type.piece']}"  />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="typePiece2" value="#{productionController.assure.typePieces}"    >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.typePiece}"  />
+                                            <f:ajax event="change" render="typePiece2" />
+                                        </p:selectOneMenu>
+                                        </h:panelGroup>
+    
+                                        <p:outputLabel  value="#{msg['personne.numero.piece']}"  />
+                                        <p:inputText id="numero_piece2"  placeholder="#{msg['SAISIR']}"  value="#{productionController.assure.numero_piece}"  >
+                                            <f:ajax event="blur" render="numero_piece2"/>
+                                        </p:inputText>-->
+                                        <p:outputLabel  value="#{msg['entre.le']}"  />
+    <!--                                    <p:datePicker id="dateEntree" value="#{productionController.risque.dateEntree}" 
+                                                      monthNavigator="true"
+                                                      yearNavigator="true"
+                                                      >
+                                            <p:ajax event="dateSelect" update="form1:tabprincipal:dateEntree" />
+    
+                                        </p:datePicker>-->
+
+                                        <p:calendar value="#{productionController.risque.dateEntree}"   mode="popup"   showOn="both"  id="dateEntreef" pattern="dd/MM/yyyy"  validator="requiredValidator" disabled="#{productionController.police.police!=null and productionController.police.police.intValue()!=0}" >
+                                            <f:ajax event="dateSelect"  render="dateEntreef" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['sortie.le']}"  />
+
+
+<!--                                    <p:datePicker id="dateSortie" value="#{productionController.risque.dateSortie}" 
+                                                  monthNavigator="true"
+                                                  yearNavigator="true"
+                                                  >
+                                        <p:ajax event="dateSelect" update="form1:tabprincipal:dateSortie" />
+
+                                    </p:datePicker>-->
+                                        <p:calendar value="#{productionController.risque.dateSortie}"    mode="popup"   showOn="both"  id="dateSortief" pattern="dd/MM/yyyy"     >
+                                            <f:ajax event="dateSelect"  render="dateEntreef" />
+                                        </p:calendar>
+                                        <br />
+                                        <p:outputLabel  value="#{msg['mode.calcul']}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="naturef" value="#{productionController.risque.modeCalcul}" disabled="#{productionController.police.police!=null and productionController.police.police.intValue()!=0}"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.modeCalcul}"  />
+                                            <f:ajax event="change" render="naturef" />
+                                        </p:selectOneMenu>
+
+
+                                    </p:panelGrid>
+
+
+                                </p:fieldset>
+
+                                <p:dataTable var="rf" value="#{productionController.listeRisqueFamille}"  widgetVar="risqueFamilleTable" 
+                                             scrollable="true"  paginator="true" rows="50"  paginatorAlwaysVisible="true" rowsPerPageTemplate="5,10,15,50,100,500,1000"
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idrisqueFamilleTable"  rowIndexVar="index"
+
+                                             >
+
+                                    <!--                                    <f:facet name="header">
+                                                                            <center>
+                                                                                <p:commandButton      styleClass="success-button"   icon="pi pi-plus"  actionListener="#{productionController.ajoutteLigneForListeRisFamily()}"  update="form1:tabprincipal:idrisqueFamilleTable" ajax="false" />
+                                    
+                                                                            </center>
+                                                                        </f:facet> -->
+
+
+                                    <p:column headerText="#{msg['numero.ordre']}"  style="width: 50px">
+
+                                        <p:inputNumber value="#{rf.id}"  decimalPlaces="0" emptyValue="#{null}"   style="width: 50px; float: left; " id="num"  rendered="#{rf.id !=null}" >
+                                            <f:ajax event="blur"   render="num" />
+                                        </p:inputNumber>
+                                        <p:commandButton  icon="pi pi-plus" actionListener="#{productionController.addLigneByRisqueFamille(rf,inde)}"  ajax="false" rendered="#{rf.id==null}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nomcomplet']}" style="width: 350px" >
+                                        <p:inputText id="nom"    value="#{rf.nom_membre}"  style="width: 350px"  >
+                                            <f:ajax event="blur"   render="nom" />
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['lien.parente']} "  >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="lienParante" value="#{rf.lienParente}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.leinParente}"  />
+                                            <f:ajax event="change" render="lienParante" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.sexe']} "  >
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="sexeRF" value="#{rf.sexe}"    >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.sexe}"  />
+                                            <f:ajax event="change" render="sexeRF" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['personne.datenaissance']}: "  >
+                                        <p:calendar value="#{rf.dateNaissance}" mode="popup"   showOn="both"  id="naissanceRf" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="naissanceRf"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['entre.le']}: "  >
+                                        <p:calendar value="#{rf.dateEntree}" mode="popup"   showOn="both"  id="entreRF" pattern="dd/MM/yyyy" disabled="#{productionController.police.police!=null and productionController.police.police.intValue()!=0}" >
+                                            <f:ajax event="dateSelect"  render="entreRF"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['sortie.le']}: "  >
+                                        <p:calendar value="#{rf.dateSortie}" mode="popup"   showOn="both"  id="sortieRF" pattern="dd/MM/yyyy"  >
+                                            <f:ajax event="dateSelect"  render="sortieRF"/>
+                                        </p:calendar>
+                                    </p:column>
+
+
+                                </p:dataTable>
+                            </p:tab> 
+
+                            <p:tab title="#{msg['prestation']}"   id="prestation">
+                                <p:fieldset  legend="#{msg['plafond_maladie']}"  styleClass="fieldset" class="fieldset"  >
+                                    <p:panelGrid   columns="10" layout="grid" >
+                                        <p:outputLabel  value="#{msg['group']}"  rendered="#{productionController.tabShowGroup}" />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="refGroupSelectPrestation" value="#{productionController.refGroupeSelectForPrestation}"  rendered="#{productionController.tabShowGroup}"   >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                            <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeListePlafondAndPrestationByGroup()}"/>
+                                        </p:selectOneMenu>
+                                        <h:outputLabel value="#{msg['plafond.Maladie']}" />
+                                        <p:selectOneMenu value="#{productionController.plafondMaladie}" 
+                                                         converter="#{genericConverter}" id="plafondMadie"   var="pr" filter="true" filterMatchMode="contains" style="width: 300px" disabled="#{productionController.police.police!=null and productionController.police.police.intValue()!=0}" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listePlafondMaladie}" var="pm" itemLabel="#{formatDateController.valueObject(pm.domaine_application)} - #{pm.montant} - #{pm.nombre_Acte} - #{formatDateController.valueObject(pm.modeControle)}"   itemValue="#{pm}"/>
+
+                                            <p:column>
+                                                #{formatDateController.valueObject(pr.domaine_application)} - #{pr.montant} - #{pr.nombre_Acte} - #{formatDateController.valueObject(pr.modeControle)}
+                                            </p:column>
+                                            <f:ajax event="change"  render=":form1:tabprincipal:plafondMadie,:form1:taprincipal"   />
+                                        </p:selectOneMenu> 
+
+                                        <h:outputLabel value="#{msg['designation']}" rendered="#{productionController.tabShowGroup==false}" />
+
+                                        <p:inputText id="designationPlafondMaladie"   value="#{productionController.police.designationPlafonMaladie}"   style="width: 300px" rendered="#{productionController.tabShowGroup==false}">
+                                            <f:ajax event="blur" render="designationPlafondMaladie"/>
+                                        </p:inputText>
+
+                                    </p:panelGrid>
+                                </p:fieldset>
+
+                                <p:fieldset  legend="#{msg['rubrique/prestation']}"  styleClass="fieldset" class="fieldset"  >
+                                    <h:panelGroup>
+                                        <h:outputLabel value="#{msg['rubrique']}" />
+                                        <p:spacer width="10"/>
+                                        <p:selectOneMenu value="#{productionController.rubriqueCategorie}" 
+                                                         converter="#{genericConverter}" id="rubrique"   var="rc" filter="true" filterMatchMode="contains" style="width: 300px" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{productionController.listeRubriqueCategorie}" var="rb" itemLabel=" #{rb.idRubrique.code} - #{rb.idRubrique.libelle} "   itemValue="#{rb}"/>
+
+                                            <p:column>
+                                                #{rc.idRubrique.code} #{rc.idRubrique.libelle}
+                                            </p:column>
+                                            <f:ajax event="change"  render=":form1:tabprincipal:rubrique,:form1:taprincipal" listener="#{productionController.chargerPrestionByRubrique()}"  />
+                                        </p:selectOneMenu> 
+
+                                    </h:panelGroup>
+                                    <!--                                    <p:panelGrid   columns="2" layout="grid" >
+                                                                            
+                                                                        </p:panelGrid>-->
+                                    <p:dataTable var="dpm" value="#{productionController.listeDetailPolicePlafond}"  widgetVar="dpmTable"  paginator="true" rows="500"  paginatorAlwaysVisible="true" rowsPerPageTemplate="50,100,500,1000"
+                                                 filteredValue="#{productionController.filterDetailPolicePlafond}"    scrollable="true" 
+
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="iddpmgTable" rowIndexVar="index"
+
+                                                 >
+
+                                        <f:facet name="header">
+                                            <p:outputPanel>
+                                                <h:outputText value="#{msg['recherche']} : "/>
+
+                                                <p:inputText id="globalFilter"
+                                                             onkeyup="PF('dpmTable').filter()"
+                                                             style="width:150px" placeholder="Search text..."  > 
+
+                                                </p:inputText>  
+
+
+                                            </p:outputPanel>
+
+                                        </f:facet> 
+                                        <p:column rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" disabled="#{productionController.police.police!=null and productionController.police.police.intValue()!=0}" rendered="#{dpm.id!=null and dpm.idPrestation.id!=null and (productionController.police.validation==false or productionController.police.validation==null)}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('managDeleteDialog2').show()" >
+                                                <f:setPropertyActionListener value="#{dpm}" target="#{productionController.detailPolicePlafond}"   />
+                                            </p:commandButton>
+                                            <p:commandButton  icon="pi pi-plus"  rendered="#{dpm.id==null and dpm.idPrestation.id!=null and (productionController.police.validation==false or productionController.police.validation==null)and productionController.police.id!=null}" actionListener="#{productionController.haveIndexForListe(index)}"
+                                                              styleClass="success-button" style="margin-right: .5rem"   onclick="PF('manageAddDialogDetailPrestation').show()"    >
+                                                <f:setPropertyActionListener value="#{dpm}" target="#{productionController.detailPolicePlafond}"   />
+
+                                            </p:commandButton>
+
+
+                                        </p:column>
+                                        <p:column headerText="#{msg['rubrique']}"  sortBy="#{dpm.idRubrique.code}" filterBy="#{dpm.idRubrique.code}" width="50" rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputText id="codeRB"     value="#{dpm.idRubrique.code}"  disabled="true"   >
+                                                <!--<p:ajax event="keyup"  oncomplete="PF('managePrestationDialog').show()"   update=":form2" />-->
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['code']}"  sortBy="#{dpm.idPrestation.code}" filterBy="#{dpm.idPrestation.code}" width="50" rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputText id="code"     value="#{dpm.idPrestation.code}"     >
+                                                <p:ajax event="keyup"  oncomplete="PF('managePrestationDialog').show()"   update=":form2" />
+                                            </p:inputText>
+                                        </p:column>
+                                        <p:spacer width="50"/>
+                                        <p:column headerText="#{msg['prestation']}: " sortBy="#{dpm.idPrestation.libelle}" width="200"  filterBy="#{dpm.idPrestation.libelle}"  rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputText id="libelle"     value="#{dpm.idPrestation.libelle}"   disabled="#{true}"    >
+                                                <p:ajax event="blur"   rendered="libelle" />
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['taux']} " rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputNumber  value="#{dpm.taux}"    decimalPlaces="2" emptyValue="#{0}"   id="tauxdpm"   >
+                                                <f:ajax event="blur"   render="tauxdpm"/>
+                                            </p:inputNumber>
+                                        </p:column>
+                                        <p:column headerText="#{msg['type']}" rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:selectOneMenu value="#{dpm.typeDetailMaladie}" style=" float: left; "  
+                                                             converter="#{genericConverter}"  >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" id="typePrestation" />
+                                                <f:selectItems value="#{productionController.typeDetailPlafondMaladie}" />
+                                                <f:ajax event="change"  render="typePrestation"   />
+
+                                            </p:selectOneMenu>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['mode.calcul']}" rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:selectOneMenu value="#{dpm.modeCalculDetailMaladie}" style=" float: left; "  
+                                                             converter="#{genericConverter}" id="calculprestation" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{productionController.modeCalculDetailPlafondMaladie}" />
+
+                                                <f:ajax event="change"  render="calculprestation"   />
+                                            </p:selectOneMenu>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['forfait']} " rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputNumber  value="#{dpm.forfait}"    decimalPlaces="0" emptyValue="#{0}"   id="forfaitdpm"   >
+                                                <f:ajax event="blur"   render="forfaitdpm"/>
+                                            </p:inputNumber>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['plafond.Maladie']} " rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputNumber  value="#{dpm.plafond}"    decimalPlaces="0" emptyValue="#{0}"   id="plafondpm"   >
+                                                <f:ajax event="blur"   render="plafondpm"/>
+                                            </p:inputNumber>
+                                        </p:column>
+
+                                        <p:column headerText="#{msg['barem']} " rendered="#{dpm.afficher==true or dpm.afficher==null}" >
+                                            <p:inputNumber  value="#{dpm.barem}"    decimalPlaces="0" emptyValue="#{0}"   id="baremdpm"    >
+                                                <f:ajax event="blur"   render="baremdpm"/>
+                                            </p:inputNumber>
+                                        </p:column>
+
+
+                                    </p:dataTable>
+                                </p:fieldset>
+                            </p:tab> 
+                            <p:tab title="#{msg['caracteristique']}"  id="caracteristique"  >
+                                <p:fieldset    styleClass="fieldset"   >
+                                    <p:panelGrid   columns="8" layout="grid" rendered="#{productionController.tabShowGroup}" >
+                                        <p:outputLabel  value="#{msg['group']}"   />
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="refGroupSelectCaracteristique" value="#{productionController.refGroupeSelectForCaracteristiqueAndGarantie}"     >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                            <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeListeCaracteristique()}"/>
+                                        </p:selectOneMenu>
+
+                                    </p:panelGrid>
+                                    <p:dataTable var="caract" value="#{productionController.listePoliceCaracteristique}"  widgetVar="pTable"  paginator="true" rows="100"  paginatorAlwaysVisible="true" rowsPerPageTemplate="5,10,15,50,100,500,1000"
+                                                 filteredValue="#{productionController.filterPoliceCaracteristique}"    scrollable="true" 
+
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="idpTable" rowIndexVar="index"
+
+                                                 >
+
+                                        <f:facet name="header">
+                                            <!--                                            <p:outputPanel>
+                                                                                            <h:outputText value="#{msg['recherche']} : "/>
+                                            
+                                                                                            <p:inputText id="globalFilter"
+                                                                                                         onkeyup="PF('pTable').filter()"
+                                                                                                         style="width:150px" placeholder="Search text..."  > 
+                                            
+                                                                                            </p:inputText>  
+                                            
+                                            
+                                                                                        </p:outputPanel>-->
+
+                                        </f:facet> 
+                                        <p:column  rendered="#{caract.afficher==true or caract.afficher==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" rendered="#{caract.id!=null and productionController.police.validation==false}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('manageRemoveDialogPoliceCaract').show()"     >
+                                                <f:setPropertyActionListener value="#{caract}" target="#{productionController.policeCaracteristique}"   />
+                                            </p:commandButton>
+
+                                            <p:commandButton  icon="pi pi-plus"  rendered="#{caract.id==null and caract.idCaracteristiques.id!=null and (productionController.police.validation==false or productionController.police.validation==null) and productionController.police.id!=null}" actionListener="#{productionController.haveIndexForListe(index)}"
+                                                              styleClass="success-button" style="margin-right: .5rem"   onclick="PF('manageAddDialogPoliceCaract').show()"   >
+                                                <f:setPropertyActionListener value="#{caract}" target="#{productionController.policeCaracteristique}"   />
+
+                                            </p:commandButton>
+
+                                        </p:column>
+
+
+                                        <p:column headerText="#{msg['caracteristique']}"  rendered="#{caract.afficher==true or caract.afficher==null}"  >
+                                            <p:inputText id="libelle"     value="#{caract.valeurCode}"   style="width:250px" rendered="#{caract.idCaracteristiques.id==null}" >
+                                                <p:ajax event="keyup"  oncomplete="PF('manageCaracteristiqueDialog').show()"  update=":form2" />
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{caract.idCaracteristiques.libelle}" rendered="#{caract.idCaracteristiques.id!=null}" />
+
+                                        </p:column>
+                                        <p:spacer width="50"/>
+                                        <p:column headerText="#{msg['designation']}: "  rendered="#{caract.afficher==true or caract.afficher==null}"  >
+                                            <p:inputText id="valeurTest"     value="#{caract.valeurTexte}"  rendered="#{productionController.checkValeurTYpeCaracterisitique(1, caract)}"  >
+                                                <p:ajax event="blur"   rendered="libelle" />
+                                            </p:inputText>
+                                            <p:inputNumber  value="#{caract.valeurNumerique}"    decimalPlaces="2" emptyValue="#{0}"   id="valeur" rendered="#{productionController.checkValeurTYpeCaracterisitique(2, caract)}"  >
+                                                <f:ajax event="blur"   render="valeur"/>
+                                            </p:inputNumber>
+                                            <p:inputNumber  value="#{caract.valeurNumerique}"    decimalPlaces="2" emptyValue="#{0}"   id="valeurEntier" rendered="#{productionController.checkValeurTYpeCaracterisitique(5, caract)}" >
+                                                <f:ajax event="blur"   render="valeurEntier"/>
+                                            </p:inputNumber>
+
+                                            <p:selectOneMenu value="#{caract.valeurCode}" style=" float: left; " id="liste"
+                                                             converter="#{genericConverter}"  rendered="#{productionController.checkValeurTYpeCaracterisitique(3, caract)}" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{productionController.listeElement_Liste_Caracteristique}" var="list"  itemLabel="#{list.libelle}" itemValue="#{list.libelle}"/>
+                                                <f:ajax event="change"   render="liste"/>
+
+                                            </p:selectOneMenu>
+                                            <p:calendar value="#{caract.dateValeur}" mode="popup"   showOn="both"  id="date" pattern="dd/MM/yyyy" rendered="#{productionController.checkValeurTYpeCaracterisitique(4, caract)}" >
+                                                <f:ajax event="dateSelect"  render="date"/>
+                                            </p:calendar>
+
+                                            <h:outputLabel  rendered="#{productionController.checkValeurTYpeCaracterisitique(0, null)}"/>
+
+                                            <p:selectBooleanButton onLabel="Yes" offLabel="No" value="#{caract.valeurBoolean}" rendered="#{productionController.checkValeurTYpeCaracterisitique(6, caract)}"
+                                                                   id="valeurBoolean"           onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" >
+                                                <f:ajax event="change"  render="valeurBoolean"/>
+                                            </p:selectBooleanButton>
+                                        </p:column>
+
+
+
+                                    </p:dataTable>   
+                                </p:fieldset>
+
+
+                            </p:tab> 
+                            <p:tab title="#{msg['garantie']}"   id="garantie" >
+                                <p:panelGrid   columns="8" layout="grid"  >
+                                    <p:outputLabel  value="#{msg['group']}"  rendered="#{productionController.tabShowGroup}" />
+                                    <p:selectOneMenu  converter="#{genericConverter}" id="refGroupSelectGarantie" value="#{productionController.refGroupeSelectForGarantie}"  rendered="#{productionController.tabShowGroup}"   >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                        <f:selectItems  value="#{productionController.listeRefGroup}"  var="ref"  itemLabel="#{ref.libelle}" itemValue="#{ref}" />
+                                        <f:ajax event="change" render=":form1:tabprincipal"  listener="#{productionController.chargeListeGarantie()}"/>
+                                    </p:selectOneMenu>
+                                    <h:outputLabel value="#{msg['force.mode.calcul']} " rendered="#{productionController.police.validation==false  }" />
+                                    <p:selectBooleanButton  onLabel=" #{msg['manuel']}" offLabel=" #{msg['Automatique']}" onIcon="ui-icon-check" offIcon="ui-icon-close" id="calcul"  value="#{productionController.modecalculForcerManuel}"  rendered="#{productionController.police.validation==false  }" >
+                                        <f:ajax event="change" render="actif"/>
+                                        <p:ajax event="change" listener="#{productionController.forceModeCalulPrimeManuelle()}" update=":form1:tabprincipal"  />
+
+                                    </p:selectBooleanButton>
+                                </p:panelGrid>
+
+                                <p:fieldset    styleClass="fieldset"   class="fieldset" >
+                                    <p:dataTable var="pg" value="#{productionController.listePoliceGarantie}" widgetVar="pgTable"   rowIndexVar="index"
+                                                 emptyMessage="#{msg['emptyMessage']}"    id="idpgTable" >
+                                        <!--                                        <f:facet name="header">
+                                        #{msg['type.tarif']} #{productionController.police.idTypeTarif.libelle} 
+                                    </f:facet>-->
+                                        <p:columnGroup type="header">
+
+                                            <p:row>
+                                                <p:column headerText="#{msg['option']}" />
+                                                <p:column headerText="#{msg['garantie']}" />
+                                                <p:column headerText="#{msg['capital']} " />
+                                                <p:column headerText="#{msg['taux']} " />
+                                                <p:column headerText="#{msg['pourcentage']} " />
+                                                <p:column headerText="#{msg['prime']} " />
+                                                <p:column headerText="#{msg['proarata']} " />
+
+                                            </p:row>
+                                        </p:columnGroup>
+                                        <p:column  rendered="#{pg.afficher==true or pg.afficher==null}" >
+
+                                            <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" rendered="#{pg.id!=null and productionController.police.validation==false}"
+                                                              styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('manageRemoveDialogPoliceGarantie').show()"     >
+                                                <f:setPropertyActionListener value="#{pg}" target="#{productionController.policeGarantie}"   />
+                                            </p:commandButton>
+                                            <p:commandButton  icon="pi pi-plus"  rendered="#{pg.id==null and pg.idGarantie.id!=null and (productionController.police.validation==false or productionController.police.validation==null) and productionController.police.id!=null }" actionListener="#{productionController.haveIndexForListe(index)}"
+                                                              styleClass="success-button" style="margin-right: .5rem"   onclick="PF('manageAddDialogPoliceGarantie').show()"   >
+                                                <f:setPropertyActionListener value="#{pg}" target="#{productionController.policeGarantie}"   />
+
+                                            </p:commandButton>
+
+                                        </p:column>
+
+
+                                        <p:column rendered="#{pg.afficher==true or pg.afficher==null}"  >
+                                            <p:inputText id="libelle"     value="#{pg.idGarantie.id}"   style="width:50px" rendered="#{pg.idGarantie.id==null}" >
+                                                <p:ajax event="keyup"  oncomplete="PF('manageGarantieDialog').show()"  update=":form2" />
+                                            </p:inputText>
+                                            <p:outputLabel  value="#{pg.idGarantie.idRefGaranties.libelle}" rendered="#{pg.idGarantie.id!=null}"  style="width:350px"/>
+
+                                        </p:column>
+
+                                        <p:column rendered="#{pg.afficher==true or pg.afficher==null}"  >
+
+                                            <p:inputNumber  value="#{pg.capital}"    decimalPlaces="2" emptyValue="#{null}"   id="capital"   >
+                                                <f:ajax event="blur"   render="capital"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:column  rendered="#{pg.afficher==true or pg.afficher==null}" >
+
+                                            <p:inputNumber  value="#{pg.taux}"    decimalPlaces="2" emptyValue="#{null}"   id="taux"   >
+                                                <f:ajax event="blur"   render="taux"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+
+                                        <p:column rendered="#{pg.afficher==true or pg.afficher==null}"  >
+
+                                            <p:inputNumber  value="#{pg.pourcentage}"    decimalPlaces="0" emptyValue="#{1}"   id="pour"   >
+                                                <f:ajax event="blur"   render="pour"/>
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:column  rendered="#{pg.afficher==true or pg.afficher==null}" >
+
+                                            <p:inputNumber  value="#{pg.prime}"    decimalPlaces="3" emptyValue="#{0}"   id="prime"   disabled="#{ !productionController.modecalculForcerManuel==true and pg.idGarantie.globalCompagnie==true}" >
+                                                <f:ajax event="blur"   render="prime" listener="#{productionController.caculTotalPrime()}"/>
+                                            </p:inputNumber>
+<!--                                            <p:commandLink id="ggp" update="form1:tabprincipal:prime" action="#{productionController.chargeGroupGarantie(pg)}" style="margin-right:20px;">
+                                                <h:outputText value="#{msg['affiche.detail.garantie']}" />
+                                            </p:commandLink>-->
+
+                                        </p:column>
+
+                                        <p:column rendered="#{pg.afficher==true or pg.afficher==null}"  >
+
+                                            <p:inputNumber  value="#{pg.prorata}"    decimalPlaces="3" emptyValue="#{0}"   id="prorata"  disabled="#{true}"   >
+                                                <f:ajax event="blur"  render="prorata"  listener="#{productionController.calculTotalProrata()}"  />
+                                            </p:inputNumber>
+
+                                        </p:column>
+                                        <p:columnGroup type="footer">
+                                            <p:row>
+                                                <p:column colspan="5" style="text-align:center" footerText="Totals:" />
+
+                                                <p:column footerText="#{formatDateController.formatNumberGeneral(productionController.totalPrime.longValue())}" style="text-align:left" id="totalPrime" />
+                                                <p:column footerText="#{formatDateController.formatNumberGeneral(productionController.totalProrata.longValue())}" style="text-align:left" id="totalProrata"/>
+                                            </p:row>
+                                        </p:columnGroup>
+                                    </p:dataTable>
+
+
+                                </p:fieldset>
+                            </p:tab> 
+
+                            <p:tab title="#{msg['quittance.police']}"  id="quittance" >
+                                <center>
+                                    <p:commandButton  value="#{msg['bouton.valider']}" icon="pi pi-check"  styleClass="success-button"   rendered="#{productionController.police.validation==false and (productionController.police.imprimer==true or productionController.police.imprimer==false ) and productionController.police.id!=null}" 
+                                                      oncomplete ="PF('validationDialog').show()"     onclick=" target = '_blank';
+                                                              return true;"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton  value="#{msg['Bouton.Sauvegarde']}"  icon="pi pi-check"    styleClass="success-button" actionListener="#{productionController.addProjetSanteSave()}"  ajax="false" rendered="#{productionController.police.id==null}"/>   
+                                    <p:spacer width="10"/>
+                                    <p:commandButton  value="#{msg['bouton.imprimer']}"  icon="pi pi-print"  styleClass="secondary-button" actionListener="#{productionController.controlleBefortPrint()}" ajax="false" onclick=" target = '_blank';
+                                            return true;" />   
+                                </center>
+
+                                <p:spacer width="10"/>
+
+
+                                <br/>
+                                <br/>
+                                <p:fieldset  legend="#{msg['devise']} #{productionController.police.idDevise.libelle} | #{productionController.police.idDevise.code}"  styleClass="fieldset"   class="fieldset" >
+
+
+                                    <p:separator  style=" border-color: #01579B"/>
+
+                                    <p:panelGrid   columns="10"   >
+                                        <p:outputLabel  value="#{msg['type.quittance']}" />
+
+                                        <p:selectOneMenu  converter="#{genericConverter}" id="emission" value="#{productionController.quitance.typQuittance}"  style="float: left" >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                            <f:selectItems  value="#{productionController.emissions}"  />
+                                            <f:ajax event="change" render="emission" />
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel  value="#{msg['date.emission']}"  />
+
+                                        <p:calendar value="#{productionController.quitance.dateEmission}"  mode="popup"   showOn="both"  id="dateEmission" pattern="dd/MM/yyyy"    >
+                                            <f:ajax event="dateSelect"  render="dateEmission" />
+                                        </p:calendar>
+                                        <p:outputLabel  value="#{msg['datedebut']}"  />
+
+                                        <p:calendar value="#{productionController.quitance.date_effet}"  mode="popup"   showOn="both"  id="dateEffet" pattern="dd/MM/yyyy"    >
+                                            <f:ajax event="dateSelect"  render="dateEffet" />
+                                        </p:calendar>
+
+                                        <p:outputLabel  value="#{msg['dateEch']}" style="float: left" />
+
+                                        <p:calendar value="#{productionController.quitance.date_echeance}"  mode="popup"   showOn="both"  id="dateEcheance" pattern="dd/MM/yyyy"    style="float: left" >
+                                            <f:ajax event="dateSelect"  render="dateEcheance" />
+                                        </p:calendar>
+
+                                    </p:panelGrid>
+                                    <p:separator  style=" border-color: #D20005"/>
+                                    <p:panel header="#{msg['detail.quittance']}" >
+                                        <p:panelGrid   columns="6" layout="flex"   >
+                                            <p:outputLabel  value="#{msg['prime.nette']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.primeNette}"    decimalPlaces="3" emptyValue="#{0}"   id="Quittanceprime"  disabled="true" >
+                                                <f:ajax event="blur"   render="Quittanceprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['taxes.prime']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.taxePrime}"    decimalPlaces="3" emptyValue="#{0}"   id="taxeprime"  disabled="#{productionController.police.id!=null}"   >
+                                                <f:ajax event="blur"   render="taxeprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['prime.nette.taxe']}"  style="color: #D20005" />
+                                            <p:inputNumber  value="#{productionController.quitance.primeTaxe}"    decimalPlaces="3" emptyValue="#{0}"   id="Primetaxequittanceprime"  disabled="#{productionController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="Primetaxequittanceprime" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['accessoir']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.montant_Accessoire}"    decimalPlaces="3" emptyValue="#{0}"   id="accessoirQuittance" disabled="#{productionController.police.id!=null}"   >
+                                                <f:ajax event="blur"   render="accessoirQuittance" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['taxe.acc']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.taxeAccessoir}"    decimalPlaces="3" emptyValue="#{0}"   id="TaxeaccessoirQuittance" disabled="#{productionController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="TaxeaccessoirQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['accessoir.taxe']}" style="color: #D20005"  />
+                                            <p:inputNumber  value="#{productionController.quitance.accessoirTaxe}"    decimalPlaces="3" emptyValue="#{0}"   id="accessoirTaxeQuittance" disabled="#{productionController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="accessoirTaxeQuittance" />
+                                            </p:inputNumber>
+
+                                            <p:outputLabel  value="#{msg['timbre.dimension']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.timbreDimension}"   minValue="#{-9999}"  decimalPlaces="3" emptyValue="#{0}"   id="timDimensionQuittance"  disabled="#{productionController.police.id!=null}" >
+                                                <f:ajax event="blur"   render="timDimensionQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['timbre.gradue']}"  />
+                                            <p:inputNumber  value="#{productionController.quitance.timbreGradue}"  minValue="#{-9999}"   decimalPlaces="3" emptyValue="#{0}"   id="timGradueQuittance" disabled="#{productionController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="timGradueQuittance" />
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['total.timbre']}" style="color: #D20005"  />
+                                            <p:inputNumber  value="#{productionController.quitance.totalTimb}"   minValue="#{-9999}"  decimalPlaces="3" emptyValue="#{0}"   id="timGradueTotalQuittance" disabled="#{productionController.police.id!=null}"  >
+                                                <f:ajax event="blur"   render="timGradueTotalQuittance" />
+                                            </p:inputNumber>
+
+
+                                        </p:panelGrid> 
+                                    </p:panel>
+                                    <p:separator  style=" border-color: #D20005"/>
+                                    <p:panelGrid   columns="6" layout="flex"  >
+                                        <p:outputLabel  value="#{msg['total.a.paye']}"  />
+                                        <p:inputNumber  value="#{productionController.quitance.total_a_paye}"    decimalPlaces="3" emptyValue="#{0}"   id="totalpayeQuittance" disabled="#{productionController.police.id!=null}"  >
+                                            <f:ajax event="blur"   render="totalpayeQuittance" />
+                                        </p:inputNumber>
+
+                                        <p:outputLabel  value="#{msg['total.taxe']}"  />
+                                        <p:inputNumber  value="#{productionController.quitance.totalTaxes}"    decimalPlaces="3" emptyValue="#{0}"   id="totalTaxepayeQuittance"  disabled="#{productionController.police.id!=null}" >
+                                            <f:ajax event="blur"   render="totalTaxepayeQuittance" />
+                                        </p:inputNumber>
+
+                                        <p:outputLabel  value="#{msg['tva']}"  />
+                                        <p:inputNumber  value="#{productionController.tva}"    decimalPlaces="2" emptyValue="#{0}"   id="tva"  disabled="#{productionController.police.id!=null and productionController.police.validation==true}" >
+                                            <f:ajax event="blur"   render="tva"  listener="#{productionController.changeValueTva()}" />
+                                        </p:inputNumber>
+
+                                    </p:panelGrid>
+
+                                    <!--<p:separator  style=" border-color: #01579B"/>-->
+                                    <!--                                    <p:panelGrid   columns="6" layout="flex"  id="gridCom"  >
+                                                                            <p:outputLabel  value="#{msg['apport']}"  />
+                                                                            <p:inputNumber  value="#{productionController.prime_Apporteur.taux_apport}"    decimalPlaces="3" emptyValue="#{0}"   id="apport"   >
+                                                                                <p:ajax event="keyup"    update=":form1:tabprincipal:apport,:form1:tabprincipal:totacom"   />
+                                                                            </p:inputNumber>
+                                    
+                                                                            <p:outputLabel  value="#{msg['gestion']}"  />
+                                                                            <p:inputNumber  value="#{productionController.prime_Apporteur.taux_gestion}"    decimalPlaces="3" emptyValue="#{0}"   id="gestion"   >
+                                                                                <f:ajax event="keyup"   render="gestion,totacom" />
+                                                                            </p:inputNumber>
+                                                                            <p:outputLabel  value="#{msg['total.com']}"  />
+                                                                            <p:inputNumber  value="#{productionController.commission_Prime_Apporteur.taux_gestion.add(productionController.commission_Prime_Apporteur.taux_gestion)}"    decimalPlaces="3" emptyValue="#{0}"   id="totacom" disabled="true"  >
+                                                                                <f:ajax event="blur"   render="totacom"  />
+                                                                            </p:inputNumber>
+                                    
+                                                                        </p:panelGrid>-->
+                                </p:fieldset>
+
+                            </p:tab> 
+
+                        </p:tabView>
+                    </h:form>  
+                    <h:form id="form2">  
+                        <p:dialog header="#{msg['prestation']}" width="650" showEffect="fade" modal="true" widgetVar="managePrestationDialog" responsive="true">
+
+                            <p:dataTable id="idprestationableTable" var="prestation" value="#{productionController.listePrestation}" 
+                                         selection="#{productionController.selectePrestations}" rowKey="#{prestation.id}"
+                                         paginatorAlwaysVisible="true" paginator="true" rows="500"  widgetVar="prestationableTable" 
+                                         rowsPerPageTemplate="500,1000,2000" filterEvent="enter" filteredValue="#{productionController.filterPrestation}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"
+                                         scrollable="true" scrollHeight="300"
+                                         >
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('prestationableTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column selectionMode="multiple" style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="Code" sortBy="#{prestation.code}" filterBy="#{prestation.code}" >
+                                    <h:outputText value="#{prestation.code}" />
+                                </p:column>
+
+                                <p:column headerText="Name" sortBy="#{prestation.libelle}" filterBy="#{prestation.libelle}">
+                                    <h:outputText value="#{prestation.libelle}" />
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <center>
+                                        <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.chargePrestaionForRubriqueCategorie()}" oncomplete=" PF('managePrestationDialog').hide()" update=":form1:tabprincipal" process="@this" ajax="false" />
+                                        <p:spacer width="10"/>
+                                        <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('managePrestationDialog').hide" ajax="false" />
+                                    </center>
+                                </f:facet>
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['caracteristique']}" width="650" showEffect="fade" modal="true" widgetVar="manageCaracteristiqueDialog" responsive="true">
+
+                            <p:dataTable var="rb" value="#{productionController.listeRubriqueCaracteristique}" paginator="true" rows="10" widgetVar="rbTable"  id="idrbTable"
+                                         filterEvent="enter" filteredValue="#{productionController.filterRubriqueCaracteristique}"
+                                         paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         scrollHeight="300" 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rb.id}" selectionMode="single"  selection="#{productionController.rubriqueCaracteristique.idCaracteristiques}"
+
+                                         scrollable="true"  >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{productionController.showDetailsRubrique(rb)}"  
+                                        oncomplete="PF('manageCaracteristiqueDialog').hide()"   update="form1:tabprincipal" process="@this" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rbTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rb.code}" filterBy="#{rb.code}"  style="width: 50px">
+                                    <h:outputText value="#{rb.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rb.libelle}" filterBy="#{rb.libelle}"  style="width: 150px">
+                                    <span class="flag flag-#{rb.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText 
+                                        value="#{rb.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['garantie']}"  showEffect="fade" modal="true" widgetVar="manageGarantieDialog" responsive="true" >
+
+                            <p:dataTable var="rg" value="#{productionController.listeRubriqueGarantie}" paginator="true" rows="10" widgetVar="rgTable"  id="idrgTable"
+                                         filterEvent="enter" filteredValue="#{productionController.filterRubriqueGarantie}"
+                                         paginatorAlwaysVisible="false" rowsPerPageTemplate="10,15,50,100,500,1000"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         scrollHeight="300" 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rg.id}" selectionMode="single"  selection="#{productionController.rubriqueGarantie.idGarantie}"
+
+                                         scrollable="true"  >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{productionController.showDetailsRubriqueGarantie(rg)}"  
+                                        oncomplete="PF('manageGarantieDialog').hide()"   update="form1:tabprincipal" process="@this" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rgTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rg.idRefGaranties.code}" filterBy="#{rb.code}"  style="width: 50px">
+                                    <h:outputText value="#{rg.idRefGaranties.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rg.idRefGaranties.libelle}" filterBy="#{rg.idRefGaranties.libelle}"  >
+                                    <span class="flag flag-#{rg.idRefGaranties.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText 
+                                        value="#{rg.idRefGaranties.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['sante']} / #{msg['liste.contrat']}   "  showEffect="fade" modal="true" widgetVar="managePoliceDialog" responsive="true">
+
+                            <p:dataTable id="idcontractTable" var="p" value="#{productionController.listeOrclassContrats}" 
+                                         selection="#{productionController.policeSelect}" rowKey="#{p.id}"
+                                         style="margin-bottom:0" paginator="true" rows="5"  selectionMode="single"   widgetVar="contractTable"  rowStyleClass="#{p.validation==false ? 'red':'old'}" >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{productionController.chargeContractSelecte()}"     
+                                        process="@this" update=":form1,form11"  oncomplete="PF('managePoliceDialog').hide()"  />
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('contractTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column  style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="#{msg['police']}" sortBy="#{p.numero_police}" filterBy="#{pnumero_police}" rendered="#{p.police==null or  p.police.intValue()==0}" >
+                                    <h:outputText value="#{p.numero_police}" />
+                                </p:column>
+                                <p:column headerText="#{msg['police']}" sortBy="#{p.police}" filterBy="#{p.police}" rendered="#{p.police!=null and  p.police.intValue()!=0}">
+                                    <h:outputText value="#{p.police}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['intermediaire']}" sortBy="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}" filterBy="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}">
+                                    <h:outputText value="#{p.idIntermediaire.idRefIntermediaire.raisonSociale}" />
+
+                                </p:column>
+
+                                <p:column headerText="#{msg['categorie']}" sortBy="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}" filterBy="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}">
+                                    <h:outputText value="#{formatDateController.valueObject(p.idCategories.libelle,p.idCategories)}" />
+                                </p:column>
+
+                                <p:column headerText="#{msg['souscripteur']}"  >
+                                    <h:outputText value="#{p.idAssure.nom.toUpperCase()}"  />
+                                    <h:outputText value="#{p.idAssure.raison_social.toUpperCase()}"  />
+                                </p:column>
+
+                                <p:column headerText="#{msg['SAISIR']} #{msg['par']}"  >
+                                    <h:outputText value="#{p.saisir_par}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['bouton.modifier']} #{msg['par']}"  >
+                                    <h:outputText value="#{p.modifier_par}"  />
+
+                                </p:column>
+                                <p:column headerText="#{msg['bouton.valider']} #{msg['par']}"  >
+                                    <h:outputText value="#{p.valider_par}"  />
+
+                                </p:column>
+<!--                                <p:column headerText="#{msg['date.valider']} "  >
+                                    <h:outputText value="#{formatDateController.formatDate(p.date_validation)}"  />
+
+                                </p:column>-->
+                                <p:column headerText="#{msg['total.a.paye']} "  >
+                                    <h:outputText value="#{productionController.quittanceByPolice(p)}"  />
+
+                                </p:column>
+
+
+
+
+
+
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+                        
+
+                        <p:dialog header="#{msg['confirmation.action']}"  showEffect="fade" modal="true" widgetVar="managDeleteDialogDV" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDevalider']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['devalider']}"     actionListener="#{productionController.devaliderContrat()}" oncomplete=" PF('managDeleteDialogDV').hide()" update="form1"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('managDeleteDialogDV').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation.action']}"  showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgAnnuler']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.annullationContrat()}" oncomplete=" PF('managDeleteDialog').hide()" update="form1"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation.action']}"  showEffect="fade" modal="true" widgetVar="managDeleteDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deletePoliceDetailPrestation()}" oncomplete=" PF('managDeleteDialog2').hide()" update="form1"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.updateContrat()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="dlg" responsive="true">
+                            <center>
+
+                                <h4>#{msg['assure.check']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.chargerAssurCheck()}" oncomplete=" PF('dlg').hide()"   ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['cest.pas.lui']}" onclick="PF('dlg').hide()"  styleClass="danger-button p-mr-2 p-mb-2" />
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="agence" responsive="true" closable="false">
+                            <center>
+                                <h:outputText value="#{msg['intermediaire']}" />
+                                <p:spacer width="10"/>
+                                <p:selectOneMenu value="#{productionController.intermediairesSelect}" 
+                                                 converter="#{genericConverter}" id="agence"   var="in" filter="true" filterMatchMode="contains" style="width: 300px" >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{productionController.listeIntermediaires}" var="i" itemLabel=" #{i.idRefIntermediaire.code} - #{i.idRefIntermediaire.raisonSociale} "   itemValue="#{rb}"/>
+
+                                    <p:column>
+                                        #{in.idRefIntermediaire.code} #{in.idRefIntermediaire.raisonSociale}
+                                    </p:column>
+                                    <f:ajax event="change"  render="agence" listener="#{productionController.chargerPrestionByRubrique()}"  />
+                                </p:selectOneMenu> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.chargeAgenceSelect()}"  update=":form1"  />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['edition.groupe']}"  showEffect="fade" modal="true" widgetVar="dlgGroup" responsive="true">
+                            <center>
+
+                                <p:spacer width="10"/>
+
+                            </center>
+                            <p:panelGrid columns="2" layout="flex" columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4" styleClass="customPanelGrid" contentStyleClass="ui-fluid">
+                                <h:outputText value="#{msg['libelle']}" /> 
+                                <p:autoComplete id="libelleGroupe" value="#{productionController.refGroupe.libelle}" completeMethod="#{productionController.completeTextReferenceGroup}" >
+                                    <f:ajax event="select" render="libelleGroupe"/>
+
+                                </p:autoComplete>
+                                <p:outputLabel  value="#{msg['adresse.bp']}" />
+                                <p:inputText value="#{productionController.refGroupe.adresseGroup}" />
+                                <p:outputLabel  value="#{msg['adresse.ville']}"  />
+
+                                <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{productionController.refGroupe.ville}"  var="vi" filter="true" filterMatchMode="contains"   >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{productionController.listeVille}" var="v" itemLabel="#{v.code} #{v.libelle}"  itemValue="#{v}"/>
+                                    <f:ajax event="change" render="ville" />
+                                    <p:column>
+                                        #{vi.code} #{vi.libelle}
+                                    </p:column>
+                                </p:selectOneMenu>
+                                <p:outputLabel  value="#{msg['observation']}" />
+                                <p:inputTextarea value="#{productionController.refGroupe.observation}" rows="5" cols="30" counter="display" maxlength="250" counterTemplate="{0} characters remaining." autoResize="false" />
+                                <p:outputLabel />
+                                <p:outputLabel  /> 
+                                <p:outputLabel  />
+                                <h:outputText id="display" />
+
+                            </p:panelGrid>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addReferenceGroupe()}"  update=":form1:tabprincipal" ajax="false" />
+
+
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addImageRisque()}" oncomplete=" PF('manageAddDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialogRisque" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addRisque()}" oncomplete=" PF('manageAddDialogRisque').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialogRisque').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageUpdateDialogRisque" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.updateRisque()}" oncomplete=" PF('manageUpdateDialogRisque').hide()" update=":form1:tabprincipal,:form1:msg"  ajax="false" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialogRisque').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialogRisque" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deleteRisque()}" oncomplete=" PF('manageRemoveDialogRisque').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialogRisque').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deleteImageRisque()}" oncomplete=" PF('manageRemoveDialog').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialogPoliceCaract" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deletePoliceCaracteristique()}" oncomplete=" PF('manageRemoveDialogPoliceCaract').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialogPoliceCaract').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialogPoliceGarantie" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deletePoliceGarantie()}" oncomplete=" PF('manageRemoveDialogPoliceGarantie').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialogPoliceGarantie').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.updateImageRisque()}" oncomplete=" PF('manageUpdateDialog').hide()" update=":form1:tabprincipal,:form1:msg"  ajax="false" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.deleteFamilleRisque()}" oncomplete=" PF('manageRemoveDialog2').hide()" update=":form1:tabprincipal,:form1:msg"     />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageUpdateDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.updateFamilleRisque()}" oncomplete=" PF('manageUpdateDialog2').hide()" update=":form1:tabprincipal,:form1:msg"  ajax="false" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addFamilleRisque()}" oncomplete=" PF('manageAddDialog2').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddImageFamilleRisqueDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addImageFamilleRisque()}" oncomplete=" PF('manageAddImageFamilleRisqueDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddImageFamilleRisqueDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialogDetailPrestation" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addDetailPrestation()}" oncomplete=" PF('manageAddDialogDetailPrestation').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialogDetailPrestation').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialogPoliceCaract" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addPoliceCaracteristique()}" oncomplete=" PF('manageAddDialogPoliceCaract').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialogPoliceCaract').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialogPoliceGarantie" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.addPoliceGarantie()}" oncomplete=" PF('manageAddDialogPoliceGarantie').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialogPoliceGarantie').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+
+
+                        <p:dialog header="#{msg['importation']}"  showEffect="fade" modal="true" widgetVar="fichier" responsive="true">
+                            <center>
+                                <p:fileUpload listener="#{productionController.handleFileUpload}" 
+                                              auto="true"  
+                                              sizeLimit="500000"
+                                              update="@this"
+
+                                              allowTypes="/(\.|\/)(xls)$/"
+                                              uploadLabel="Confirm"
+                                              invalidSizeMessage="Please Choose File which size is less than 500Kb "
+                                              />
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+<!--                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.chargeRisqueByGroup()}" oncomplete=" PF('fichier').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>-->
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('fichier').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="validationDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['validation.contrat']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.validationProjet()}"   oncomplete=" PF('validationDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('validationDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['affiche.detail.garantie']}"  showEffect="fade" modal="true" widgetVar="groupPoliceGarantieDialog" responsive="true">
+                            <center>
+                                <h4>#{productionController.policeGarantieAffiche.idGarantie.idRefGaranties.code} #{productionController.policeGarantieAffiche.idGarantie.idRefGaranties.libelle}</h4> 
+                            </center>
+                            <p:dataTable var="ggp" value="#{productionController.listeGroupGrantitePolice}" reflow="true" rows="20" paginator="true">
+
+
+                                <p:column headerText="#{msg['group']}">
+                                    <h:outputText value="#{ggp.idGroupePolice.idRefGroupe.libelle}" />
+                                </p:column>
+                                <p:column headerText="#{msg['prime.nette']}">
+                                    <p:inputNumber id="primePoliceGarentie" value="#{ggp.prime}" minValue="0"  decimalPlaces="0">  
+
+                                    </p:inputNumber> 
+                                </p:column>
+                            </p:dataTable>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{productionController.chargedetailGroupeGarantiePolice()}"   oncomplete=" PF('groupPoliceGarantieDialog').hide()" update=":form1:tabprincipal,:form1:msg,:form1"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('groupPoliceGarantieDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+                    </h:form> 
+
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

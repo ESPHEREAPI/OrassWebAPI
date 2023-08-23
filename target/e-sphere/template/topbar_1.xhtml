@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:po="http://primefaces.org/rain">
+    <f:view  locale="#{languageController.localeCode}">
+    <h:form>
+               
+    <div class="layout-topbar">
+        <div class="layout-topbar-wrapper">
+
+
+       <!--<p:graphicImage name="images/#{ guestPreferences.lightLogo ? 'logo-rain-white.svg' : 'logo-rain-black.svg'}"  library="rain-layout"  />-->
+
+
+            <!--  <li>PAGES</li>
+                    <li><i class="pi pi-chevron-right"></i></li>
+                    <li>
+                        <p:link outcome="/principal">PRINCIPAL</p:link>
+                    </li>-->
+
+            <h:panelGroup styleClass="md-inputfield search-input-wrapper" rendered="#{connectionController.afficherNameForEntity()}" >
+                <p:spacer width="20" />
+                <label > ENTITY :</label> 
+                <p:spacer width="10"></p:spacer>
+                <label style="color:#ffffff;font-style: normal;"> #{connectionController.entreprise.code} </label> 
+                <p:spacer width="10"/>
+                <label >ANNEE :</label> 
+                <p:spacer width="5"/>
+                <label style="color:#ffffff;font-style: normal;"> #{connectionController.date} </label> 
+                <p:spacer width="5"/>
+
+            </h:panelGroup>
+
+
+
+
+            <div class="layout-topbar-right">
+                <div class="menu-button-wrapper">
+                    <a href="#" class="menu-button">
+                        <div class="menu-button-bars">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="menu-button-times">
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </a>
+                </div>
+                <center>
+                    <ul class="layout-topbar-actions">
+                        <li class="search-item topbar-item">
+                            <h:form onsubmit="return false;" >
+
+
+                                <label >#{msg['welcome.bienvenue']} : </label>  
+                                <p:spacer width="5"/>
+                                <label style="color:gold;font-style: normal;">#{connectionController.user.login}</label>
+
+
+
+                            </h:form>
+                        </li>
+
+
+                    </ul>
+                </center>
+
+                <!--                <a href="#" class="layout-rightpanel-button">
+                                    <i class="pi pi-ellipsis-v"></i>
+                                </a>-->
+                <center>
+
+
+                    <!--                    <h:outputText value="BIENVENU : "/>   
+                                        <h:outputText value="NAME OF USER" style="color:gold;font-style: normal;"/>-->
+
+                    <div class="right_logout">
+                        <label class="jclock"></label> 
+                        <p:spacer width="20"/><br/>
+                         <!--<h:outputText value="#{msg['welcome.deconect']}:" style="color: #FFFFFF;  font-style: italic;"/>-->
+                        <p:linkButton outcome="/connection" value="Deconnection" style="color: gold;  font-style: italic;"  />
+                        
+                        <!--                        <h:commandLink styleClass="lien" value="Deconnection"  style="color: gold;  font-style: italic;" >
+                        
+                                                </h:commandLink>-->
+                        <p:spacer width="20"/>
+                    </div>
+
+
+                </center>
+            </div>
+            <div >
+                 <!--<h:outputText value="#{msg['langue.lang']}:" style="color:#FFFFFF;"/>-->
+                <p:selectOneMenu value="#{languageController.localeCode}" onchange="submit()"
+                                 valueChangeListener="#{languageController.countryLocaleCodeChanged}">
+                    <f:selectItems value="#{languageController.countriesInMap}"/> 
+                    
+                </p:selectOneMenu>
+            </div>
+            <p:spacer width="20"/>
+        </div>
+
+    </div>
+        </h:form>
+</f:view>
+</ui:composition>

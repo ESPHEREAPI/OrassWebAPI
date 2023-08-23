@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_1.xhtml">
+
+
+    <style type="text/css">
+        .roundedImage{
+            overflow:hidden;
+            -webkit-border-radius:50px;
+            -moz-border-radius:50px;
+            border-radius:50px;
+            width:90px;
+            height:90px;
+        }
+    </style>
+    <!--    <div class="roundedImage" style="background:url(/images/slideshow/1.jpg) no-repeat 0px 0px;">
+            &nbsp;
+        </div>-->
+
+    <ui:define name="title">E-SPHERE</ui:define>
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/acceuil_admin_system">#{msg['acceuille']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="ACCEUILLE PAGE" />
+
+    <ui:define name="content">
+        <f:view locale="#{languageController.localeCode}">
+            <h:form id="form1" >
+
+                <p:messages closable="true"   showSummary="true" globalOnly="false" id="msg1"/>
+
+                <div class="p-grid">
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+
+                            <div class="card ">
+                                <center>
+                                    <h4>#{msg['creer.compagny']} </h4>
+                                </center>
+                                <center>
+
+
+
+
+                                    <h:link  outcome="/administration/configuration" styleClass="layout-topbar-logo" onclick="#{connectionController.optionChoixUserSysteme(0)}" >
+                                        <p:graphicImage name="/globe.png"  library="images"  />
+
+
+                                    </h:link>
+
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+
+                            <div class="card ">
+                                <center>
+                                    <h4>#{msg['liste.compagnies']} </h4>
+                                </center>
+                                <center>
+
+
+
+
+                                    <h:link  outcome="/administration/listecompagnies" styleClass="layout-topbar-logo" onclick="#{connectionController.optionChoixUserSysteme(0)}" >
+                                        <p:graphicImage name="/liste.png"  library="images"  />
+
+
+                                    </h:link>
+
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+<!--                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+
+                            <div class="card ">
+                                <center>
+                                    <h4>#{msg['condition.gestion']} </h4>
+                                </center>
+                                <center>
+
+
+
+
+                                    <h:link  outcome="/administration/condition" styleClass="layout-topbar-logo">
+                                        <p:graphicImage name="/connexion.png"  library="images"  />
+
+
+                                    </h:link>
+
+                                </center>
+                            </div>
+                        </div>
+                    </div>-->
+<!--                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+
+                            <div class="card ">
+                                <center>
+                                    <h4>#{msg['tarif']} </h4>
+                                </center>
+                                <center>
+
+
+
+
+                                    <h:link  outcome="/administration/tarif" styleClass="layout-topbar-logo">
+                                        <p:graphicImage name="/tarif.png"  library="images"  />
+
+
+                                    </h:link>
+
+                                </center>
+                            </div>
+                        </div>
+                    </div>-->
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>  #{msg['utilisateur.system']}</h4>
+                                </center>
+                                <center>
+
+
+                                    <h:link  outcome="/administration/utilisateur_system" styleClass="layout-topbar-logo" onclick="#{connectionController.optionChoixUserSysteme(0)}" >
+                                        <p:graphicImage name="/user2.png"  library="images"  />
+
+
+                                    </h:link>
+                                    <!--<p:commandButton value="menuAccess" actionListener="#{connectionController.chargeMenuAcces()}"></p:commandButton>-->
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4> #{msg['module.gestion']}</h4>
+                                </center>
+                                <center>
+<!--                                    <p:commandLink styleClass="layout-topbar-logo"  action="#{configurationController.redirect('"/administration/ajoutModule"')}" >
+                                     <p:graphicImage name="/epreuve.png"  library="images"  />
+                                    </p:commandLink>-->
+
+                                    <h:link  outcome="/administration/ajoutModule" styleClass="layout-topbar-logo" onclick="#{connectionController.optionChoixUserSysteme(0)}"   >
+                                        <p:graphicImage name="/epreuve.png"  library="images"  />
+
+
+                                    </h:link>
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+
+
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['parametrage']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo" action="#{connectionController.optionChoixUserSysteme(1)}" >
+                                     <p:graphicImage name="modules-logos/055.png"  library="images"  />
+                                    </p:commandLink>
+                                   
+<!--                                    <h:link  outcome="/administration/menuAccess" styleClass="layout-topbar-logo"  >
+                                       
+
+                                    </h:link>-->
+
+
+
+
+                                </center>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <p:spacer width="10"></p:spacer>
+                    <div class=" ui-shadow-24">
+
+
+                        <div class="p-col">
+                            <div class="card">
+                                <center>
+                                    <h4>#{msg['mod.change.pass']}</h4>
+                                </center>
+                                <center>
+                                    <p:commandLink  styleClass="layout-topbar-logo"  onclick="PF('pass').show()" update="form1" actionListener="#{configurationController.chargeUserForUpdatePassWord()}"  title="#{msg['bouton.modifier']}">
+                                        <p:graphicImage name="modules-logos/pass2.png"  library="images"  />
+
+                                    </p:commandLink>
+
+
+
+
+                                </center>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </h:form>
+            <h:form id="form2">
+                <p:dialog header="Reset password" width="450" showEffect="fade" modal="true" widgetVar="pass" responsive="true">
+                    <h:panelGrid id="display" columns="2" cellpadding="5">  
+                        <h:outputLabel for="pwd3" value="#{msg['saisir.ancien.password']} :" />  
+                        <p:password id="pwd5" value="#{configurationController.oldPassWord}"  validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" 
+                                    feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" />  
+<!--                        <h:outputLabel for="pwd3" value="Ancien Mot de Passe : " rendered="#{false}" />  
+                        <p:password id="pwd6" value="#{configurationController.utilisateur.password}"  validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" 
+                                    feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true"  rendered="#{false}"/>  -->
+
+                        <h:outputLabel  value=" #{msg['bouton.nouveau']}#{msg['motdePasse']}* : " />  
+                        <p:password id="pwd3" value="#{configurationController.newPassWord}" match="pwd4" validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" 
+                                    feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" />  
+
+
+                        <h:outputLabel for="newPassWord" value="#{msg['CONFIRM_MOT_DE_PASSE']}* : " />  
+                        <p:password id="pwd4" value="#{configurationController.newPassWord}" label="#{msg['CONFIRM_MOT_DE_PASSE']}" validator="requiredValidator" feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['CONFIRM_MOT_DE_PASSE']}" 
+                                    weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true"/>  
+
+                        <h:outputLabel  value="#{msg['cle.securite']}* : " /> 
+                        <p:password id="pwd44" value="#{configurationController.cle_securite}" label="#{msg['cle.securite']}" validator="requiredValidator"   toggleMask="true" maxlength="6"
+                                    redisplay="true" /> 
+                        <f:facet name="footer" >
+
+
+                            <center>
+                                <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.modifier']}" onclick="PF('pass').hide()"  actionListener="#{configurationController.updatePassWord()}" ajax="false"/>  
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('pass').hide()" immediate="true"/> 
+
+                            </center>
+                        </f:facet> 
+                    </h:panelGrid> 
+                </p:dialog> 
+            </h:form> 
+        </f:view> 
+    </ui:define>
+
+
+</ui:composition>

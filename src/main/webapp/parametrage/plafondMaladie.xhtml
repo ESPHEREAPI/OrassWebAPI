@@ -1,0 +1,447 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/plafondMaladie">#{msg['plafond.Maladie']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <p:tabView  id="tabprincipal">
+                        <p:ajax event="tabChange"  listener="#{plafondMaladieController.changeTabPrincipal()}" update=":form111" process="@this"/>
+
+                        <p:tab title="#{msg['plafond.Maladie']}">
+                            <h:form id="form1">
+                                <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                                <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   
+                                                 styleClass="success-button" style="margin-right: .5rem"    actionListener="#{plafondMaladieController.changeTabPrincipal()}"  rendered="#{plafondMaladieController.accessAjouter()==true or plafondMaladieController.accessCreer()}"  onclick="PF('managePlafondDialog').show()"  />
+
+                                <p:dataTable var="pm" value="#{plafondMaladieController.lisPlafondMaladie}"  widgetVar="pmTable" 
+                                             filteredValue="#{plafondMaladieController.filterPlafondMaladie}"    scrollable="true" 
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idpmgTable"
+
+                                             >
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('pmTable').filter()"
+                                                         style="width:150px" placeholder="Search text..."  > 
+
+                                            </p:inputText>  
+
+
+                                        </p:outputPanel>
+
+                                    </f:facet> 
+                                    <p:column  >
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"  action="#{plafondMaladieController.showDetail(pm)}"  rendered="#{plafondMaladieController.accessModifier()}" onclick="PF('manageUpdateDialog').show()"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"      >
+                                            <f:setPropertyActionListener value="#{pm}" target="#{plafondMaladieController.plafondMaladieSelectEdit}"   />
+
+                                            <f:ajax event="click"   listener="#{plafondMaladieController.showDetail(pm)}" render="idpmgTable" />
+
+                                        </p:commandButton>
+
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}" action="#{plafondMaladieController.showDetail(pm)}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('managDeleteDialog').show()"   rendered="#{plafondMaladieController.accessSupprimer()}"  >
+                                            <f:setPropertyActionListener value="#{pm}" target="#{plafondMaladieController.plafondMaladieSelectEdit}"   />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['code']}"  sortBy="#{pm.code}" filterBy="#{pm.code}" >
+                                        <p:inputText id="code"     value="#{pm.code}"    >
+                                            <p:ajax event="blur"   rendered="code" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}: "  >
+                                        <p:inputText id="libelle"     value="#{pm.libelle}"    >
+                                            <p:ajax event="blur"   rendered="libelle" />
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['domaine.application']}" sortBy="#{formatDateController.valueObject(pm.domaine_application)}" filterBy="#{formatDateController.valueObject(pm.domaine_application)}" >
+                                        <p:selectOneMenu value="#{pm.domaine_application}" style=" float: left; " id ="da"
+                                                         converter="#{genericConverter}"  >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{plafondMaladieController.domaineApplicationPlafondMaladie}" />
+                                            <f:ajax event="change"   render="da"/>
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['Montant']} "  >
+                                        <p:inputNumber  value="#{pm.montant}"    decimalPlaces="2" emptyValue="#{0}"   id="montant"  >
+                                            <f:ajax event="blur"   render="montant"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['nbre.actes']} "  >
+                                        <p:inputNumber  value="#{pm.nombre_Acte}"    decimalPlaces="0" emptyValue="#{0}"   id="nbre_acte"  >
+                                            <f:ajax event="blur"   render="nbre_acte"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['mode.controle']}" >
+
+                                        <p:selectOneMenu value="#{pm.modeControle}" style=" float: left; " 
+                                                         converter="#{genericConverter}"  >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}"  id="md"/>
+                                            <f:selectItems value="#{plafondMaladieController.modeControle}" />
+                                            <f:ajax event="change"   render="md"/>
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['periode_couverture']} "  >
+                                        <p:inputNumber  value="#{pm.priode}"    decimalPlaces="0" emptyValue="#{0}"   id="periode"  >
+                                            <f:ajax event="blur"   render="periode"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['Unite']}" >
+
+                                        <p:selectOneMenu value="#{pm.uniteDuree}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="unite"  >
+                                            <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" />
+                                            <f:selectItems value="#{plafondMaladieController.uniteDuree}" />
+
+                                            <f:ajax event="change"   render="unite"/>
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+
+                                </p:dataTable>
+                            </h:form>
+                        </p:tab>  
+                        <p:tab title="#{msg['detail.plafond.maladie']}"  rendered="false">
+                            <h:form id="form2">
+                                <p:toolbarGroup>
+
+                                    <p:outputLabel  value="#{msg['plafond.Maladie']}"  />
+                                    <p:spacer width="50"/>
+
+                                    <p:selectOneMenu value="#{plafondMaladieController.plafondMaladieSelecte}"  
+                                                     converter="#{genericConverter}" id="plafonSelect" validator="requiredValidator" required="true" var="p" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{plafondMaladieController.lisPlafondMaladie}" var="pm" itemLabel="#{pm.code} #{pm.libelle} #{pm.montant}  #{formatDateController.valueObject(pm.domaine_application)} #{pm.priode}" itemValue="#{pm}"/>
+
+                                        <p:column>
+                                            #{p.code} #{p.libelle} #{p.montant}  #{formatDateController.valueObject(p.domaine_application)} #{p.priode}
+                                        </p:column>
+                                        <f:ajax event="change"   render="plafonSelect" />
+                                        <p:ajax event="change"  listener="#{plafondMaladieController.chargeDetailPlafondMaladiesByPlafondMaladie()}" update=":tabprincipal:form2"  process="@this" />
+                                    </p:selectOneMenu> 
+                                </p:toolbarGroup>
+
+                                <p:dataTable var="dpm" value="#{plafondMaladieController.lisDetailPlafondMaladie}"  widgetVar="dpmTable" 
+                                             filteredValue="#{plafondMaladieController.filterDetailPlafondMaladie}"    scrollable="true" 
+
+                                             emptyMessage="#{msg['emptyMessage']}"    id="iddpmgTable"
+
+                                             >
+
+                                    <f:facet name="header">
+                                        <p:outputPanel>
+                                            <h:outputText value="#{msg['recherche']} : "/>
+
+                                            <p:inputText id="globalFilter"
+                                                         onkeyup="PF('dpmTable').filter()"
+                                                         style="width:150px" placeholder="Search text..."  > 
+
+                                            </p:inputText>  
+
+
+                                        </p:outputPanel>
+
+                                    </f:facet> 
+                                    <p:column  >
+
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"    onclick="PF('manageUpdateDialog2').show()" >
+                                            <f:setPropertyActionListener value="#{dpm}" target="#{plafondMaladieController.detailPlafondMaladieSelecte}"   />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"    onclick="PF('managDeleteDialog2').show()"    >
+                                            <f:setPropertyActionListener value="#{dpm}" target="#{plafondMaladieController.detailPlafondMaladieSelecte}"   />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['plafond.Maladie']}"  sortBy="#{dpm.idPlafondMaladie.code}" filterBy="#{dpm.idPlafondMaladie.code}" width="50" >
+                                        <p:inputText id="plafondMadie"     value="#{dpm.idPlafondMaladie.code}"  disabled="true"   >
+                                            <p:ajax event="blur"   rendered="plafondMadie" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:spacer width="50"/>
+                                    <p:column headerText="#{msg['rubrique']}: " width="250" >
+                                        <p:inputText id="rubrique"     value="#{dpm.idRubriquePrestation.idRubriqueCategorie.idRubrique.libelle}"  style="width:250px"  >
+                                            <p:ajax event="blur"   rendered="rubrique" />
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['mode.calcul']}"  >
+                                        <p:selectOneMenu value="#{dpm.modeCalculDetailMaladie}" style=" float: left; " 
+                                                         converter="#{genericConverter}"  >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{plafondMaladieController.modeCalculDetailPlafondMaladie}" />
+
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['taux']} "  >
+                                        <p:inputNumber  value="#{dpm.taux}"    decimalPlaces="2" emptyValue="#{0}"   id="tauxdpm"  >
+                                            <f:ajax event="blur"   render="tauxdpm"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['forfait']} "  >
+                                        <p:inputNumber  value="#{dpm.forfait}"    decimalPlaces="0" emptyValue="#{0}"   id="forfaitdpm"  >
+                                            <f:ajax event="blur"   render="forfaitdpm"/>
+                                        </p:inputNumber>
+                                    </p:column>
+                                    <p:column headerText="#{msg['type']}"  >
+                                        <p:selectOneMenu value="#{dpm.typeDetailMaladie}" style=" float: left; " 
+                                                         converter="#{genericConverter}"  >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{plafondMaladieController.typeDetailPlafondMaladie}" />
+
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['plafond.Maladie']} "  >
+                                        <p:inputNumber  value="#{dpm.plafond}"    decimalPlaces="0" emptyValue="#{0}"   id="plafondpm"  >
+                                            <f:ajax event="blur"   render="plafondpm"/>
+                                        </p:inputNumber>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['barem']} "  >
+                                        <p:inputNumber  value="#{dpm.barem}"    decimalPlaces="0" emptyValue="#{0}"   id="baremdpm"  >
+                                            <f:ajax event="blur"   render="baremdpm"/>
+                                        </p:inputNumber>
+                                    </p:column>
+
+
+
+
+
+
+
+
+                                </p:dataTable>
+                            </h:form>
+                        </p:tab>
+                    </p:tabView>  
+                    <h:form id="form11">
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.modifier']}"     actionListener="#{plafondMaladieController.updatePlafondMaladie()}"  update=":tabprincipal:form1:idpmgTable,:tabprincipal:form1:msg" oncomplete=" PF('manageUpdateDialog').hide()"    />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{plafondMaladieController.deletePlafondMaladie()}" oncomplete=" PF('managDeleteDialog').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{plafondMaladieController.updatedDtailPlafondMaladieSelecte()}" oncomplete=" PF('manageUpdateDialog2').hide()" update=":tabprincipal:form2,:tabprincipal:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{plafondMaladieController.deleteDetailPlafondMaladie()}" oncomplete=" PF('managDeleteDialog2').hide()" update=":tabprincipal:form2,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                    </h:form>
+                    <h:form id="form111">
+                        <p:dialog header="#{msg['edition.plafond']}" width="1500" showEffect="fade" modal="true" widgetVar="managePlafondDialog" responsive="true">
+                            <p:fieldset   style="color: blue">
+                                <p:panelGrid   columns="6" layout="grid" >
+                                    <p:outputLabel  value="#{msg['code']}"  />
+                                    <p:inputText id="codepm"  placeholder="  #{msg['code']}"   value="#{plafondMaladieController.plafondMaladie.code}"    >
+                                        <f:ajax event="blur"   rendered="codepm" />
+                                    </p:inputText>
+
+                                    <p:outputLabel  value="#{msg['libelle']}"  />
+                                    <p:inputText id="libellepm"  placeholder="  #{msg['description']}"   value="#{plafondMaladieController.plafondMaladie.libelle}"    >
+                                        <f:ajax event="blur"   rendered="libellepm" />
+                                    </p:inputText>
+                                    <p:outputLabel  value="#{msg['domaine.application']}"  />
+                                    <p:selectOneMenu value="#{plafondMaladieController.plafondMaladie.domaine_application}" style=" float: left; "  id="application"
+                                                     converter="#{genericConverter}"  >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{plafondMaladieController.domaineApplicationPlafondMaladie}" />
+                                        <f:ajax event="change"   rendered="application"   />
+
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['mode.controle']}"  />
+                                    <p:selectOneMenu value="#{plafondMaladieController.plafondMaladie.modeControle}" style=" float: left; " 
+                                                     converter="#{genericConverter}"  >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{plafondMaladieController.modeControle}" />
+
+                                        <f:ajax event="change"   rendered="codepm"   />
+                                        <p:ajax event="change"    listener="#{plafondMaladieController.controleMode()}"  update=":form111" oncomplete="PF('managePlafondDialog').show()" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['Montant']}"  />
+
+                                    <p:inputNumber  value="#{plafondMaladieController.plafondMaladie.montant}"    decimalPlaces="2" emptyValue="#{0}"   id="montantpm"  >
+                                        <f:ajax event="blur"   render="montantpm"/>
+                                    </p:inputNumber>
+                                    <p:outputLabel  value="#{msg['nbre.actes']}"  />
+                                    <p:inputNumber  value="#{plafondMaladieController.plafondMaladie.nombre_Acte}"    decimalPlaces="0" emptyValue="#{0}"   id="nbre_actepm"  >
+                                        <f:ajax event="blur"   render="nbre_actepm"/>
+                                    </p:inputNumber>
+
+                                    <p:outputLabel  value="#{msg['periode_couverture']}" rendered="#{plafondMaladieController.controleCouverture==true}" />
+                                    <p:inputNumber  value="#{plafondMaladieController.plafondMaladie.priode}"    decimalPlaces="0" emptyValue="#{0}"   id="periodepm" rendered="#{plafondMaladieController.controleCouverture==true}" >
+                                        <f:ajax event="blur"   render="periodepm"/>
+                                    </p:inputNumber>
+                                    <h:outputLabel value="#{msg['Unite']}: "  rendered="#{plafondMaladieController.controleCouverture==true}" />
+                                    <p:selectOneMenu  value="#{plafondMaladieController.plafondMaladie.uniteDuree}" style="width: 150px;" converter="#{genericConverter}" id="uniteDuree"   validator="requiredValidator" required="true" rendered="#{plafondMaladieController.controleCouverture==true}" >
+                                        <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" />
+                                        <f:selectItems value="#{plafondMaladieController.uniteDuree}" />
+                                        <f:ajax event="change"   render="uniteDuree" />
+                                    </p:selectOneMenu>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:tabView  id="tabsecond" rendered="false">
+                                <p:tab title="#{msg['detail.plafond.maladie']}">
+                                    <p:fieldset  style="color: blue"> 
+                                        <p:panelGrid   columns="4" layout="grid" columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4" contentStyleClass="p-align-baseline ui-fluid">
+                                            <p:outputLabel  value="#{msg['categorie']}"  />
+                                            <p:selectOneMenu value="#{plafondMaladieController.categories}" style=" float: left; " 
+                                                             converter="#{genericConverter}" id="categorie" validator="requiredValidator" required="true" var="c" filter="true" filterMatchMode="contains" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{plafondMaladieController.lisCategories}" var="cat" itemLabel="   #{cat.code} #{formatDateController.valueObject(cat.libelle,cat)} " itemValue="#{cat}"/>
+
+                                                <p:column>
+                                                    #{c.code}   #{formatDateController.valueObject(c.libelle,c)} 
+                                                </p:column>
+                                                <p:ajax event="change"  listener="#{plafondMaladieController.chrageRubiquePrestationByCategories()}" update=":form111:tabsecond"  process="@this" oncomplete="PF('managePlafondDialog').show()"/>
+                                            </p:selectOneMenu>
+                                            <p:outputLabel  value="#{msg['rubrique.prestation']}"  />
+                                            <p:selectCheckboxMenu id="menu" value="#{plafondMaladieController.selecteRubriquePrestation}" label="#{msg['select']}" 
+                                                                  filter="true" filterMatchMode="startsWith" panelStyle="width: 30rem" scrollHeight="250">
+                                                <f:selectItems value="#{plafondMaladieController.listRubriquePrestation}" var="rp" itemLabel=" #{rp.idRubriqueCategorie.idRubrique.code} #{rp.idRubriqueCategorie.idRubrique.libelle}"/>
+                                            </p:selectCheckboxMenu>
+                                            <p:outputLabel  value="#{msg['mode.calcul']}"  />
+                                            <p:selectOneMenu value="#{plafondMaladieController.detailPlafondMaladie.modeCalculDetailMaladie}" style=" float: left; " 
+                                                             converter="#{genericConverter}"  >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{plafondMaladieController.modeCalculDetailPlafondMaladie}" />
+
+
+                                            </p:selectOneMenu>
+                                            <p:outputLabel  value="#{msg['forfait']}"  />
+                                            <p:inputNumber  value="#{plafondMaladieController.detailPlafondMaladie.forfait}"    decimalPlaces="0" emptyValue="#{0}"   id="forfait"  >
+                                                <f:ajax event="blur"   render="forfait"/>
+                                            </p:inputNumber>
+                                            <p:outputLabel  value="#{msg['taux']}"  />
+                                            <p:inputNumber  value="#{plafondMaladieController.detailPlafondMaladie.taux}"    decimalPlaces="0" emptyValue="#{0}"   id="taux"  >
+                                                <f:ajax event="blur"   render="taux"/>
+                                            </p:inputNumber>    
+                                            <p:outputLabel  value="#{msg['type']}"  />
+                                            <p:selectOneMenu value="#{plafondMaladieController.detailPlafondMaladie.typeDetailMaladie}" style=" float: left; " 
+                                                             converter="#{genericConverter}"  >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{plafondMaladieController.typeDetailPlafondMaladie}" />
+
+
+                                            </p:selectOneMenu>
+
+                                            <p:outputLabel  value="#{msg['plafond.Maladie']}"  />
+                                            <p:inputNumber  value="#{plafondMaladieController.detailPlafondMaladie.plafond}"    decimalPlaces="0" emptyValue="#{0}"   id="plafond"  >
+                                                <f:ajax event="blur"   render="plafond"/>
+                                            </p:inputNumber>    
+                                            <p:outputLabel  value="#{msg['barem']}"  />
+                                            <p:inputNumber  value="#{plafondMaladieController.detailPlafondMaladie.barem}"    decimalPlaces="0" emptyValue="#{0}"   id="barem"  >
+                                                <f:ajax event="blur"   render="barem"/>
+                                            </p:inputNumber>  
+
+                                        </p:panelGrid>
+
+
+                                    </p:fieldset>
+                                </p:tab>
+                            </p:tabView>
+
+
+
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}"     actionListener="#{plafondMaladieController.addPlafondMaladie()}" oncomplete="PF('managePlafondDialog').show()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  ajax="false"/>
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}"  styleClass="danger-button" onclick="PF('managePlafondDialog').hide()"/>
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

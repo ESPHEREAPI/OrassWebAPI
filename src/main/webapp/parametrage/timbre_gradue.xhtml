@@ -1,0 +1,314 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/timbre_gradue.xhtml">#{msg['timbre.gradue']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <p:toolbarGroup>
+                        <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                         styleClass="warning-button" style="margin-right: .5rem"       actionListener="#{timbreGradueController.reload()}" /> 
+
+                        <p:commandButton value="#{msg['liste.categorie']}" icon="pi pi-sliders-h"  onclick="PF('manageCategorieDialog2').show()" 
+                                         styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  update="form1_1" process="@this"  rendered="#{timbreGradueController.accessAfficheListe()}"/>
+                        <p:commandButton value="#{msg['timbre.gradue']}"  onclick="PF('TaxeDialog').show()" icon="pi pi-plus"  styleClass="secondary-warning"  rendered="#{timbreGradueController.accessCree() or timbreGradueController.accessAjouter()}"/>
+
+                    </p:toolbarGroup>
+                    <h:form id="form1_1">
+                        <p:growl id="msg" showDetail="true" escape="false"/>  
+
+                        <h:outputLabel value="#{timbreGradueController.categories.code}  #{formatDateController.valueObject(timbreGradueController.categories.libelle,timbreGradueController.categories)}" class="info-label"/>
+
+
+                        <p:panelGrid  columns="9" layout="grid" style="border: 0px; border-bottom: 0px" >
+                            <p:outputLabel  value="#{msg['timbre.gradue']}" style="float: top" />
+                            <p:selectOneMenu value="#{timbreGradueController.refTimbreGradue}" style=" float: left; " 
+                                             converter="#{genericConverter}" id="timbreGraduee" validator="requiredValidator" required="true" var="t" filter="true" filterMatchMode="contains" >
+                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                <f:selectItems value="#{timbreGradueController.listeRefTimbreGradue}" var="tr" itemLabel=" #{tr.libelle} " itemValue="#{tr}"/>
+
+                                <p:column>
+                                    #{t.libelle} 
+                                </p:column>
+                                <!--<f:ajax event="change"  render="timbreGraduee" />-->
+                                <p:ajax event="change"  listener="#{timbreGradueController.chargeTimbreByREfTimbre()}" update=":form1_1:idtimbreTable" process="@this"/>
+                            </p:selectOneMenu>
+
+
+                            <h:outputLabel value="#{msg['date_effet']}*: " />
+                            <p:calendar value="#{timbreGradueController.effet}" mode="popup"  title="#{msg['date_effet']}" showOn="both"  id="date_effet" pattern="dd/MM/yyyy"   >
+                                <p:ajax event="dateSelect"    listener="#{timbreGradueController.chargeTimbreByREfTimbreANdAutres()}" update=":form1_1:idtimbreTable" process="@this" />
+                            </p:calendar>
+
+                        </p:panelGrid>
+
+                        <p:dataTable var="t" value="#{timbreGradueController.listeTimbreGradue}"  widgetVar="timbreTable" 
+                                     filteredValue="#{timbreGradueController.filterTimbreGradue}"    
+
+                                     emptyMessage="#{msg['emptyMessage']}"    id="idtimbreTable"
+                                     globalFilterFunction="#{timbreGradueController.globalFilterFunction}"
+
+                                     >
+
+                            <f:facet name="header">
+                                <!--                                <p:outputPanel>
+                                                                    <h:outputText value="#{msg['recherche']} : "/>
+                                
+                                                                    <p:inputText id="globalFilter"
+                                                                                 onkeyup="PF('rubriqueCategorieTable').filter()"
+                                                                                 style="width:150px" placeholder="Search text..."  > 
+                                
+                                                                    </p:inputText>  
+                                
+                                
+                                                                </p:outputPanel>-->
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('timbreTable').filter()" style="width:300px"
+                                                 placeholder="Search all text..." />
+                                </div>
+
+                            </f:facet> 
+                            <p:column  >
+                                <p:commandButton  icon="pi pi-plus"  
+                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{t.id==null and (timbreGradueController.accessCree()==true or timbreGradueController.accessAjouter()==true) }" onclick="PF('manageConfirmeDialog').show()" actionListener="#{timbreGradueController.showTimbreGradue(t)}"  >
+                                    <f:setPropertyActionListener value="#{t}" target="#{timbreGradueController.timbreGradue}"   />
+                                </p:commandButton>
+
+                                <p:commandButton  icon="pi pi-check-circle"  
+                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{t.id!=null}"  disabled="true" >
+
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                  styleClass="secondary-button" style="margin-right: .5rem"   rendered="#{t.id!=null and timbreGradueController.accessModifier()}"   onclick="PF('manageConfirmeDialog3').show()" >
+                                    <f:setPropertyActionListener value="#{t}" target="#{timbreGradueController.timbreGradue}"   />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                  styleClass="danger-button" style="margin-right: .5rem"   rendered="#{t.id!=null and timbreGradueController.accessSupprimer()}"   onclick="PF('managDeleteDialog').show()"   actionListener="#{timbreGradueController.showTimbreGradue(t)}"  >
+                                    <f:setPropertyActionListener value="#{t}" target="#{timbreGradueController.timbreGradue}"   />
+                                </p:commandButton>
+
+                            </p:column>
+                            <p:column headerText="#{msg['date_effet']}" rendered="#{timbreGradueController.effet==null}"  >
+                                <h:outputLabel value="#{formatDateController.formatDate(t.date_effet)} " />
+                            </p:column>
+                            <p:column headerText="#{msg['categorie']}" rendered="#{timbreGradueController.effet==null}"  >
+                                <h:outputLabel value="#{t.idCategories==null ? t.idCategories :t.idCategories.code  } " />
+                            </p:column>
+
+                            <p:column headerText="#{msg['puissance.min']}" sortBy="#{t.prime_mini}"  >
+
+                                <p:inputNumber id="puissance_min"  value="#{t.puissance_min}" 
+                                               required="true" emptyValue="empty">
+                                    <p:ajax update="puissance_min" />  
+                                </p:inputNumber>
+
+                            </p:column>
+                            <p:column headerText="#{msg['puissance_max']}"  sortBy="#{t.puissance_max}" >
+                                <p:inputNumber id="puissance_max"  value="#{t.puissance_max}" 
+                                               required="true" emptyValue="empty">
+                                    <p:ajax update="puissance_max" />  
+                                </p:inputNumber>
+                            </p:column>
+                            <p:column headerText="#{msg['prime_mini']}" >
+                                <p:inputNumber id="prime_mini"  value="#{t.prime_mini}"  thousandSeparator="."
+                                               required="true" emptyValue="#{0}" minValue="#{1}">
+                                    <p:ajax update="prime_mini" />  
+                                </p:inputNumber>
+                            </p:column>
+                            <p:column headerText="#{msg['prime_max']}" >
+                                <p:inputNumber id="prime_max"  value="#{t.prime_max}"  thousandSeparator="."
+                                               required="true" emptyValue="empty">
+                                    <p:ajax update="prime_max" />  
+                                </p:inputNumber>
+                            </p:column>
+                            <p:column headerText="#{msg['taux_tg_cp_fg']}" >
+                                <p:inputNumber id="taux_tg_cp_fg" value="#{t.taux_tg_cp_fg}" symbol="%" 
+                                               symbolPosition="s"  emptyValue="empty" decimalSeparator=",">
+                                    <p:ajax update="taux_tg_cp_fg" />  
+                                </p:inputNumber>
+                            </p:column>
+
+                            <p:column headerText="#{msg['valeur_tg_cp_fg']}" >
+                                <p:inputNumber id="_tg_cp_fg"  value="#{t.valeur_tg_cp_fg}"  thousandSeparator="."
+                                               emptyValue="empty">
+                                    <p:ajax update="prime_max" />  
+                                </p:inputNumber>
+                            </p:column>
+
+
+                        </p:dataTable>
+
+
+                    </h:form>
+                    <h:form id="form2_2">
+                        <p:dialog header="#{msg['welcome.bienvenue']}" width="1000" showEffect="fade" modal="true" widgetVar="manageCategorieDialog2" responsive="true">
+                            <p:dataTable var="cat" value="#{timbreGradueController.lisCategories}" paginator="true" rows="3"  widgetVar="tableCategorie"  id="idtableCategorie"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="3,5,15,50,100,500,1000" filterEvent="enter" filteredValue="#{timbreGradueController.filterCategories}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cat.idCategorie}" selectionMode="single"  selection="#{timbreGradueController.categories}"
+
+                                         scrollable="true" scrollHeight="300" >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{timbreGradueController.chargeRubriqueByCategories(cat)}"     
+                                        process="@this" update=":form1_1"  oncomplete="PF('manageCategorieDialog2').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('tableCategorie').filter()"
+                                                     style="width:350px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+                                <p:column headerText="id"  style="width: 50px">
+                                    <h:outputText value="#{cat.idCategorie}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['code']}" sortBy="#{cat.code}" filterBy="#{cat.code}"  style="width: 200px">
+                                    <h:outputText value="#{cat.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{cat.libelle}" filterBy="#{cat.libelle}"  style="width: 250px">
+                                    <span class="flag flag-#{cat.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{formatDateController.valueObject(cat.libelle,cat)}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['branche']}" sortBy="#{cat.idBranche.code}" filterBy="#{cat.idBranche.code}" style="width: 250px">
+                                    <h:outputText value="#{cat.idBranche.code} #{formatDateController.valueObject(cat.idBranche.libelle,cat.idBranche)}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{timbreGradueController.addTimbreGraduee()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1_1,:form1_1:msg"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+<!--                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.retire.garantie.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{rubriqueCategorieController.removeRubriqueByListe()}" oncomplete=" PF('manageConfirmeDialog2').hide()" update="form1_1,:form1_1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>-->
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{timbreGradueController.updateTimbreGraduee()}" oncomplete=" PF('manageConfirmeDialog3').hide()" update="form1_1,:form1_1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{timbreGradueController.deleteTimbreGradue()}" oncomplete=" PF('managDeleteDialog').hide()" update="form1_1,:form1_1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+
+
+
+                    </h:form>
+                    <h:form id="form2">
+
+
+                        <p:dialog widgetVar="TaxeDialog" header="#{msg['edition.taxe']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+
+                            <p:panelGrid columns="9"  id="grid1"  
+                                         layout="grid" style="border: 0px; border-bottom: 0px; " >
+                                <p:outputLabel value="#{msg['code']}: " for="code" /> 
+                                <p:inputText id="code"  title="code"   value="#{timbreGradueController.refTimbreGradueAdd.code}" style="width: 100px;  "   required="true" validator="requiredValidator" >
+                                    <f:ajax event="blur"  render="code"/>
+                                </p:inputText>
+
+                                <p:outputLabel value="#{msg['libelle']}: *"    /> 
+                                <p:inputText id="libelle"     value="#{timbreGradueController.refTimbreGradueAdd.libelle}" required="true" validator="requiredValidator" >
+                                    <f:ajax event="blur"  render="libelle"/>
+                                </p:inputText>
+
+
+                                <p:outputLabel value="#{msg['libelle.frais']}: *"    /> 
+                                <p:selectOneMenu value="#{timbreGradueController.refTimbreGradueAdd.libelleFrais}" style=" float: left; " id ="libelleFrais"
+                                                 converter="#{genericConverter}"  >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{timbreGradueController.libelleFrais}" />
+                                    <f:ajax event="change"   render="libelleFrais"/>
+
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check" process="@this"  update=":form1_1:msg" 
+                                                     styleClass="success-button" style="margin-right: .5rem"    actionListener="#{timbreGradueController.addRefTimbreGraduee()}"  ajax="false" rendered="#{(timbreGradueController.accessCree() or timbreGradueController.accessAjoute()) and timbreGradueController.refTimbreGradueAdd.id==null}" oncomplete="PF('TaxeDialog').show()"/>
+
+                                    <p:spacer width="10"/>
+<!--                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form1:msg" process="@this"  
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"    actionListener="#{timbreGradueController.u()}" rendered="#{typeTaxeController.accessModifier()  and typeTaxeController.typeTaxe.idTypeTaxe!=null}" oncomplete="PF('TaxeDialog').hide()" />-->
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('TaxeDialog').hide()" icon="pi pi-times"  styleClass="warning-button" /> 
+                                </center>
+                            </f:facet>
+                        </p:dialog>    
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

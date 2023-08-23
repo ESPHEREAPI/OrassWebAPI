@@ -1,0 +1,678 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mycompany</groupId>
+    <artifactId>E-Sphere</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+   
+
+    <name>E-SphereOrassWeb</name>
+
+
+    <repositories>
+        <repository>
+            <id>version99</id>
+            <!-- highly available repository serving empty artifacts -->
+            <url>http://version99.qos.ch/</url>
+        </repository>
+        <repository>
+            <id>prime-repo</id>
+            <name>PrimeFaces Maven Repository</name>
+            <url>https://repository.primefaces.org</url>
+        </repository>
+        <repository>
+            <id>maven-repo</id>
+            <name> Maven local</name>
+            <url> https://repo.maven.apache.org/maven2/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>localhost</id>
+          
+        
+            <url>file://${user.home}/.m2/repository/</url>
+        </repository>
+        <repository>
+            <id>unknown-jars-temp-repo</id>
+            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+            <url>file:${project.basedir}/lib</url>
+        </repository>
+    </repositories>
+    
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <owb.version>2.0.12</owb.version>
+        <org.hibernate.version>4.1.0.Final</org.hibernate.version>
+        <org.hibernate.version> 4.3.0.Beta3</org.hibernate.version>
+        <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+        <version.arquillian_core>1.0.3.Final</version.arquillian_core>
+        <mojarra.version>2.3.13</mojarra.version>
+    </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <!--Arquillian Dependency Pour les tests-->
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>1.0.0.Final</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+           
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <!--                <version>99-empty</version>-->
+                <version>1.1.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+            <scope>system</scope>
+            <systemPath>${user.home}/.m2/repository/oracle/ojdbc6/11.2.0.3/ojdbc6-11.2.0.3.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>6.1.1</version>
+            <!--            <type>jar</type>-->
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian</groupId>
+            <artifactId>arquillian-bom</artifactId>
+            <version>1.0.3.Final</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.main.extras</groupId>
+            <artifactId>glassfish-embedded-all</artifactId>
+            <version>3.1.2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+            <version>1.0.0.CR3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+            
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+            
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${org.hibernate.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-collections</artifactId>
+                    <groupId>commons-collections</groupId>
+                </exclusion>
+           
+            
+            </exclusions>
+           
+                
+                
+           
+        </dependency>
+        <dependency>
+           
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.0.0.Beta3</version>
+
+            <!--            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${org.hibernate.version}</version>-->
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>${org.hibernate.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>${org.hibernate.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>11.0.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.faces</artifactId>
+            <version>${mojarra.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Java EE 6 API -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+        </dependency>
+      
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <type>jar</type>
+        </dependency>
+        <!--        <dependency>
+            <groupId>com.mycompany</groupId>
+            <artifactId>E-Sphere</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>-->
+<!--        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.core</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.asm</artifactId>
+            <version>9.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.antlr</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>jakarta.persistence</artifactId>
+            <version>2.2.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+            <version>2.7.10</version>
+            <scope>provided</scope>
+        </dependency>-->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- CDI required APIs -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-atinject_1.0_spec</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jcdi_2.0_spec</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-interceptor_1.2_spec</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-annotation_1.3_spec</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- CDI Impl -->
+        <dependency>
+            <groupId>org.apache.openwebbeans</groupId>
+            <artifactId>openwebbeans-impl</artifactId>
+            <version>${owb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.openwebbeans</groupId>
+            <artifactId>openwebbeans-web</artifactId>
+            <version>${owb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.openwebbeans</groupId>
+            <artifactId>openwebbeans-jsf</artifactId>
+            <version>${owb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>font-awesome</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+
+        <!-- Export Demo Impl -->
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcmail-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bctsp-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <!--Api pour bosser avec les fichiers CSV-->
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <!--Api pour bosser avec les fichiers Excel-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.rometools/rome -->
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.9</version>
+            <type>jar</type>
+        </dependency>
+        <!--        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7</version>
+        </dependency>-->
+        <!--API Necessaire pour upload les fichiers-->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3</version>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/org.atmosphere/atmosphere-runtime -->
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>2.4.6</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sf.barcode4j/barcode4j-light -->
+        <dependency>
+            <groupId>net.sf.barcode4j</groupId>
+            <artifactId>barcode4j-light</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.glxn/qrgen -->
+        <dependency>
+            <groupId>net.glxn</groupId>
+            <artifactId>qrgen</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        
+        <!--JSF et PrimeFaces-->
+        
+        <!-- https://mvnrepository.com/artifact/javax.faces/javax.faces-api -->
+        <dependency>
+            <groupId>javax.faces</groupId>
+            <artifactId>javax.faces-api</artifactId>
+            <version>2.3</version>
+            <type>jar</type>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+
+      
+        <!--        <dependency> 
+         <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>6.1.1 </version>
+            <type>jar</type>
+        </dependency>-->
+        <!--Jasper Report pour faire le reporting--> 
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.17.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>castor</artifactId>
+                    <groupId>org.codehaus.castor</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-mapper-lgpl</artifactId>
+                    <groupId>org.codehaus.jackson</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-core-lgpl</artifactId>
+                    <groupId>org.codehaus.jackson</groupId>
+                </exclusion>
+            </exclusions>
+            <type>jar</type>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <!--<version>6.8.0</version>-->
+             <version>6.17.0</version>
+        </dependency>
+
+
+        <!--Dependency pour JEE EJB et WEB-->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.ejb</artifactId>
+            <version>3.1</version>
+            <type>jar</type>
+        </dependency>
+        <!--        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <type>jar</type>
+        </dependency>-->
+        
+        <!--Pour faire des batch--> 
+        <dependency>
+            <groupId>io.github.benas</groupId>
+            <artifactId>easybatch-core</artifactId>
+            <version>2.1.3</version>
+        </dependency>
+        <!--Microsolft Exchange Mail-->
+        <dependency>
+            <groupId>org.mycrosolft.exchange.mail</groupId>
+            <artifactId>microsolft</artifactId>
+            <version>1.0.3</version>
+            
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mycrosolft.exchange.mail</groupId>
+            <artifactId>jbex-v1.4.8-eva</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+         
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+    </dependencies>
+   
+ 
+
+ 
+
+    <build>
+        <finalName>e-sphere</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                <includes>
+                    <include>web.xml</include>
+                </includes>
+                <filtering>true</filtering>
+                <targetPath>${project.build.directory}</targetPath>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>${project.buildC.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.1</version>
+
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ejb-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <ejbVersion>3.1</ejbVersion>
+                </configuration>
+            </plugin>
+            <!--            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.2.v20170220</version>
+                <configuration>
+                    <webAppConfig>
+                        <contextPath>/rain</contextPath>
+                    </webAppConfig>
+                    <scanIntervalSeconds>5</scanIntervalSeconds>
+                    <webXml>${project.build.directory}/web.xml</webXml>
+                </configuration>
+            </plugin>-->
+            
+            <!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                    <webXml>${project.build.directory}/web.xml</webXml>
+                </configuration>
+            </plugin>-->
+        </plugins>
+    </build>
+        
+    <profiles>
+        <profile>
+            <id>arquillian-glassfish-embedded</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <!--            <dependencies>
+           
+               
+                <dependency>
+                    <groupId>org.glassfish.extras</groupId>
+                    <artifactId>glassfish-embedded-all</artifactId>
+                    <version>5.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.4.3</version>
+                        <configuration>
+                            <systemProperties>
+                                <arquillian.launch>glassfish-embedded</arquillian.launch>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+                <testResources>
+                    <testResource>
+                        <directory>src/test/resources</directory>
+                    </testResource>
+                    <testResource>
+                        <directory>src/test/resources-glassfish-embedded</directory>
+                    </testResource>
+                </testResources>
+            </build>
+        </profile>  
+        
+        <!--        <profile>
+            <id>distribute</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.3</version>
+                        <executions>
+                            <execution>
+                                <id>build-layout</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/assemble/layout.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>${project.name}-layout-${project.version}</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-theme</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/assemble/theme.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>${project.name}-theme-${project.version}</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>-->
+  
+    </profiles>
+    
+</project>

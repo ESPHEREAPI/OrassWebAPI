@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="9fae7a66-8160-438c-9fce-76eb8404dd4f">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="15"/>
+	<property name="ireport.y" value="0"/>
+	<field name="idCaracteristiques.libelle" class="java.lang.String"/>
+	<field name="valeur" class="java.lang.String"/>
+	<field name="idGroup.id" class="java.lang.Long"/>
+	<field name="idPolice.police" class="java.math.BigDecimal"/>
+	<field name="idCaracteristiques.unite_Caracteristique.libelle" class="java.lang.String"/>
+	<group name="groupe">
+		<groupExpression><![CDATA[$F{idPolice.police}]]></groupExpression>
+		<groupHeader>
+			<band height="16">
+				<staticText>
+					<reportElement mode="Opaque" x="205" y="0" width="213" height="16" forecolor="#009999" backcolor="#CCFFFF" uuid="5abb1cff-aa92-4860-8e02-63d52a2c0e33"/>
+					<box>
+						<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans" size="12" isBold="true" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[CARACTERISTIQUES]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="13">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="308" height="13" backcolor="#CCCCFF" uuid="e1f12cfa-ef01-452c-bc15-d25cee02871f"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{idCaracteristiques.libelle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="308" y="0" width="250" height="13" backcolor="#CCCCFF" uuid="f41f0002-5ffd-46c9-bb67-229afe6a503c"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["  "+$F{valeur}+""+($F{idCaracteristiques.unite_Caracteristique.libelle}=="%°" ? "%°":"")]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

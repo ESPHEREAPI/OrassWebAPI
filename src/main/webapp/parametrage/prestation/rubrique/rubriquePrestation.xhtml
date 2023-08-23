@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/prestation/rubrique/groupe">#{msg['rubrique_group']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+
+                    <h:form id="form1">
+                        <p:toolbarGroup>
+
+
+                            <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update=":form1,:form1:msg" process="@this" 
+                                             styleClass="success-button" style="margin-right: .5rem"  disabled="#{rubriquePrestationController.lisRubriquePrestations.size()==0}"  actionListener="#{rubriquePrestationController.addRubriquePrestation()}" rendered="#{rubriquePrestationController.accessCree() or rubriquePrestationController.accessAjouter()}"/>
+
+                            <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                             styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{rubriquePrestationController.reset()}" update="@form" process="@this" />
+
+
+                        </p:toolbarGroup>
+                        <p:growl id="msg" showDetail="true" escape="false"/>  
+
+                        <p:fieldset    style="border-color: #2c84d8">
+                            <p:panelGrid columns="1" layout="flex"
+                                         columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4"
+                                         styleClass="customPanelGrid" contentStyleClass="ui-fluid">
+
+                                <p:outputLabel  value="#{msg['categorie']}"/>      
+                                <p:selectOneMenu  converter="#{genericConverter}" id="categorie" value="#{rubriquePrestationController.categories}"  validator="requiredValidator" required="true"  var="cat" filter="true"  filterMatchMode="contains" panelStyle="height: 200px;width: 300px" >
+                                    <f:selectItem itemLabel="#{msg['select']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{rubriquePrestationController.lisCategories}" var="cats" itemLabel="#{cats.code} #{formatDateController.valueObject(cats.libelle,cats)}" itemValue="#{cats}" />
+                                    <p:ajax event="change" listener="#{rubriquePrestationController.chargerRubriqueByCategories()}" update=":form1:categorie,:form1:rubrique,:form1:idrubriquePrestationTable,:form2:idprestationableTable" process="@this" />
+                                    <p:column>
+                                        #{cat.code} #{formatDateController.valueObject(cat.libelle,cat)}
+
+                                    </p:column>
+
+                                </p:selectOneMenu>
+
+                                <p:outputLabel  value="#{msg['rubrique']}"/>      
+                                <p:selectOneMenu  converter="#{genericConverter}" id="rubrique" value="#{rubriquePrestationController.rubrique}"  validator="requiredValidator" required="true"  var="rb" filter="true"  filterMatchMode="contains" panelStyle="height: 200px;width: 300px" >
+                                    <f:selectItem itemLabel="#{msg['select']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{rubriquePrestationController.lisRubriques}" var="rbs" itemLabel="#{cats.code}  #{rbs.libelle}" itemValue="#{rbs}" />
+                                    <p:ajax event="change" listener="#{rubriquePrestationController.chargeRubriPrestationByRubriCategories()}" update=":form1:idrubriquePrestationTable,:form2:idprestationableTable" process="@this"/>
+                                    <p:column>
+                                        #{rb.code} #{rb.libelle}
+
+                                    </p:column>
+
+                                </p:selectOneMenu>
+
+                            </p:panelGrid>
+                        </p:fieldset>
+                        <p:separator style="width: 10px"></p:separator>
+                        <p:fieldset title="#{msg['prestation']}" legend="#{msg['prestation']}"  style="border-color: #2c84d8">
+                            <p:dataTable var="rp" value="#{rubriquePrestationController.lisRubriquePrestations}"  widgetVar="rubriquePrestationTable" 
+                                         filteredValue="#{rubriquePrestationController.filterRubriquePrestations}"    scrollable="true" 
+                                         globalFilterFunction="#{rubriquePrestationController.globalFilterFunction}"
+                                         emptyMessage="#{msg['emptyMessage']}"    id="idrubriquePrestationTable"
+
+                                         >
+
+                                <f:facet name="header">
+                                    <!--                                <p:outputPanel>
+                                                                        <h:outputText value="#{msg['recherche']} : "/>
+                                    
+                                                                        <p:inputText id="globalFilter"
+                                                                                     onkeyup="PF('rubriquePrestationTable').filter()"
+                                                                                     style="width:150px" placeholder="Search text..."  > 
+                                    
+                                                                        </p:inputText>  
+                                    
+                                    
+                                                                    </p:outputPanel>-->
+                                    <div class="p-d-flex p-jc-end">
+                                        <p:inputText id="globalFilter" onkeyup="PF('rubriquePrestationTable').filter()" style="width:300px"
+                                                     placeholder="Search all text..." />
+                                    </div>
+
+                                </f:facet> 
+                                <p:column style="width: 100px" >
+
+                                    <p:commandButton  icon="pi pi-times"  title="#{msg['bouton.annuler']}"
+                                                      styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rp.idPrestation.id!=null and rp.id==null}" onclick="PF('manageConfirmeDialog').show()" actionListener="#{rubriquePrestationController.showDetailsRubrique(item)}" >
+                                        <f:setPropertyActionListener value="#{rp}" target="#{rubriquePrestationController.rubriquePrestation}"   />
+                                    </p:commandButton>
+                                    <p:commandButton  icon="pi pi-check-circle"  
+                                                      styleClass="success-button" style="margin-right: .5rem"  rendered="#{rp.idRubriqueCategorie.idCategories.idCategorie!=null and rp.id!=null}"   disabled="true" >
+
+                                    </p:commandButton>
+
+                                    <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                      styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rp.idRubriqueCategorie.idCategories.idCategorie!=null and rp.id!=null and rubriquePrestationController.accessSupprimer()}"   onclick="PF('managDeleteDialog').show()"  actionListener="#{rubriquePrestationController.showDetailsRubrique(rp)}"  >
+                                        <f:setPropertyActionListener value="#{rp}" target="#{rubriquePrestationController.rubriquePrestation}"   />
+                                    </p:commandButton>
+
+                                </p:column>
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rp.idPrestation.code}" filterBy="#{rp.idPrestation.code}" style=" float: left;margin-right: .5rem" >
+                                    <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{rp.idPrestation.code}" style="width:100px; float: left;margin-right: .5rem"   >
+                                        <p:ajax event="keyup"   oncomplete="PF('managePrestationDialog').show()"  update=":form2:idprestationableTable"/>
+                                    </p:inputText>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rp.idPrestation.libelle}" filterBy="#{rp.idPrestation.libelle}" style="float: left">
+                                    <h:outputText value="#{rp.idPrestation.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+                        </p:fieldset>
+
+
+
+                    </h:form>
+                    <h:form id="form2">
+
+
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{rubriquePrestationController.removeRubriqueByListe()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{rubriquePrestationController.deleteRubriquePrestagtion()}" oncomplete=" PF('managDeleteDialog').hide()" update=":form1:idrubriquePrestationTable,:form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()" />
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+
+                        <!--</div>-->
+
+
+                        <p:dialog header="#{msg['welcome.bienvenue']}" width="650" showEffect="fade" modal="true" widgetVar="managePrestationDialog" responsive="true">
+
+                            <p:dataTable id="idprestationableTable" var="p" value="#{rubriquePrestationController.lisPrestation}" 
+                                         selection="#{rubriquePrestationController.selectePrestations}" rowKey="#{p.id}"
+                                         style="margin-bottom:0" paginator="true" rows="5"  widgetVar="prestationableTable"  selectionMode="multiple"  rowSelectMode="multiple">
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('prestationableTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column selectionMode="multiple" style="width:16px;text-align:center" id="check"/>
+                                <p:column headerText="Code" sortBy="#{p.code}" filterBy="#{p.code}"  >
+                                    <h:outputText value="#{p.code}" />
+                                </p:column>
+
+                                <p:column headerText="Name" sortBy="#{p.libelle}" filterBy="#{p.libelle}">
+                                    <h:outputText value="#{p.libelle}" />
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <center>
+                                        <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{rubriquePrestationController.chargePrestaionForRubriqueCategorie()}" oncomplete=" PF('managePrestationDialog').hide()" update=":form1:idrubriquePrestationTable,:form1" process="@this" ajax="false" />
+                                        <p:spacer width="10"/>
+                                        <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managePrestationDialog').hide()" actionListener="#{rubriquePrestationController.initialSelectePrestation()}" update=":form1,:form2"/>
+                                    </center>
+                                </f:facet>
+                            </p:dataTable>
+
+
+
+
+
+                        </p:dialog>
+
+                    </h:form>
+
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

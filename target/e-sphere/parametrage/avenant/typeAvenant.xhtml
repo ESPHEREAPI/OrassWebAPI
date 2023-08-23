@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/avenant/typeAvenant">#{msg['typeAvenant']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form11">
+                        <p:toolbarGroup>
+                            <p:commandButton value="#{msg['bouton.creer']} #{msg['typeAvenant']}" onclick="PF('TypeAvenantDialog').show()" icon="pi pi-plus"  styleClass="secondary-warning" /> 
+                            <p:spacer width="10"/>
+                            <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                             styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{typeAvenantController.reset()}" update="@('form')"  />
+
+                        </p:toolbarGroup>  
+
+                    </h:form>
+
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" escape="false"/>
+
+
+
+
+                        <p:dataTable var="tav" value="#{typeAvenantController.listeTypeAvenant}" paginator="true" rows="10" widgetVar="typeAvenantTable"  id="idtypeAvenantTable"
+                                     paginatorAlwaysVisible="true" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{typeAvenantController.filterTypeAvenant}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                     emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{pa.id}" 
+
+                                     >
+
+                            <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{typeAvenantController.showDetails(tav)}"  
+                                    process="@this" update=":form1,:form1:msg" oncomplete="PF('TypeAvenantDialog').hide()" />
+
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('typeAvenantTable').filter()"
+                                                 style="width:350px" placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+
+
+
+
+                            <p:column >
+                                <p:commandButton icon="pi pi-pencil" 
+                                                 styleClass="edit-button rounded-button success-button" process="@this" update="form2,:form1:msg"  title="#{msg['bouton.modifier']}" style="margin-right: .5rem" actionListener="#{typeAvenantController.showDetails(tav)}" oncomplete="PF('TypeAvenantDialog').show()"
+                                                 >
+                                    <f:setPropertyActionListener value="#{tav}" target="#{typeAvenantController.typeAvenant}"   />
+                                </p:commandButton>
+
+                                <p:commandButton class="danger-button rounded-button" icon="pi pi-trash" process="@this"  onclick="PF('manageDeleteDialog').show()" style="margin-right: .5rem"  title="#{msg['bouton.supprimer']}" >
+                                    <f:setPropertyActionListener value="#{tav}" target="#{typeAvenantController.typeAvenant}"   />
+                                </p:commandButton>
+
+
+
+                            </p:column>
+                            <!--</p:column>-->
+                            <p:column headerText="#{msg['code']}" sortBy="#{tav.idRefAvenant.code}" filterBy="#{tav.idRefAvenant.code}">
+                                <h:outputText value="#{tav.idRefAvenant.code}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['libelle']}" sortBy="#{tav.idRefAvenant.libelle}" filterBy="#{tav.idRefAvenant.libelle}">
+
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                              value="#{tav.idRefAvenant.libelle}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['nature']}" >
+
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                              value="#{formatDateController.valueObject(tav.natureAvenant)}  "/>
+                            </p:column>
+                            <p:column headerText="#{msg['contract']}" >
+
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                              value="#{formatDateController.valueObject(tav.contrat)}  "/>
+                            </p:column>
+
+
+                        </p:dataTable>
+
+                    </h:form>
+
+                    <h:form id="form2">
+
+                        <p:dialog widgetVar="TypeAvenantDialog" header="#{msg['edition.typeAvenant']}" closable="true" width="1000" height="150" showEffect="fade" modal="true" responsive="true">
+
+                            <p:panelGrid columns="4"  id="grid1"  
+                                         layout="grid" style="border: 0px; border-bottom: 0px; " >
+                                <p:outputLabel value="#{msg['code']}: " for="code" /> 
+
+                                <p:inputText id="code"     value="#{typeAvenantController.refAvenant.code}" required="true" validator="requiredValidator"  style="width: 50px" disabled="true">
+                                    <f:ajax event="blur"  render="code"/>
+                                </p:inputText>
+                                <p:outputLabel value="#{msg['libelle']}: *"    /> 
+                                <p:autoComplete id="libelle"  title="libelle"   value="#{typeAvenantController.refAvenant.libelle}" completeMethod="#{typeAvenantController.completeText}"  >
+                                    <f:ajax event="blur" render=":libelle"/>  
+                                    <p:ajax event="itemSelect" listener="#{typeAvenantController.onItemSelect}"  update=":form2"/>
+                                </p:autoComplete>
+
+
+                                <p:outputLabel value="#{msg['nature']}: *" for="nature"  /> 
+                                <p:selectOneMenu  converter="#{genericConverter}" id="nature" value="#{typeAvenantController.typeAvenant.natureAvenant}" var="n" filter="true" filterMatchMode="contains" style="width: 200px;" >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{typeAvenantController.typeNature}" />
+                                    <f:ajax event="change" render="nature"/>
+                                    <p:column>
+                                        #{formatDateController.valueObject(n)} 
+                                    </p:column>
+                                </p:selectOneMenu>
+
+                                <p:outputLabel value="#{msg['contract']}: " for="contrat"  /> 
+                                <p:selectOneMenu  converter="#{genericConverter}" id="contrat" value="#{typeAvenantController.typeAvenant.contrat}" var="c" filter="true" filterMatchMode="contains" >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{typeAvenantController.typeContrat}" />
+                                    <f:ajax event="change" render="contrat"/>
+                                    <p:column>
+                                        #{formatDateController.valueObject(c)} 
+                                    </p:column>
+                                </p:selectOneMenu>
+
+
+
+                            </p:panelGrid>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check" process="@this"  update=":form1:msg" 
+                                                     styleClass="success-button" style="margin-right: .5rem"  disabled="#{typeAvenantController.typeAvenant.id!=null}"  actionListener="#{typeAvenantController.addTypeAvenant()}"  ajax="false" rendered="#{typeAvenantController.typeAvenant.id==null}" oncomplete="PF('TypeAvenantDialog').show()"/>
+
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form1:msg" process="@this"  
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"    actionListener="#{typeAvenantController.updateTypeAvenant()}" rendered="#{typeAvenantController.typeAvenant.id!=null}" oncomplete="PF('TypeAvenantDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('TypeAvenantDialog').hide()" icon="pi pi-times"  styleClass="warning-button" actionListener="#{typeAvenantController.reset()}"/> 
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                        
+                        <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="false" width="500" height="75" showEffect="fade" modal="true" responsive="true">
+                        <center>
+                            <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                        </center>
+
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="OK" actionListener="#{typeAvenantController.deleteTypeAvenan()}" update="form1,:form1:msg" onclick="PF('manageDeleteDialog').hide()" />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()" actionListener="#{typeAvenantController.reset()}" update="form1,:form1:msg"/>  
+                            </center>
+                        </f:facet>
+                    </p:dialog>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:pr="http://primefaces.org/rain">
+    <f:view  locale="#{languageController.localeCode}">
+
+        <h:form>
+            <pr:menu widgetVar="RainMenuWidget">
+                <p:submenu id="om_homepage" label="Favorites" icon="pi pi-home">
+                    <p:menuitem id="acceuil" value="#{msg['acceuille']}" icon="pi pi-home" outcome="/accueil"  />
+                </p:submenu>
+                <p:submenu id="administration" label="#{msg['administration']}" icon="pi pi-home" rendered="#{connectionController.administration}" >
+                   <!--<p:menuitem id="template" value="#{msg['gestion.template']}" icon="pi pi-globe" outcome="/administration/template" rendered="#{connectionController.showMenuDroitAccess}"/>-->
+                    <p:menuitem id="template" value="#{msg['gestion.template']}" icon="pi pi-globe" outcome="/administration/template" rendered="#{false}"/>
+                    <p:menuitem id="configuration" value="#{msg['codeconfiguration']}" icon="pi pi-microsoft" outcome="/administration/configuration" rendered="#{false}"/>
+                    <p:menuitem id="profile" value="#{msg['utilisateur.profil']}" icon="pi pi-users" outcome="/administration/profile" rendered="#{connectionController.showMenuProfilUtilisateur}" />
+                    <p:menuitem id="utilisateur" value="#{msg['entite.user']}" icon="pi pi-user-plus" outcome="/administration/utilisateur" rendered="#{connectionController.showMenuUtilisateur}"/>
+                    <p:menuitem id="droit_Acces" value="#{msg['droit.access']}" icon="pi pi-sitemap" outcome="/administration/droitAcces" rendered="#{connectionController.showMenuDroitAccess}" />
+                    <p:menuitem id="intermediaire" value="#{msg['intermediaire']}" icon="pi pi-align-left" outcome="/administration/intermediaire" rendered="#{connectionController.showMenuIntermediaire}"/>
+                    <p:menuitem id="classe" value="#{msg['classe']}" icon="pi pi-align-center" outcome="/administration/classe" rendered="#{connectionController.showMenuClasse}"/>
+                    <p:menuitem id="branche" value="#{msg['branche']}" icon="pi pi-sliders-v" outcome="/administration/branche" rendered="#{connectionController.showMenuBrance}"/>
+                    <p:menuitem id="categorie" value="#{msg['categorie']}" icon="pi pi-sliders-h" outcome="/administration/categorie" rendered="#{connectionController.showMenuCategorie}"/>
+                    <p:menuitem id="option_entreprise" value="#{msg['optionEtab']}" icon="pi pi-cog" outcome="/administration/optionEntreprise" rendered="#{connectionController.showMenuOptinEntreprise}"/>
+                    <p:menuitem id="entreprise" value="#{msg['entite.entreprise']}" icon="pi pi-info-circle" outcome="/administration/entreprise" #{connectionController.showMenuEntreprise} />
+                </p:submenu>
+                <!--rendered="#{connectionController.showMenuEntreprise}"-->
+                <p:submenu id="assurance_ird" label="#{msg['mod.assure.ird']}" icon="pi pi-home" rendered="#{connectionController.assurance_ird}" >
+
+                </p:submenu>
+                <p:submenu id="transport" label="#{msg['mod.transp']}" icon="pi pi-home" rendered="#{connectionController.transport}" >
+
+                </p:submenu>
+                <p:submenu id="caution_credit" label="#{msg['mod.caution.credit']}" icon="pi pi-home" rendered="#{connectionController.caution_credit}" >
+
+                </p:submenu>
+                <p:submenu id="agricolte" label="#{msg['mod.agr']}" icon="pi pi-home" rendered="#{connectionController.agricolte}" >
+
+                </p:submenu>
+<!--#{connectionController.cheminApplication()} #{connectionController.cheminApplication()}/assurance_adp-->
+<!--                <p:submenu id="asuranceadp" label="#{msg['mod.assure.adp']}" icon="pi pi-home" rendered="#{connectionController.assurance_adp}" >
+                    <p:submenu id="sante" label="#{msg['sante']}" icon="pi pi-align-left">
+                        <p:submenu id="production_sante" label="#{msg['production']}" icon="pi pi-align-left">
+                            <p:menuitem id="affaire_nouvelle" value="#{msg['affaire_nouvelle']}" icon="pi pi-align-left"   />
+                            <p:menuitem id="avenant" value="#{msg['avenant']}" icon="pi pi-align-left"  />
+                            <p:menuitem id="echeance" value="#{msg['echeance']}" icon="pi pi-align-left" url="/assurance_adp/sante/production/echeance" />
+                            <p:menuitem id="encaissement" value="#{msg['encaissement']}" icon="pi pi-align-left" url="/assurance_adp/sante/production/encaissement" />
+                            <p:menuitem id="versement" value="#{msg['versement']}" icon="pi pi-align-left" url="/assurance_adp/sante/production/versement" />
+
+                        </p:submenu>
+
+                        <p:submenu id="sinistre_sante" label="#{msg['sinistre']}" icon="pi pi-align-left">
+                            <p:submenu id="prise_en_charge" label="#{msg['prise_en_charge']}" icon="pi pi-align-left">
+                                <p:menuitem id="maladie_prise_en_charge" value="#{msg['maladie']}" icon="pi pi-align-left" url="/assurance_adp/sante/sinistre/prise_en_charge/maladie" />
+                            </p:submenu>
+                            <p:submenu id="remboursement" label="#{msg['remboursement']}" icon="pi pi-align-left">
+                                <p:menuitem id="maladie_remboursement" value="#{msg['maladie']}" icon="pi pi-align-left" url="/assurance_adp/sante/sinistre/remboursement/maladie" />
+                            </p:submenu>
+
+                            <p:submenu id="facture_tiers" label="#{msg['facture_tier']}" icon="pi pi-align-left">
+                                <p:menuitem id="menu_Facture" value="#{msg['maladie']}" icon="pi pi-align-left" url="/assurance_adp/sante/sinistre/remboursement/maladie" />
+                            </p:submenu>
+
+                        </p:submenu>
+
+
+                    </p:submenu>
+                </p:submenu>-->
+                <p:submenu id="gestion_assure" label="#{msg['mod.ges.ass']}" icon="pi pi-home" rendered="#{connectionController.gestion_assure}" >
+
+                </p:submenu>
+                <p:submenu id="compta" label="#{msg['mod.compt.gene']}" icon="pi pi-home" rendered="#{connectionController.compta_general}" >
+
+                </p:submenu>
+                <p:submenu id="assurance_auto" label="#{msg['mod.ass.auto']}" icon="pi pi-home" rendered="#{connectionController.assurance_auto}" >
+
+                </p:submenu>
+                <p:submenu id="compta_agence" label="#{msg['mod.compt.agence']}" icon="pi pi-home" rendered="#{connectionController.compta_agence}" >
+
+                </p:submenu>
+                <p:submenu id="reassurance" label="#{msg['mod.reassu']}" icon="pi pi-home" rendered="#{connectionController.reassurance}" >
+
+                </p:submenu>
+                <p:submenu id="reporting" label="#{msg['gestionEtat']}" icon="pi pi-home" rendered="#{connectionController.reporting}" >
+
+                </p:submenu>
+            </pr:menu>
+        </h:form>
+    </f:view>
+</ui:composition>

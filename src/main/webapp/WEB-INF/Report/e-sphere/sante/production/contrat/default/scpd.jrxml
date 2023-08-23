@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="db6af00a-5bbc-4c8e-ad62-6bd29916d3f1">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="prcent" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[100]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tva_v_1" class="java.math.BigDecimal"/>
+	<parameter name="tva_v" class="java.math.BigDecimal"/>
+	<parameter name="scpd" class="java.util.List"/>
+	<field name="capital" class="java.math.BigDecimal"/>
+	<field name="taux" class="java.math.BigDecimal"/>
+	<field name="pourcentage" class="java.lang.Object"/>
+	<field name="prime" class="java.math.BigDecimal"/>
+	<field name="idGarantie.idRefGaranties.libelle" class="java.lang.String"/>
+	<field name="idGroup.id" class="java.lang.Long"/>
+	<field name="idPolice.police" class="java.math.BigDecimal"/>
+	<variable name="totalPrime" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{prime}]]></variableExpression>
+	</variable>
+	<variable name="netpaye" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.add($V{taxeTva})]]></variableExpression>
+	</variable>
+	<variable name="taxeTva" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.multiply($P{tva_v_1})]]></variableExpression>
+	</variable>
+	<variable name="prcent" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[100]]></variableExpression>
+	</variable>
+	<variable name="taux" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[java.math.BigDecimal.valueOf(19.25)]]></variableExpression>
+	</variable>
+	<group name="groupe">
+		<groupExpression><![CDATA[$F{idPolice.police}]]></groupExpression>
+		<groupHeader>
+			<band height="31">
+				<staticText>
+					<reportElement x="239" y="16" width="70" height="15" uuid="aed7402e-82a3-40ab-b8fe-b8ebfa2dcab8"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Capital]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="309" y="16" width="68" height="15" uuid="ac283819-9908-46b0-9eb9-2cde7c55302d"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Taux]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="377" y="16" width="78" height="15" uuid="5867f7f6-4107-49c1-a951-f887eebbd632"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Pourcentage]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="455" y="16" width="100" height="15" uuid="b83e6288-36bb-467c-8aa7-872b5382f05e"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[Prime]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="186" y="0" width="281" height="16" forecolor="#009999" backcolor="#CCFFFF" uuid="5abb1cff-aa92-4860-8e02-63d52a2c0e33"/>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans" size="12" isBold="true" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[GARANTIE]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="48">
+				<staticText>
+					<reportElement x="0" y="0" width="455" height="16" uuid="f1638d44-7d0d-424f-a3bb-53fbeee6d0ce"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[TOTAL PRIME]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="16" width="455" height="16" uuid="7dd055ed-28a5-436e-9b49-b1188cca929b"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[TVA]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="0" y="32" width="455" height="16" backcolor="#66FF66" uuid="04dbd764-7df5-4b8d-b595-77fcbdecc8e4"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[TOTAL A PAYE]]></text>
+				</staticText>
+				<textField pattern="#,##0">
+					<reportElement x="455" y="0" width="100" height="16" uuid="76ba83e8-f13a-4ad4-aa82-e2cd166a315f"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{totalPrime}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement x="455" y="16" width="100" height="16" uuid="76ba83e8-f13a-4ad4-aa82-e2cd166a315f"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{taxeTva}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0">
+					<reportElement mode="Opaque" x="455" y="32" width="100" height="16" backcolor="#66FF66" uuid="7743d402-f50a-4230-8df8-dda2ea126918"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="DejaVu Sans" size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{taxeTva}.add($V{totalPrime} )]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="309" y="16" width="146" height="16" uuid="747ad268-f141-4017-aa54-8a662beacd16"/>
+					<textElement>
+						<font fontName="DejaVu Sans" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{tva_v}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="239" height="15" uuid="bf6d8c5d-ebe2-431c-86d9-5ab87163234c"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" "+$F{idGarantie.idRefGaranties.libelle}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="239" y="0" width="70" height="15" uuid="7d8cd505-4c07-4ccf-b0da-31c0e229603d"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{capital}!=null)?$F{capital}:0]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="309" y="0" width="68" height="15" uuid="27e65ff1-2960-4896-9ade-b1f280b14844"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{taux}!=null)? $F{taux}:0]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="377" y="0" width="78" height="15" uuid="6ebf2700-5fdb-471b-a233-e6bd6dbb383b"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{pourcentage}.toString()!=null)?$F{pourcentage}:""]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="455" y="0" width="100" height="15" uuid="0a801269-dd1b-43eb-b886-6ba9d4129c8d"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{prime}!=null)? $F{prime}:0]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

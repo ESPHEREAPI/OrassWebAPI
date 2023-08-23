@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/utilisateur">#{msg['utilisateur']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="UTILISATEUR PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <f:view locale="#{languageController.localeCode}">
+                        <!--<h4>#{msg['utilisateur']}</h4>-->
+
+                        <p:messages closable="true"   showSummary="true" />
+
+                        <p:accordionPanel id="accord"   widgetVar="accordP"  multiple="false" activeIndex="1"    >
+                            <p:tab id="tab1"  title="#{msg['cree.utilisateur']}">
+                                <h:form id="formPersonnel">
+
+                                    <p:growl id="grwFile" showDetail="true" />
+                                    <p:tabView id="tabView1"  widgetVar="tabViewP" >
+                                        <!--<p:ajax event="tabChange"  listener="#{utilisateurController.onTabChange}" update="accord:formPersonnel" process="@this"/>-->
+
+                                        <p:tab  title="#{msg['infogene']}" id="infogeneral">
+                                            <!--<p:panelGrid  id="grid11" style="width:100%;">-->
+                                            <div class="ui-g">
+                                                <div class="ui-g-12 ui-md-10 ui-g-nopad">
+                                                    <div class="ui-g-12 ui-g-nopad">
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-4">
+                                                                <p:outputLabel value="#{msg['login']}: *" for="login" />  
+                                                            </div>
+                                                            <div class="ui-g-12 ui-md-4">   <p:inputText id="login"  title="login" value="#{utilisateurController.utilisateurs.login}" validator="requiredValidator" disabled="#{utilisateurController.selectedUtiliseur.idUtilisateur!=null}">
+                                                                    <f:ajax event="blur" render="login"/>
+                                                                </p:inputText> </div>
+
+
+                                                        </div>
+
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-4">
+                                                                <h:outputLabel value="#{msg['nom']}: *" for="nom"  />
+                                                            </div>
+                                                            <div class="ui-g-12 ui-md-4">   <p:inputText id="nom"  title="nom"  value="#{utilisateurController.utilisateurs.nom}" validator="requiredValidator" style="width: 100%; text-transform: uppercase;">
+
+                                                                    <f:ajax event="blur" render="nom"/>
+                                                                </p:inputText> </div>
+                                                            <div ><p:message for="nom" /></div> 
+                                                        </div>
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-4"> <h:outputLabel value="#{msg['prenom']}: " for="prenom" /></div>
+                                                            <div class="ui-g-12 ui-md-4"> <p:inputText id="prenom" value="#{utilisateurController.utilisateurs.prenom}"  title="prenom"  style="width: 100%;" >
+                                                                    <f:ajax event="blur" render="prenom" />
+                                                                </p:inputText></div>
+                                                            <div >
+                                                                <p:message for="prenom" /> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="ui-g">
+                                                            <div class="ui-g-12 ui-md-4"> <h:outputLabel value="#{msg['date_naissance']}: *" for="dateNaissance" /></div>
+                                                            <div class="ui-g-12 ui-md-4">     <p:calendar value="#{utilisateurController.utilisateurs.datenaissance}"  mode="popup"   showOn="both"  id="dateNaissance" pattern="dd/MM/yyyy"    >
+                                                                    <f:ajax event="dateSelect"  render="dateNaissance" />
+                                                                </p:calendar>
+                                                            </div>
+                                                            <div >
+                                                                <p:message for="dateNaissance" /> 
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="ui-g-12 ui-md-2" >
+                                                    <p:fileUpload listener="#{utilisateurController.handleFileUpload}"   
+                                                                  auto="true"  
+                                                                  sizeLimit="2200000"  
+                                                                  label="#{msg['photo.select']}"
+                                                                  allowTypes="/(\.|\/)(gif|jpe?g)$/"
+                                                                  uploadLabel="Confirm"
+                                                                  update="@this,idlogo"
+                                                                  invalidSizeMessage="Please Choose File which size is less than 500Kb "
+                                                                  >
+
+                                                    </p:fileUpload> 
+                                                    <p:graphicImage alt="#{msg['photo.indisponible']}" value="#{utilisateurController.absolutePathImages}" id="idlogo" style="width:150px; height:125px">
+                                                        <!--<f:ajax event="blur" render="idlogo"/>-->
+                                                    </p:graphicImage>
+                                                </div>
+                                            </div>
+
+
+
+                                            <!--</p:panelGrid>-->
+
+                                        </p:tab>
+                                        <!--id="tabEtab2", id="tabEtab22"-->
+                                        <p:tab  title="#{msg['autre.infos']}" id="autreinfos">
+
+                                            <p:panelGrid id="gridinfoGeneral"  columns="6" styleClass="noBorders" layout="grid" >
+
+
+                                                <h:outputLabel value="#{msg['numero_cni']}: *" for="cni" />
+
+                                                <p:inputText id="cni"  title="cni" value="#{utilisateurController.utilisateurs.numeroCNI}" style="width: 100%;" validator="requiredValidator">
+                                                    <f:ajax event="blur" render="cni"/>
+                                                </p:inputText>
+
+
+                                                <h:outputLabel value="#{msg['personne.sexe']}: *" for="sexe"  /> 
+
+
+                                                <p:selectOneMenu id="sexe"  style="width: 90%;" value="#{utilisateurController.utilisateurs.sexe}" validator="requiredValidator" >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItem itemLabel="#{msg.Masculin}" itemValue="Masculin" />  
+                                                    <f:selectItem itemLabel="#{msg.Feminin}" itemValue="Feminin" />
+                                                    <f:ajax event="change" render="sexe"/>
+                                                </p:selectOneMenu> 
+
+
+                                                <h:outputLabel value="#{msg['personne.situationmatri']}: *" for="situationmatri" />  
+
+                                                <p:selectOneMenu id="situationmatri"  style="width: 100%;" value="#{utilisateurController.utilisateurs.situationMatrimoniale}" validator="requiredValidator">  
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItem itemLabel="#{msg['personne.celibataire']}" itemValue="personne.celibataire"/>  
+                                                    <f:selectItem itemLabel="#{msg['personne.marie']}" itemValue="personne.marie" />  
+                                                    <f:selectItem itemLabel="#{msg['personne.divorce']}" itemValue="personne.divorce" /> 
+                                                    <f:selectItem itemLabel="#{msg['personne.veuf']}" itemValue="personne.veuf" /> 
+                                                    <f:ajax event="change" render="situationmatri"/>
+                                                </p:selectOneMenu> 
+
+
+
+                                                <h:outputLabel value="#{msg['profil']}*: " for="profil"/>
+                                                <p:selectCheckboxMenu label=" #{msg['choix']} #{msg['profil']}" filter="true"  filterMatchMode="contains" id="profil" value="#{utilisateurController.selectedProfils}"    style="width:200px;" panelStyle="height: 400px;" validator="requiredValidator" multiple="true">
+                                                    <!--<f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/>--> 
+                                                    <f:selectItems var="m" value="#{utilisateurController.colProfil}" itemLabel="#{m.code} | #{m.libelle} " itemValue="#{m}"/>
+                                                    <f:ajax event="change" render="profil"/>
+
+                                                </p:selectCheckboxMenu>
+
+
+                                            </p:panelGrid>
+                                        </p:tab>
+                                        <!--id="tabAdresse"-->
+                                        <p:tab  title="#{msg['entite.adresse']}" id="adresseuser">
+                                            <p:panelGrid id="gridAdresse"  columns="6" styleClass="noBorders" layout="grid" >
+
+<!--                                                <h:outputLabel value="#{msg['religion']}:" for="religion" />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" value="#{utilisateurController.utilisateurs.adresse.region}" id="religion" style="width: 100%;">
+
+                                                    <f:selectItems  value="#{utilisateurController.religionDao.allReligion}" var="religion" itemLabel="#{religion.notes}" itemValue="#{religion}" />
+                                                    <f:ajax event="change" render="religion"/>
+                                                </p:selectOneMenu>-->
+
+
+
+                                                <h:outputLabel value="#{msg['adresse.ville']}: " for="ville" />
+<!--                                                <p:inputText id="ville"  value="#{utilisateurController.utilisateurs.adresse.ville}" title="ville" style="width: 100%;">
+                                                    <f:ajax event="blur" render="ville"/>
+                                                </p:inputText>-->
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="ville" value="#{utilisateurController.utilisateurs.adresse.ville}"  var="vi" filter="true" filterMatchMode="contains"   >
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{utilisateurController.listeVille}" var="v" itemLabel=" #{v.libelle}"  itemValue="#{v.libelle}"/>
+                                                    <f:ajax event="change" render="ville" />
+                                                    <p:column>
+                                                        #{vi}
+                                                    </p:column>
+                                                </p:selectOneMenu>
+
+
+                                                <h:outputLabel value="#{msg['quartier']}: " for="quartier" />
+                                                <p:inputText id="quartier" value="#{utilisateurController.utilisateurs.adresse.quartier}" title="quartier" style="width: 100%;">
+                                                    <f:ajax event="blur" render="quartier"/>
+                                                </p:inputText>
+
+
+                                                <h:outputLabel value="#{msg['adresse.telephone']}: *" for="telephone" />
+                                                <h:panelGroup>
+                                                    <h:selectOneMenu  converter="#{genericConverter}" id="indicatif"  value="#{utilisateurController.utilisateurs.adresse.indicatifPays}" validator="requiredValidator" >
+                                                        <!--<f:selectItem itemLabel="Select" itemValue="#{null}" />-->
+                                                        <f:selectItems  value="#{utilisateurController.listeIndicatifPays}" var="ind" itemLabel="#{ind.indicatif}" itemValue="#{ind.indicatif}" />
+                                                        <f:ajax event="change" render="indicatif" />
+                                                    </h:selectOneMenu>
+                                                    <p:inputText id="telephone"  title="telephone" value="#{utilisateurController.utilisateurs.adresse.tel}" size="20"  >
+                                                        <f:ajax event="blur" render="telephone"/>
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                                <h:outputLabel value="#{msg['adresse.fax']}: " for="fax" />
+                                                <p:inputText id="fax"  value="#{utilisateurController.utilisateurs.adresse.fax}" title="fax" style="width: 100%;" >
+                                                    <f:ajax event="blur" render="fax"/>
+                                                </p:inputText>
+
+                                                <h:outputLabel value="#{msg['adresse.bp']}: " for="bp" />
+                                                <p:inputText id="bp" value="#{utilisateurController.utilisateurs.adresse.bp}" title="bp" style="width: 100%;" >
+                                                    <f:ajax event="blur" render="bp"/>
+                                                </p:inputText>
+
+                                             
+
+                                            </p:panelGrid>
+                                        </p:tab>
+                                        <!--id="contract2"-->
+                                        <p:tab  title="#{msg['connection']}"   id="connectionuser"  >
+                                            <p:panelGrid  columns="4" layout="grid" >
+<!--                                                <h:outputLabel for="pwd3" value=" #{msg['motdePasse']}* : " rendered="#{utilisateurController.selectedUtiliseur.idUtilisateur==null}" />  
+                                                <p:password id="pwd3" value="#{utilisateurController.utilisateurs.password}" match="pwd4" validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" style="width: 100%;" 
+                                                            feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" rendered="#{utilisateurController.selectedUtiliseur.idUtilisateur==null}" >
+                                                    <f:ajax event="blur" render="pwd3"/>
+                                                </p:password>  
+
+
+                                                <h:outputLabel for="pwd4" value="#{msg['CONFIRM_MOT_DE_PASSE']}* : " rendered="#{utilisateurController.selectedUtiliseur.idUtilisateur==null}" />  
+                                                <p:password id="pwd4" value="#{utilisateurController.utilisateurs.password}" label="#{msg['CONFIRM_MOT_DE_PASSE']}" validator="requiredValidator" feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['CONFIRM_MOT_DE_PASSE']}" style="width: 100%;" 
+                                                            weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" rendered="#{utilisateurController.selectedUtiliseur.idUtilisateur==null}">
+                                                    <f:ajax event="blur" render="pwd3"/>
+                                                </p:password>  -->
+                                                <h:outputLabel value="#{msg['access.all.agences']}: " />
+                                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="agence" value="#{utilisateurController.utilisateurs.allAccessForIntermediaire}" disabled="#{utilisateurController.utilisateurs.idIntermediaire.idIntermediaire!=null}">
+                                                    <f:ajax event="change" render="agence"/>
+
+                                                    <p:ajax event="change" update=":accord:formPersonnel:tabView1:intermediaire"/>
+                                                </p:selectBooleanButton>
+                                                <h:outputLabel value="#{msg['intermediaire']}:" for="intermediaire"  />
+
+                                                <p:selectOneMenu  converter="#{genericConverter}" id="intermediaire" value="#{utilisateurController.utilisateurs.idIntermediaire}" style="width: 150px;"  var="agence" filter="true" filterMatchMode="contains"  disabled="#{utilisateurController.utilisateurs.allAccessForIntermediaire==true}">
+                                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                    <f:selectItems  value="#{utilisateurController.colIntermediaire}" var="int" itemLabel="#{int.idRefIntermediaire.code} #{int.idRefIntermediaire.raisonSociale}" itemValue="#{int}" />
+                                                    <f:ajax event="change" render="intermediaire"/>
+                                                    <p:column>
+                                                        #{agence.idRefIntermediaire.code} | #{agence.idRefIntermediaire.raisonSociale} 
+                                                    </p:column>
+                                                    <f:ajax event="change" render="intermediaire"/>
+                                                    <p:ajax event="change" update=":accord:formPersonnel:tabView1:agence"/>
+                                                </p:selectOneMenu>
+
+                                                <h:outputLabel value="#{msg['langue.parle']} *"  />
+                                                <p:selectOneMenu  id="langueDefaut" value="#{utilisateurController.utilisateurs.langue}"    validator="requiredValidator"  style="width: 250px">
+                                                    <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                                    <f:selectItems value="#{utilisateurController.languageCountrie}"  />
+                                                    <f:ajax event="change"  render="langueDefaut"/>
+                                                    <!--<f:ajax event="change" render="langueDefaut"/>-->
+                                                </p:selectOneMenu>
+                                                   <h:outputLabel value="#{msg['adresse.email']}: " for="email" />
+                                                <p:inputText id="email"  value="#{utilisateurController.utilisateurs.adresse.email}" title="email" validatorMessage="#{msg['email.message']}" validator="emailValidator"  >
+                                                    <f:ajax event="blur" render="email"/>
+                                                </p:inputText>
+                                                <h:outputLabel value="#{msg['actif']}: " rendered="#{utilisateurController.utilisateurs.idUtilisateur!=null}"/>
+                                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="actif" value="#{utilisateurController.utilisateurs.actif}" rendered="#{utilisateurController.utilisateurs.idUtilisateur!=null}" >
+                                                    <f:ajax event="change" render="actif"/>
+
+                                                </p:selectBooleanButton>
+
+
+
+                                            </p:panelGrid>
+                                        </p:tab>
+
+                                    </p:tabView>
+
+                                    <p:toolbarGroup>
+
+                                        <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check" 
+                                                         styleClass="p-mr-2 p-mb-2" style="margin-right: .5rem"  actionListener="#{utilisateurController.addUtilisateur()}" disabled="#{utilisateurController.utilisateurs.idUtilisateur!=null}"   update="accord:formPersonnel,accord:form1"  process="@this" rendered="#{utilisateurController.accessCreeUser()}"/>
+                                        <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil" 
+                                                         styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"  disabled="#{utilisateurController.utilisateurs.idUtilisateur==null}" actionListener="#{utilisateurController.updateUser()}" update="accord:formPersonnel,accord:form1"  process="@this" rendered="#{utilisateurController.accessModifierUser()}"/>
+                                        <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-refresh" 
+                                                         styleClass="success-button" style="margin-right: .5rem"  actionListener="#{utilisateurController.reset()}" update=":accord:formPersonnel" process="@form" oncomplete="PF('tab1').select(0);" />
+                                    </p:toolbarGroup>
+
+
+
+
+
+                                </h:form>
+
+
+                            </p:tab>
+
+                            <p:tab  title="#{msg['utilisateur.gestion']}" id="tabSearch"   >
+
+
+                                <div class="card">
+                                    <h:form id="form1">
+                                        <p:dataTable var="user" value="#{utilisateurController.datasource}" paginator="true" rows="10" widgetVar="utilisateur" paginatorPosition="both"
+                                                     paginatorAlwaysVisible="false" rowsPerPageTemplate="10,100,500,1000" filterEvent="enter" filteredValue="#{utilisateurController.filteredUtilisateur}"
+                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                                     emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;"
+                                                     selectionMode="single"  selection="#{utilisateurController.selectedUtiliseur}" 
+                                                     rowKey="#{user.idUtilisateur}" scrollable="true" rowStyleClass="#{user.actif==false ? 'red':'old' }" >
+
+                                            <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{utilisateurController.onRowSelect()}" update=":accord:formPersonnel" oncomplete="PF('accordP').select(0);"/>
+
+
+                                            <f:facet name="header">
+                                                <p:outputPanel>
+                                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                                    <p:inputText id="globalFilter"
+                                                                 onkeyup="PF('utilisateur').filter()"
+                                                                 style="width:350px" placeholder="Search text"/>
+                                                </p:outputPanel>
+
+                                            </f:facet>
+                                            <p:column headerText="#{msg['REPRESENTATION']}" >
+                                                <p:avatar styleClass="p-mr-2" size="xlarge" shape="circle">
+                                                    <p:graphicImage value="#{utilisateurController.getRepresentationByUser(user)}" 
+                                                                    width="32" style="vertical-align: middle"/> 
+                                                </p:avatar>
+
+                                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                              value="#{user.login} "/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['nom']}" sortBy="#{user.nom}" filterBy="#{user.nom}">
+                                                <h:outputText value="#{user.nom}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['prenom']}" sortBy="#{user.prenom}" filterBy="#{user.prenom}">
+                                                <span class="flag flag-#{user.prenom}" style="width: 30px; height: 20px"/>
+                                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                              value="#{user.prenom}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['intermediaire']}" sortBy="#{user.idIntermediaire.idRefIntermediaire.raisonSociale}" filterBy="#{user.idIntermediaire.idRefIntermediaire.raisonSociale}">
+                                                <h:outputText value="#{user.idIntermediaire.idRefIntermediaire.raisonSociale}"/>
+                                            </p:column>
+<!--                                            <p:column headerText="#{msg['actif']}" sortBy="#{user.actif}" filterBy="#{user.actif}">
+                                                <h:outputText value="#{user.actif}"/>
+                                            </p:column>-->
+                                            <p:column headerText="#{msg['personne.sexe']}" sortBy="#{user.sexe}" filterBy="#{user.sexe}">
+                                                <h:outputText value="#{msg[user.sexe]}"/> 
+                                            </p:column>
+                                            <p:column headerText="#{msg['adresse.telephone']}" >
+                                                <h:outputText value="#{user.adresse.tel}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['adresse.ville']}" >
+                                                <h:outputText value="#{user.adresse.ville}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['adresse.email']}" >
+                                                <h:outputText value="#{user.adresse.email}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg['langue.parle']}" >
+                                                <h:outputText value=" #{user.langue}"/>
+                                            </p:column>
+
+<!--                                            <p:column headerText="#{msg['personne.situationmatri']}" >
+                                                <h:outputText value="#{msg[user.situationMatrimoniale]}"/>
+                                            </p:column>-->
+                                            
+                                        </p:dataTable>
+
+                                        <p:dialog header="Customer Detail" widgetVar="customerDialog" modal="true" showEffect="fade"
+                                                  hideEffect="fade" resizable="false">
+                                            <p:outputPanel id="customerDetail" style="text-align:center;">
+
+                                            </p:outputPanel>
+                                        </p:dialog>
+                                    </h:form>
+                                </div>
+
+                            </p:tab>
+
+                        </p:accordionPanel>
+
+                        <h:form id="form2">
+                            <p:dialog header="#{msg['motdePasse']}"  showEffect="fade" modal="true" widgetVar="motPasseDialog" responsive="true" closable="true">
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-user"></i> #{msg['login']} * :
+                                    </label> 
+                                    <h4>#{utilisateurController.login}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['motdePasse']} * :
+                                    </label> 
+                                    <h4>#{utilisateurController.passWord}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['cle.securite']}* :
+                                    </label> 
+
+                                    <h4>#{utilisateurController.cle}</h4>
+                                </div>
+
+
+                                <!--                                <f:facet name="footer">
+                                
+                                
+                                
+                                                                    <center>
+                                
+                                
+                                
+                                                                        <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.nouveau']}"  onclick="PF('motPasseDialog').hide()" />  
+                                                                        <p:spacer width="10"/>
+                                                                        <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('motPasseDialog').hide()" immediate="true"  /> 
+                                                                    </center>
+                                                                </f:facet>-->
+
+                            </p:dialog>
+                        </h:form>
+
+
+
+                    </f:view> 
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

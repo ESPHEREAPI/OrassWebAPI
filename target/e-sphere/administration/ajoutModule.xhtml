@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/ajoutModule"> #{msg['module.gestion']} #{msg['entite.entreprise']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h4>#{msg['bouton.ajouter']} #{msg['modulesecurite']}</h4>
+                       
+                    <f:view locale="#{languageController.localeCode}">
+                        <h:form id="formModuleSecurite">
+                         <div class="products-buttonbar">
+                                <p:commandButton value="#{msg['bouton.ajouter']} " icon="pi pi-plus"  actionListener="#{configurationController.addModuleforEntreprise()}"
+                                                 styleClass="success-button" style="margin-right: .5rem" update="formModuleSecurite"  process="@this"/>
+                            </div>
+                             <p:growl id="grwFile" showDetail="true" />
+                             <br/>
+                            <p:panel header="#{msg['module.gestion']} #{msg['entite.entreprise']}">
+
+
+                                <h:panelGrid id="idgrid" columns="3" styleClass="noBorders">
+
+                                    <h:outputLabel value="#{msg['entite.entreprise']}*: " for="entreprise"/>
+                                    <p:selectOneMenu label=" #{msg['choix']} #{msg['entite.entreprise']}" filter="true"  filterMatchMode="contains" id="entreprise" value="#{configurationController.entreprise}" validator="requiredValidator" converter="#{genericConverter}" style="width:200px;" panelStyle="height: 400px;">
+                                         <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                        <f:selectItems var="e" value="#{configurationController.listeEntreprise}" itemLabel=" #{e.raisonSociale} " />
+                                        <p:ajax event="change" update="module" listener="#{configurationController.chargerModuleNotHaveEntite()}"/>
+                                    </p:selectOneMenu>
+                                    <p:message for="entreprise"/> 
+                                    <h:outputLabel value="#{msg['modulesecurite']}*: " for="module"/>
+                                    <p:selectCheckboxMenu label=" #{msg['choix']} #{msg['modulesecurite']}" filter="true"  filterMatchMode="contains" id="module" value="#{configurationController.selectedModules}"   style="width:200px;" panelStyle="height: 400px;" validator="requiredValidator" >
+                                        <f:selectItems var="m" value="#{configurationController.listModules}" itemLabel="#{msg[m.code]} " />
+                                        <f:ajax event="change"  render="module"/>
+                                    </p:selectCheckboxMenu>
+                                    <p:message for="module"/> 
+                                    <h:outputLabel value="#{msg['datedebut']}: " for="date_debut" />
+                                    <p:calendar value="#{configurationController.debut}" mode="popup"  title="#{msg['datedebut']}" showOn="both"  id="date_debut" pattern="dd/MM/yyyy" validator="requiredValidator" >
+                                                    <f:ajax event="dateSelect"  render="date_debut"/>
+                                    </p:calendar>
+                                    <p:message for="date_debut"/> 
+                                    <h:outputLabel value="#{msg['datefin']}: " for="date_fin" />
+                                    <p:calendar value="#{configurationController.fin}" mode="popup"  title="#{msg['datefin']}" showOn="both"  id="date_fin" pattern="dd/MM/yyyy"  validator="requiredValidator">
+                                      <f:ajax event="dateSelect"  render="date_fin" />
+                                    </p:calendar>
+                                    <p:message for="date_fin"/> 
+
+<!--                                    <h:outputLabel value="#{msg['langue.parle']}"  />
+                                    <p:selectOneMenu  id="langueDefaut" value="#{configurationController.utilisateur.langue}"    validator="requiredValidator"  style="width: 250px">
+                                        <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                        <f:selectItems value="#{configurationController.languageCountrie}"  />
+                                                                                <f:ajax event="change"  render="langueDefaut"/>
+                                    </p:selectOneMenu>-->
+
+                                </h:panelGrid>
+
+
+                            </p:panel> 
+                               <p:separator />
+                            <h:link  outcome="/acceuil_admin_system" styleClass="layout-topbar-logo" >
+
+                                <i class="topbar-icon pi pi-home " style="font-size: 2em"></i>
+
+
+                            </h:link>
+                        </h:form>  
+
+
+                    </f:view>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

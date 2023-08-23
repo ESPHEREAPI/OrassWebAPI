@@ -1,0 +1,408 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/garanties/assure">#{msg['garantie_assure']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1_1" >
+                        <p:growl id="msg" showDetail="true" escape="false"/>  
+                        <p:toolbarGroup>
+
+
+                            <p:commandButton value="#{msg['liste.categorie']}" icon="pi pi-sliders-h" actionListener="#{categorieController.showDialog()}"
+                                             styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  update="form1_1"   rendered="#{categorieController.accessAfficherList()}" oncomplete="#{categorieController.updateTableRefGarantie()}"/>
+
+                            <h:outputLabel value="#{categorieController.categoriesSelect.code}  #{formatDateController. valueObject(categorieController.categoriesSelect.libelle, categorieController.categoriesSelect)}" class="info-label"/>
+                        </p:toolbarGroup>
+
+                        <p:panelGrid styleClass="noBorders" columns="9" layout="grid" style="border: 0px; border-bottom: 0px" rendered="#{categorieController.categoriesSelect.idCategorie!=null}">
+<!--                            <p:outputLabel value="#{msg['categorie']}: "  /> 
+                            <p:inputText id="categorie" value="#{categorieController.categoriesSelect.code}  #{formatDateController.valueObjectByLibelleAutres(categorieController.categoriesSelect.libelle)}" style="width: 250px"   disabled="#{true}" >
+
+                            </p:inputText>-->
+
+
+                            <h:outputLabel value="#{msg['branche']}*: " for="branche"/>
+                            <p:selectOneMenu  converter="#{genericConverter}" id="branche" value="#{categorieController.categoriesSelect.idBranche}" style="width: 250px;" validator="requiredValidator" var="br" filter="true"  filterMatchMode="contains" panelStyle="height: 200px;width: 400px"  required="true" disabled="#{true}" >
+                                <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                <f:selectItems  value="#{categorieController.lisBranche}" var="int" itemLabel="#{int.code} #{categorieController.valueObjectByLibelleAutres(int)}" itemValue="#{int}" />
+                                <f:ajax event="change" render="branche"/>
+                                <p:column>
+                                    #{categorieController.valueObjectByLibelleAutres(br)} 
+                                </p:column>
+                            </p:selectOneMenu>
+
+
+
+                            <p:outputLabel value="#{msg['classe']}: *"    /> 
+                            <p:inputText id="classe"  title="classe"  value="#{categorieController.valueObjectByLibelleAutresClasse(categorieController.categoriesSelect.idBranche.idClasse)}"  style="width: 250px" disabled="true"  >
+
+                            </p:inputText>
+
+
+                        </p:panelGrid>
+
+                        <!--<p:scrollPanel mode="native" style="width:1200px;height:600px" id="scrollpane">-->
+                        <p:dataTable var="ga" value="#{categorieController.listeGarantie}"  widgetVar="garantieTable" 
+
+                                     filteredValue="#{categorieController.filterGarantie}"
+                                     globalFilterFunction="#{categorieController.globalFilterFunction}"
+                                     emptyMessage="#{msg['emptyMessage']}"    id="idgarantieTable"   rowIndexVar="index"
+
+                                     >
+
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('garantieTable').filter()" style="width:300px"
+                                                 placeholder="Search all text..." />
+                                </div>
+<!--                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('garantieTable').filter()"
+                                                 style="width:150px" placeholder="Search text..."  > 
+
+                                    </p:inputText> 
+                                    <p:commandButton  icon="pi pi-plus"   actionListener="#{categorieController. ajoutLigneGrantie()}"
+                                                       update="form1_1"  >
+                                    
+                                </p:commandButton>
+
+                                    <p:commandButton update="idgarantieTable" action="#{categorieController.updateTableGarantie()}" value="Update"
+         process="@parent" icon="pi pi-refresh"
+         oncomplete="PF('garantieTable').clearFilters()"/>
+                                                                                 <br/>
+                                                                                <p:commandButton  icon="pi pi-plus"  
+                                                                                                 styleClass="success-button" style="margin-right: .5rem"  >
+                                                                                     <p:ajax event="click"  oncomplete="PF('manageRefGarantieDialog').show();PF('tab').select(1);"  update=":form_tab"   />
+                                                                                </p:commandButton>
+
+                                </p:outputPanel>-->
+
+                            </f:facet> 
+                            <p:column  >
+                           
+                                <p:commandButton  icon="pi pi-plus"  
+                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{ga.idRefGaranties.id!=null and ga.id==null and (categorieController.accessCreeCategorieGarantie() or categorieController.accessAjouterCategorieGarantie())}" onclick="PF('manageConfirmeDialog').show()">
+                                    <f:setPropertyActionListener value="#{ga}" target="#{categorieController.garantieSave}"   />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-times"  
+                                                  styleClass="danger-button" style="margin-right: .5rem"  rendered="#{ga.idRefGaranties.id!=null and ga.id==null }" onclick="PF('manageConfirmeDialog2').show()">
+                                    <f:setPropertyActionListener value="#{ga}" target="#{categorieController.garantieSave}"   />
+                                </p:commandButton>
+                                <!--                                <p:commandButton  icon="pi pi-check-circle"  
+                                                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{ga.idRefGaranties.id!=null and ga.id!=null}"  disabled="#{true}">
+                                
+                                                                </p:commandButton>-->
+                                <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                  styleClass="danger-button" style="margin-right: .5rem" rendered="#{(ga.idRefGaranties.id!=null and ga.id!=null) and categorieController.accessSupprimer()}"   onclick="PF('manageDeleteDialog').show()"  >
+
+                                    <f:setPropertyActionListener value="#{ga}" target="#{categorieController.garantieSave}"   />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-pencil"   title="#{msg['recherche']}"
+                                                  styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{ga.idRefGaranties.id!=null and ga.id!=null and categorieController.accessModifierCategorieGarantie()==true}"   onclick="PF('manageConfirmeDialog3').show()">
+                                    <f:setPropertyActionListener value="#{ga}" target="#{categorieController.garantieSave}"   />
+                                </p:commandButton>
+
+                            </p:column>
+
+                            <p:column headerText="#{msg['code']}" sortBy="#{ga.idRefGaranties.code}"  style="width: 50px" >
+                                <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{ga.idRefGaranties.code}"    >
+                                    <p:ajax event="keyup"   oncomplete="PF('manageRefGarantieDialog').show()"  update=":form2_2:idrefGarantieTable"/>
+                                </p:inputText>
+                            </p:column>
+                            <p:column headerText="#{msg['libelle']}"  sortBy="#{ga.idRefGaranties.libelle}" >
+                                <h:outputText value="#{ga.idRefGaranties.libelle}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['nature']}" >
+                                <p:selectOneMenu  converter="#{genericConverter}" id="nature" value="#{ga.natureGarantie}" style="width: 150px"   >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{categorieController.natureGarantieForCreer}"  />
+                                    <!--                                            <p:ajax event="change" update="nature"   process="@this"/>-->
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column headerText="#{msg['mode.calcul']}" >
+                                <p:selectOneMenu  converter="#{genericConverter}" id="mode_calcul" value="#{ga.modeCalcul}" style="width: 150px"   >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{categorieController.modeCalculGarantieForCreer}"  />
+                                    <!--<f:ajax event="change" render=":mode_calcul"   />-->
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column headerText="#{msg['gratuit']}" >
+                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="gratuit" value="#{ga.gratuit}"  >
+                                    <f:ajax event="change" render="gratuit"/>
+
+                                </p:selectBooleanButton>
+                            </p:column>
+                            
+
+                            <p:column headerText="#{msg['forfaire']}" >
+                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="forfaire" value="#{ga.forfaire}"  >
+                                    <f:ajax event="change" render="forfaire"/>
+
+                                </p:selectBooleanButton>
+                            </p:column>
+
+                            <p:column headerText="#{msg['proarata']}" >
+                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="prorata" value="#{ga.proarate}"  >
+                                    <!--<f:ajax event="change" render="prorata"/>-->
+
+                                </p:selectBooleanButton>
+                            </p:column>
+<!--                             <p:column headerText="#{msg['applicable.tarif']}" >
+                                 <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="tarifWithCondition" value="#{ga.tarifWithCondition}"  >
+                                    <f:ajax event="change" render="tarifWithCondition"/>
+
+                                </p:selectBooleanButton>
+                            </p:column>-->
+                            <p:column headerText="#{msg['g.caract']}" >
+                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="caract" value="#{ga.generer_caract}"  >
+                                    <!--<f:ajax event="change" render="caract"/>-->
+
+                                </p:selectBooleanButton>
+                            </p:column>
+
+
+                            <p:column headerText="#{msg['type.garantie']}" >
+                                <p:selectOneMenu  converter="#{genericConverter}" id="rp" value="#{ga.idType_Garantie}" style="width: 100px"  var="tpg" filter="true"  filterMatchMode="contains" panelStyle="height: 200px;width: 400px"  >
+                                    <f:selectItem itemLabel="#{msg['choix']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                    <f:selectItems  value="#{categorieController.listeType_Garanties}" var="rpp" itemLabel="#{rpp.code} #{categorieController.valueObjectByTypeGarentie(rpp)}"   itemValue="#{rpp}"/>
+                                    <!--<f:ajax event="change" render=":rp"   />-->
+                                    <!--<f:ajax event="change" render="rp"  />-->
+                                    <p:column>
+                                        #{tpg.code}   #{formatDateController.valueObject(tpg.libelle)}  
+                                    </p:column>
+                                </p:selectOneMenu>
+                            </p:column>
+
+
+                        </p:dataTable>
+                        <!--</p:scrollPanel>-->
+
+                    </h:form>
+                    <h:form id="form2_2">
+                        <p:dialog header="#{msg['welcome.bienvenue']}"  showEffect="fade" modal="true" widgetVar="manageCategorieDialog2" responsive="true">
+                            <p:dataTable var="cl" value="#{categorieController.lisCategories}" paginator="true" rows="3" widgetVar="classTable2"  id="idmanageCategorie"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="3,5,15,50,100,500,1000" filterEvent="enter" filteredValue="#{categorieController.filterCategories}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cl.idCategorie}" selectionMode="single"  selection="#{categorieController.categoriesSelect}"
+
+                                         scrollable="true" scrollHeight="300" >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{categorieController.chargeGarantieByCategories()}"     
+                                        process="@this" update=":form1_1,"  oncomplete="PF('manageCategorieDialog2').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('classTable2').filter()"
+                                                     placeholder="Search text"   immediate="true"/>
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+                                <p:column headerText="id"  style="width: 50px">
+                                    <h:outputText value="#{cl.idCategorie}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['code']}" sortBy="#{cl.code}" filterBy="#{cl.code}"  style="width: 200px">
+                                    <h:outputText value="#{cl.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{cl.libelle}" filterBy="#{cl.libelle}"  style="width: 250px">
+                                    <span class="flag flag-#{cl.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{categorieController.valueObjectByLibelleAutres(cl)}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['branche']}" sortBy="#{cl.idBranche.code}" filterBy="#{cl.idBranche.code}" style="width: 250px">
+                                    <h:outputText value="#{cl.idBranche.code} #{categorieController.valueObjectByLibelleAutres(cl.idBranche)}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{categorieController.addGarantieByCategorie()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1_1,:form1_1:msg" process="@this" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.retire.garantie.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{categorieController.removeGarantieByListe()}" oncomplete="PF('manageConfirmeDialog2').hide()" update="form1_1,:form1_1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{categorieController.updateGarantieByCategorie()}" oncomplete=" PF('manageConfirmeDialog3').hide()" update="form1_1,:form1_1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="Attention" widgetVar="infosDialog" minHeight="40" width="650" showEffect="fade">
+                            <h4>     <p class="p-m-0" style="color: red">"#{msg['infos.garantie']}"</p></h4> 
+                            <f:facet name="footer">
+                                <p:commandButton type="button" value="#{msg['bouton.fermer']}" styleClass="ui-button-flat p-mr-2" style="width: 6rem"  onclick="PF('infosDialog').hide()"/>
+
+                            </f:facet>
+                        </p:dialog>
+
+
+                        <!--</div>-->
+                        <p:dialog widgetVar="manageAddRefGarantieDialog" header="#{msg['bouton.ajouter']} #{msg['garantie']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                         <p:panelGrid columns="9"  id="grid1"  
+                                     layout="grid" style="border: 0px; border-bottom: 0px; " >
+                            <p:outputLabel value="#{msg['code']}: " for="code" /> 
+                            <p:inputText id="code"  title="code"   value="#{categorieController.refGarantiesAdd.code}" style="width: 100px;  "    >
+                                <f:ajax event="blur"  render="code"/>
+                            </p:inputText>
+
+                            <p:outputLabel value="#{msg['libelle']}: *"    /> 
+                            <p:inputText id="libelle"     value="#{categorieController.refGarantiesAdd.libelle}"   style="width: 300px">
+                                <f:ajax event="blur"  render="libelle"/>
+                            </p:inputText>
+
+                           
+                            <p:outputLabel value="#{msg['famille']}: *"    /> 
+                            <p:inputText id="famille"     value="#{categorieController.refGarantiesAdd.famille}"    >
+                                <f:ajax event="blur"  render="libelle"/>
+                            </p:inputText>
+
+
+                        </p:panelGrid>
+                              <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{categorieController.addRefGarantie()}"  onclick="PF('manageAddRefGarantieDialog').hide(),PF('manageRefGarantieDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddRefGarantieDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                       
+
+                        <p:dialog header="#{msg['welcome.bienvenue']}"  showEffect="fade" modal="true" widgetVar="manageRefGarantieDialog" responsive="true">
+                            <p:outputPanel>
+                                <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   
+                                                           styleClass="success-button" style="margin-right: .5rem"    actionListener="#{categorieController.createRefgarantieDialog()}"   ajax="false" />
+                       
+                            </p:outputPanel>
+                                 
+                            <p:dataTable var="rga" value="#{categorieController.listeRefGarantieses}" paginator="true" rows="50" widgetVar="refGarantieTable"  id="idrefGarantieTable"
+                                         filterEvent="enter" filteredValue="#{categorieController.filterRefGarantie}"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="3,5,15,50,100,500,1000"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         scrollHeight="300" 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rga.id}" selectionMode="single"  selection="#{categorieController.refGaranties}"
+
+                                         scrollable="true"  >
+
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{categorieController.showDetailsRefGarantie(rga)}"  
+                                        oncomplete="PF('manageRefGarantieDialog').hide()"   update="form1_1" process="@this" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('refGarantieTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                          
+                                    </p:outputPanel>
+                                    
+
+                                    
+                                </f:facet>
+
+
+                                <p:column headerText="id"  style="width: 50px">
+                                    <h:outputText value="#{rga.id}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['code']}" sortBy="#{rga.code}" filterBy="#{rga.code}"  style="width: 50px">
+                                    <h:outputText value="#{rga.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rga.libelle}" filterBy="#{rga.libelle}"  style="width: 150px">
+                                    <span class="flag flag-#{rga.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText 
+                                        value="#{rga.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+                        </p:dialog>
+                          
+
+                        <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{categorieController.deleteGarantieCategorie()}" update=":form1_1" onclick="PF('manageDeleteDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

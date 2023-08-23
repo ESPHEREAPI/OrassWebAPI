@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+    
+    
+      <application>
+     	   <locale-config>
+     	      <default-locale>en</default-locale>
+              <supported-locale>fr</supported-locale>             
+     	   </locale-config>
+	   <resource-bundle>
+               
+		<base-name>langue.welcome</base-name>
+		<var>msg</var>
+	   </resource-bundle>
+           
+  </application>
+  <lifecycle>
+      <phase-listener>listeners.MonPhaseListener</phase-listener>
+     
+  </lifecycle>
+    <name>primefaces_rain</name>
+    
+    <component>
+        <component-type>org.primefaces.component.RainMenu</component-type>
+        <component-class>org.primefaces.rain.component.RainMenu</component-class>
+    </component>
+    
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.RainMenuRenderer</renderer-type>
+            <renderer-class>org.primefaces.rain.component.RainMenuRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+   
+  
+
+  <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>client.deconnect</from-outcome>
+          <to-view-id>/connection.xhtml</to-view-id>
+          <redirect/>
+      </navigation-case>
+  </navigation-rule>
+   <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>affaire.nouvelle</from-outcome>
+          <to-view-id>/assurance_adp/sante/production/affaire_nouvelle.xhtml</to-view-id>
+          <redirect/>
+      </navigation-case>
+  </navigation-rule>
+   <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>pageerror</from-outcome>
+          <to-view-id>/access.xhtml</to-view-id>
+          <redirect/>
+      </navigation-case>
+  </navigation-rule>
+  <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>principal</from-outcome>
+          <to-view-id>/principal.xhtml</to-view-id>
+          <redirect/>
+      </navigation-case>
+  </navigation-rule>
+   <navigation-rule>
+      <from-view-id>*</from-view-id>
+      <navigation-case>
+          <from-outcome>acceuil_admin_system</from-outcome>
+          <to-view-id>/acceuil_admin_system.xhtml</to-view-id>
+          <redirect/>
+      </navigation-case>
+  </navigation-rule>
+    
+</faces-config>

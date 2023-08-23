@@ -1,0 +1,301 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <a href="profile.xhtml"></a>
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/profile">#{msg['profil']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PROFIL PAGE" />
+
+    <ui:define name="content">
+        <f:view locale="#{languageController.localeCode}">
+
+            <div class="p-grid">
+                <div class="p-col">
+                    <div class="card">
+<!--                        <h4>#{msg['profil']}</h4>-->
+
+                        <!--                        <p:toolbarGroup>
+                                                    <p:commandButton value="#{msg['cree.profil']}" icon="pi pi-plus"  oncomplete="PF('manageProfilDialog').show()" 
+                                                                     styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem" />
+                                                    <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                                     styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{profilControlller.reset()}"  process="@this" update="@('form')" />
+                        
+                        
+                                                </p:toolbarGroup>-->
+                        <h:form id="form2">
+                            <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"  oncomplete="PF('manageProfilDialog').show()"  rendered="#{profilControlller.accessCree()}"
+                                             styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{profilControlller.reset()}" update="form1" />
+                            <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                                     styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{profilControlller.reset()}"  process="@this" update="@('form')" />
+                      
+                            <p:growl id="msg" showDetail="true" escape="false"/>
+
+
+                            <p:dataTable var="pa" value="#{profilControlller.listeProfileAccesByEntreprise}" paginator="true" rows="10" widgetVar="profilTable" 
+                                         paginatorAlwaysVisible="false"  rowsPerPageTemplate="10,50,100,500,1000" filterEvent="enter" filteredValue="#{profilControlller.filteredProfilAcces}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} " 
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{pa.idProfil}" selectionMode="single"  selection="#{profilControlller.profilsByUser}"
+
+                                         scrollable="true"  >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{profilControlller.showDetails(pa)}"  rendered="#{profilControlller.accessModifier()}" 
+                                        update=":form1,:form1:msg1,:form1:tabprincipal:pickListfonctionnalite,:form1:tabprincipal:pickListmodule,:form1:tabprincipal:pickListAction,:form1:tabprincipal:action" oncomplete="PF('manageProfilDialog').show()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('profilTable').filter()"
+                                                     style="width:350px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+                                <p:column >
+                                    <f:facet name="header">
+                                        <h:outputText value="Options"/>
+                                    </f:facet>
+
+
+
+                                    <!--                                    <p:column exportable="false">-->
+                                    <div class="ui-g">
+                                         <div class="ui-g-12 ui-md-6 ui-lg-3">   <p:commandButton icon="pi pi-pencil" 
+                                                     styleClass="edit-button rounded-button success-button" process="@this" update=":form1,:form1:msg1,:form1:tabprincipal:pickListfonctionnalite,:form1:tabprincipal:pickListmodule,,:form1:tabprincipal:pickListAction,:form1:tabprincipal:action"  title="#{msg['bouton.modifier']}" actionListener="#{profilControlller.showDetails(pa)}" 
+                                                     oncomplete="PF('manageProfilDialog').show()"    rendered="#{profilControlller.accessModifier()}"     >
+                                        <f:setPropertyActionListener value="#{pa}" target="#{profilControlller.profilsByUser}"  />
+                                    </p:commandButton>
+                                         </div>
+                                        <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:commandButton  icon="pi pi-trash"  rendered="#{profilControlller.accessSupprimer()}" 
+                                                      styleClass="danger-button" style="margin-right: .5rem"    oncomplete="PF('manageDeleteDialog').show()" actionListener="#{profilControlller.showDetails(pa)}"  update=":form1">
+                                        <f:setPropertyActionListener value="#{pa}" target="#{profilControlller.profilsByUserForDelete}"   />
+                                    </p:commandButton></div> 
+                                        
+                                    </div>
+                                 
+                                    <!--                                        <p:commandButton class="danger-button rounded-button" icon="pi pi-trash" process="@this" oncomplete="PF('deleteProfilDialog').show()" >
+                                                                                <f:setPropertyActionListener value="#{product}" target="#{crudDemoView.selectedProduct}" />
+                                                                            </p:commandButton>-->
+                                       
+
+                                  
+                                    <!--</p:column>-->
+                                </p:column>
+                                <p:column headerText="#{msg['code']}" sortBy="#{pa.code}" filterBy="#{pa.code}">
+                                    <h:outputText value="#{pa.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{pa.libelle}" filterBy="#{pa.libelle}">
+                                    <span class="flag flag-#{pa.libelle}" style="width: 30px; height: 20px"/>
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{pa.libelle}"/>
+                                </p:column>
+
+                                <p:column headerText="#{msg['actif']}" >
+                                    <h:outputText value="#{pa.actif}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                            <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true" width="500" height="75" showEffect="fade" modal="true" responsive="true">
+                                <center>
+                                    <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                                </center>
+
+                                <f:facet name="footer">
+                                    <center>
+                                        <p:commandButton value="OK" actionListener="#{profilControlller.checkDelete()}" update=":form1,:form2,form2:msg" oncomplete="PF('manageDeleteDialog').hide()"   ajax="false"/>
+                                        <p:spacer width="10"/>
+                                        <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                                    </center>
+                                </f:facet>
+                            </p:dialog>
+                        </h:form>
+                    </div>
+                    <!--<div class="card">-->
+                    <h:form id="form1">
+
+                        <p:dialog header="#{msg['edition.profil']}"  showEffect="fade" modal="true" widgetVar="manageProfilDialog" responsive="true">
+                            <p:growl id="msg1" showDetail="true" escape="false"/>
+
+                            <p:fieldset  id="fieldset1" style=" border: #01579B">
+                                <!--<p:panelGrid styleClass="noBorders" columns="9" style="border: 0px; border-bottom: 0px" layout="grid" >-->
+                                    <div class="ui-g">
+                                       <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:outputLabel value="#{msg['code']}*: " for="code"  /></div> 
+                                       <div > <p:inputText id="code"  title="code" validator="requiredValidator"  value="#{profilControlller.profilsByUser.code}" style="width: 75px" disabled="#{profilControlller.adminNotUpdate==true}" >
+                                        <f:ajax event="blur" render="code"/>
+                                    </p:inputText></div>
+                                       <div > <p:message for="code" /></div>
+                                       <div class="ui-g-12 ui-md-6 ui-lg-3">  <p:outputLabel value="#{msg['libelle']}*: " for="libelle" /> </div>
+                                       <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:inputText id="libelle"  title="libelle" validator="requiredValidator" value="#{profilControlller.profilsByUser.libelle}"  >
+                                        <f:ajax event="blur" render="libelle"/>
+                                    </p:inputText></div>
+                                       <div >    <p:message for="libelle" /></div>
+                                       <div class="ui-g-12 ui-md-6 ui-lg-3"><h:outputLabel value="#{msg['actif']}: " rendered="#{profilControlller.profilsByUser.idProfil!=null}"/></div>
+                                       <div class="ui-g-12 ui-md-6 ui-lg-3"> <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check" offIcon="ui-icon-close" id="actif" value="#{profilControlller.profilsByUser.actif}" rendered="#{profilControlller.profilsByUser.idProfil!=null}" >
+                                        <f:ajax event="change" render="actif"/>
+
+                                    </p:selectBooleanButton></div>
+                                       
+                                    </div>
+                                   
+                             
+                                <!--</p:panelGrid>-->
+                            </p:fieldset>
+                            <p:tabView id="tabprincipal" style="height: 300px" >
+                                <p:ajax event="tabChange"  listener="#{profilControlller.chargeModuleTransfert()}" update="tabprincipal:pickListmodule,tabprincipal:pickListfonctionnalite,tabprincipal:moduleid,:form2:msg,:form1:tabprincipal:action" process="@this"/>
+                                <p:tab id="tab1" title="#{msg['entite.module']}">
+
+                                    <h:panelGrid  id="grid2"  >
+<!--          <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"   update="tabprincipal:pickListfonctionnalite,:form1:msg1" process="@this" style="float: right;" actionListener="#{profilControlller.removeAndAddModule()}"/>  -->
+                            
+                                        <p:pickList id="pickListmodule" value="#{profilControlller.modulesModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}"
+                                                    showSourceControls="true"  responsive="true"  
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}" > 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{profilControlller.onTransfer}" update=":form1:msg1,tabprincipal:moduleid"/>
+                                            <p:ajax event="select" listener="#{profilControlller.onSelect}" update=":form1:msg1"/>
+                                            <p:ajax event="unselect" listener="#{profilControlller.onUnselect}" update=":form1:msg1"/>
+                                            <p:ajax event="reorder" listener="#{profilControlller.onReorder}" update=":form1:msg1"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 30px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]}"/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+                                      </h:panelGrid>
+                                </p:tab>  
+
+
+                                <p:tab id="tab2" title="#{msg['fonctionnalite']}">
+                                    <h:panelGrid>
+                                        <f:facet name="header">
+
+                                            <h:outputLabel value="#{msg['entite.module']}* : " for="moduleid" style="float: left;"/>
+                                            <p:selectOneMenu value="#{profilControlller.moduleSelectForTarget}" style=" float: left; width: 250px;" 
+                                                             converter="#{genericConverter}" id="moduleid">
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{profilControlller.moduleTransFert}" var="modules" itemLabel="#{msg[modules.code]} " itemValue="#{modules}"/>
+                                                <p:ajax event="change" listener="#{profilControlller.populateFonctionnalite()}" update="tabprincipal:pickListfonctionnalite"/>
+
+                                            </p:selectOneMenu>   
+
+                                            <p:commandButton icon="pi pi-save" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{profilControlller.saveFonctionnnaliteByModule()}"  update="tabprincipal:pickListmodule,:form1:msg1" style="float: right;"/>  
+
+
+                                        </f:facet>
+                                        <p:pickList id="pickListfonctionnalite" value="#{profilControlller.fonctionaliteModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}"
+                                                    showSourceControls="true"  responsive="true" 
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}"> 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{profilControlller.onTransfer}" update=":form1:msg1"/>
+                                            <p:ajax event="select" listener="#{profilControlller.onSelect}" update=":form1:msg1"/>
+                                            <p:ajax event="unselect" listener="#{profilControlller.onUnselect}" update=":form1:msg1"/>
+                                            <p:ajax event="reorder" listener="#{profilControlller.onReorder}" update=":form1:msg1"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 50px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]}"/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+
+                                    </h:panelGrid>
+                                </p:tab>
+                                <p:tab id="action_tab" title="#{msg['action']}"  rendered="#{profilControlller.profilsByUser.getIdProfil()!=null}"    >
+                                    <h:panelGrid>
+                                        <f:facet name="header">
+
+                                            <h:outputLabel value="#{msg['fonctionnalite']}* : "  style="float: left;"/>
+                                            <p:selectOneMenu value="#{profilControlller.fonctionnaliteByUser}" style=" float: left; width: 250px;" 
+                                                             converter="#{genericConverter}" id="action">
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{profilControlller.fonctionnaliteTransFert}" var="modules" itemLabel="#{msg[modules.code]} " itemValue="#{modules}"/>
+                                                <p:ajax event="change" listener="#{profilControlller.populateAction()}" update="tabprincipal:pickListAction"/>
+
+                                            </p:selectOneMenu>   
+
+                                            <p:commandButton icon="ajouter" value="#{msg['Bouton.Sauvegarde']}"  actionListener="#{profilControlller.updateProfil()}" update=":form2,:form2:msg,tabprincipal:pickListAction" style="float: right;"/>  
+
+
+                                        </f:facet>
+<!--disabled="#{profilControlller.activeAction==true}"-->
+                                        <p:pickList id="pickListAction" value="#{profilControlller.actionModel}" var="item" itemLabel="#{msg[item.code]}" itemValue="#{item}" 
+                                                    showSourceControls="true"  responsive="true"  
+
+                                                    showTargetControls="true" showCheckbox="true"
+                                                    showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains"  converter="#{genericConverter}"> 
+
+                                            <f:facet name="sourceCaption">#{msg['attribution.non']}</f:facet>
+                                            <f:facet name="targetCaption">#{msg['attribution.oui']}</f:facet>
+                                            <p:ajax event="transfer" listener="#{profilControlller.onTransfer}" update=":form1:msg1"/>
+                                            <p:ajax event="select" listener="#{profilControlller.onSelect}" update=":form1:msg1"/>
+                                            <p:ajax event="unselect" listener="#{profilControlller.onUnselect}" update=":form1:msg1"/>
+                                            <p:ajax event="reorder" listener="#{profilControlller.onReorder}" update=":form1:msg1"/>
+                                            <p:column style="width:300px">
+                                                <div class="p-d-flex p-ai-center">
+                                                    <span class="flag flag-#{msg[item.code]} p-mr-2" style="width: 30px; height: 20px" />
+                                                    <h:outputText value="#{msg[item.code]} "/>
+                                                </div>
+                                            </p:column>
+                                        </p:pickList>
+
+                                    </h:panelGrid> 
+
+
+                                </p:tab>
+
+                                
+                            </p:tabView>
+                          
+                              <f:facet name="header">
+                                <center>
+
+
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update=":form2,:form1:fieldset1,:form2:msg" process="@this" rendered="#{profilControlller.accessCree() and profilControlller.profilsByUser.idProfil==null}"
+                                                     styleClass="success-button" style="margin-right: .5rem"   actionListener="#{profilControlller.saveProfilAccess()}"  oncomplete="PF('manageProfilDialog').show()"/>
+
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form2,:form1:fieldset1,:form2:msg" process="@this"  rendered="#{profilControlller.accessModifier() and profilControlller.profilsByUser.idProfil!=null}"
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"    actionListener="#{profilControlller.updateProfil()}" oncomplete="PF('manageProfilDialog').hide()"/>
+
+
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('manageProfilDialog').hide()" styleClass="danger-button" actionListener="#{profilControlller.reset()}"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+
+                    </h:form>
+                    <!--</div>-->
+                </div>
+            </div>
+        </f:view>
+    </ui:define>
+
+</ui:composition>

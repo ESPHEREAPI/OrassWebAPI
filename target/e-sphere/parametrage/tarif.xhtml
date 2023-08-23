@@ -1,0 +1,1219 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/tarif">#{msg['Tarif']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+
+                <div class="card">
+                    <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                     styleClass="warning-button" style="margin-right: .5rem"       actionListener="#{tarifConntroller.reload()}" />
+                    <p:tabView  id="tabprincipal" widgetVar="principal">
+                        <p:ajax event="tabChange"  listener="#{tarifConntroller.onTabChange}" update=":tabprincipal:form2" process="@this"/>
+
+                        <p:tab title="#{msg['rubrique.garantie']}" id="rubriqueGarantie" rendered="#{tarifConntroller.accessCreerRubriqueGarantie()==true or tarifConntroller.accessModifierRubriqueGarantie()==true or tarifConntroller.accessSupprimerRubriqueGaranties()==true}">
+                            <h:form id="form1">
+                                <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+                                <p:panelGrid columns="7" layout="flex" >
+
+                                    <p:outputLabel  value="#{msg['type.tarif']}" style="float: top" />
+                                    <p:selectOneMenu value="#{tarifConntroller.typeTarif}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="tarif" validator="requiredValidator" required="true" var="t" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.lisTypeTarif}" var="tf" itemLabel=" #{tf.libelle} " itemValue="#{tf}"/>
+
+                                        <p:column>
+                                            #{t.libelle} 
+                                        </p:column>
+                                        <p:ajax event="change"  listener="#{tarifConntroller.chargeRubriqueGarantieByGarantie()}" update=":tabprincipal:form1,:tabprincipal:form1:idirgTable" process="@this"/>
+                                    </p:selectOneMenu>
+
+                                    <p:outputLabel  value="#{msg['categorie']}" style="float: top" />
+                                    <p:selectOneMenu value="#{tarifConntroller.categories}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="categorie" validator="requiredValidator" required="true" var="c" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.lisCategories}" var="cat" itemLabel="#{cat.code} #{formatDateController.valueObject(cat.libelle,cat)}" itemValue="#{cat}"/>
+
+                                        <p:column>
+                                            #{c.code}  #{formatDateController.valueObject(c.libelle,c)} 
+                                        </p:column>
+                                        <p:ajax event="change"  listener="#{tarifConntroller.chargeGarantieByCategories()}" update="tabprincipal:form1,tabprincipal:form1:garantie" process="@this"/>
+                                        <p:ajax event="change"  listener="#{tarifConntroller.chargeRubriqueGarantieByGarantie()}" update=":tabprincipal:form1,:tabprincipal:form1:idirgTable" process="@this"/>
+                                    </p:selectOneMenu>
+
+
+                                    <p:outputLabel  value="#{msg['garantie']}" style="float: top" />
+                                    <p:selectOneMenu value="#{tarifConntroller.garantie}" style=" float: left; " 
+                                                     converter="#{genericConverter}" id="garantie" validator="requiredValidator" required="true" var="g" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.lisGarantie}" var="ga" itemLabel="#{ga.idRefGaranties.code} #{ga.idRefGaranties.libelle} " itemValue="#{ga}"/>
+
+                                        <p:column>
+                                            #{g.idRefGaranties.code}  #{g.idRefGaranties.libelle} 
+                                        </p:column>
+                                        <p:ajax event="change"  listener="#{tarifConntroller.chargeRubriqueGarantieByGarantie()}" update=":tabprincipal:form1,:tabprincipal:form1:idirgTable" process="@this"/>
+                                    </p:selectOneMenu>
+
+
+
+                                </p:panelGrid>
+
+                                <p:dataTable var="rg" value="#{tarifConntroller.listRubriqueGarantie}"  widgetVar="rgTable" 
+                                             scrollable="true" 
+                                             filteredValue="#{tarifConntroller.filterRubriqueGarantie}"
+                                             emptyMessage="#{msg['emptyMessage']}"    id="idirgTable"
+                                             globalFilterFunction="#{tarifConntroller.globalFilterFunction}"
+
+                                             >
+
+                                    <f:facet name="header">
+                                        <!--                                        <p:outputPanel>
+                                                                                    <h:outputText value="#{msg['recherche']} : "/>
+                                        
+                                                                                    <p:inputText id="globalFilter"
+                                                                                                 onkeyup="PF('rgTable').filter()"
+                                                                                                 style="width:150px" placeholder="Search text..."  > 
+                                        
+                                                                                    </p:inputText>  
+                                        
+                                        
+                                                                                </p:outputPanel>-->
+                                        <div class="p-d-flex p-jc-end">
+                                            <p:inputText id="globalFilter" onkeyup="PF('rgTable').filter()" style="width:300px"
+                                                         placeholder="Search all text..." />
+                                        </div>
+
+                                    </f:facet> 
+                                    <p:column  >
+                                        <p:commandButton  icon="pi pi-plus"  
+                                                          styleClass="success-button" style="margin-right: .5rem"  rendered="#{rg.idRubrique.id!=null and rg.id==null and   tarifConntroller.accessCreerRubriqueGarantie()==true}" onclick="PF('manageAddDialog').show()"  >
+                                            <f:setPropertyActionListener value="#{rg}" target="#{tarifConntroller.rubriqueGarantie}"   />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-times"  
+                                                          styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rg.idRubrique.id!=null and rg.id==null}" oncomplete="PF('manageRemoveDialog').show()"    >
+                                            <f:setPropertyActionListener value="#{rg}" target="#{tarifConntroller.rubriqueGarantie}"   />
+                                        </p:commandButton>
+
+                                        <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                          styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{rg.idRubrique.id!=null and rg.id!=null and tarifConntroller.accessModifierRubriqueGarantie()==true}"   onclick="PF('manageUpdateDialog22').show()" >
+                                            <f:setPropertyActionListener value="#{rg}" target="#{tarifConntroller.rubriqueGarantie}"    />
+                                        </p:commandButton>
+                                        <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                          styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rg.idRubrique.id!=null and rg.id!=null and tarifConntroller.accessSupprimerRubriqueGaranties()==true}"   onclick="PF('managDeleteDialog').show()"    >
+                                            <f:setPropertyActionListener value="#{rg}" target="#{tarifConntroller.rubriqueGarantie}"   />
+                                        </p:commandButton>
+
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['code']}" sortBy="#{rg.idRubrique.code}"  style="width: 50px">
+                                        <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{rg.idRubrique.code}"  disabled="#{rg.id!=null}"  >
+                                            <p:ajax event="keyup"   oncomplete="PF('manageRubriqueDialog').show()" />
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column headerText="#{msg['libelle']}" >
+                                        <h:outputText value="#{rg.idRubrique.libelle}"  />
+                                    </p:column>
+                                    <p:column headerText="#{msg['datedebut']}: " rendered="#{tarifConntroller.garantie.forfaire==false }" >
+                                        <p:calendar value="#{rg.dateEffet}" mode="popup"  title="#{msg['datedebut']}" showOn="both"  id="date_debut" pattern="dd/MM/yyyy" disabled="#{rg.id!=null}" >
+                                            <f:ajax event="dateSelect"  render="date_debut"/>
+                                        </p:calendar>
+                                    </p:column>
+
+                                    <p:column headerText="#{msg['datefin']}: "  rendered="#{tarifConntroller.garantie.forfaire==false }">
+                                        <p:calendar value="#{rg.dateEcheance}" mode="popup"  title="#{msg['datefin']}" showOn="both"  id="date_fin" pattern="dd/MM/yyyy" disabled="#{rg.id!=null}"  >
+                                            <f:ajax event="dateSelect"  render="date_fin"/>
+                                        </p:calendar>
+                                    </p:column>
+                                    <p:column headerText="#{msg['numero.ordre']}: "  rendered="#{tarifConntroller.garantie.forfaire==true }">
+                                       <h:outputText value="#{rg.id}"  />
+                                    </p:column>
+                                    <p:column headerText="#{msg['date_creation']}: "  rendered="#{tarifConntroller.garantie.forfaire==true}">
+                                        <p:calendar value="#{rg.datecreation}" mode="popup"  title="#{msg['date_creation']}" showOn="both"  id="date_creation" pattern="dd/MM/yyyy" disabled="#{rg.id!=null}"  >
+                                            <f:ajax event="dateSelect"  render="date_creation"/>
+                                        </p:calendar>
+                                    </p:column>
+<!--                                    <p:column headerText="#{msg['caracteristique']}" >
+
+                                        <p:selectOneMenu value="#{rg.idCaracteristiques}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="carct"  var="c" filter="true" filterMatchMode="contains" >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{tarifConntroller.lisTCaracteristiques}" var="ca" itemLabel="#{ca.code} #{ca.libelle} " itemValue="#{ca}"/>
+
+                                            <p:column>
+                                    #{c.code}  #{c.libelle} 
+                                </p:column>
+                            </p:selectOneMenu>
+                        </p:column>-->
+                                    <p:column headerText="#{msg['Unite']}" >
+                                        <p:selectOneMenu value="#{rg.unite_Caracteristique}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="unite"  >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{tarifConntroller.lisTUnite_Caracteristique}" var="un" itemLabel=" #{un.libelle} " itemValue="#{un}"/>
+
+                                            <!--                                            <p:column>
+                                            #{un.libelle} 
+                                      </p:column>-->
+                                        </p:selectOneMenu>
+                                    </p:column>
+                                    <p:column headerText="#{msg['mode.calcul']}" >
+                                        <p:selectOneMenu value="#{rg.modeCalcul}" style=" float: left; " 
+                                                         converter="#{genericConverter}" id="mc"   >
+                                            <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                            <f:selectItems value="#{tarifConntroller.modeCalcul}" />
+
+
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+
+
+
+                                </p:dataTable>
+
+                            </h:form >
+                        </p:tab>  
+                        <p:tab title="#{msg['Tarif']}"  id="tarif" rendered="#{tarifConntroller.accessCreerRubriqueCaracterisque()==true or tarifConntroller.accessModifierRubriqueCaracteristique()==true or tarifConntroller.accessSupprimerRubriqueCaracteristique()==true or tarifConntroller.accessCreerFormule()==true}">
+                            <h:form id="form2">
+
+                                <p:panelGrid  rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null}" columns="8" layout="grid"  >
+
+
+                                    <p:outputLabel  value="#{msg['categorie']}"  />
+                                    <p:outputLabel  value="#{tarifConntroller.rubriqueGarantieSelecte.idGarantie.idCategories.code} #{formatDateController.valueObject(tarifConntroller.rubriqueGarantieSelecte.idGarantie.idCategories.libelle,tarifConntroller.rubriqueGarantieSelecte.idGarantie.idCategories)}" style=" background: #8dd1eb" />
+
+                                    <p:outputLabel  value="#{msg['garantie']}"  />
+                                    <p:outputLabel  value="#{tarifConntroller.rubriqueGarantieSelecte.idGarantie.idRefGaranties.code} #{tarifConntroller.rubriqueGarantieSelecte.idGarantie.idRefGaranties.libelle}" style=" background: #8dd1eb" />
+                                    <p:outputLabel  value="#{msg['type.tarif']}"  />
+                                    <p:outputLabel  value="#{tarifConntroller.rubriqueGarantieSelecte.idTypeTarif.libelle}" style=" background: #8dd1eb" />
+                                    <p:outputLabel  value="#{msg['datedebut']}" style="float: top" rendered="#{tarifConntroller.garantie.forfaire==false}" />
+                                    <p:outputLabel  value="#{formatDateController.formatDate(tarifConntroller.rubriqueGarantieSelecte.dateEffet)}" style=" background: #8dd1eb" rendered="#{tarifConntroller.garantie.forfaire==false}"/>
+
+                                </p:panelGrid>
+                                <p:tabView id ="tabsecond"  widgetVar="second">
+                                    <p:ajax event="tabChange"  listener="#{tarifConntroller.removeRowIdIsNullForListeRubriqueCaracteristique()}"  process="@this"/>
+                                    <p:tab title="#{msg['rubrique']}/#{msg['caracteristique']}" rendered="#{tarifConntroller.accessCreerRubriqueCaracterisque()==true or tarifConntroller.accessModifierRubriqueCaracteristique()==true or tarifConntroller.accessSupprimerRubriqueCaracteristique()==true}">
+                                        <p:panelGrid   columns="4" layout="grid" columnClasses="p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4, p-col-12 p-md-3 p-xl-2, p-col-12 p-md-9 p-xl-4" contentStyleClass="p-align-baseline ui-fluid">
+                                            <p:outputLabel  value="#{msg['rubrique']}" style="float: top" />
+                                            <p:selectOneMenu value="#{tarifConntroller.rubriqueGarantieSelecte}" style=" float: left; " 
+                                                             converter="#{genericConverter}" id="Rubrique_Garantie" validator="requiredValidator" required="true" var="rg" filter="true" filterMatchMode="contains" rendered="#{tarifConntroller.garantie.forfaire==false }" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <f:selectItems value="#{tarifConntroller.listeRG}" var="rga" itemLabel=" #{rga.idRubrique.libelle} - ((#{formatDateController.formatDate(rga.dateEffet)})-(#{formatDateController.formatDate(rga.dateEcheance)})) " itemValue="#{rga}"  />
+                                                <!--<f:selectItems value="#{tarifConntroller.listeRG}" var="rga" itemLabel=" #{rga.idRubrique.libelle} - ((#{formatDateController.formatDate(rga.datecreation)})-(#{rga.id}))" itemValue="#{rga}"  rendered="#{rga.datecreation!=null}"/>-->
+
+                                                <p:column rendered="#{tarifConntroller.garantie.forfaire==false }">
+                                                    #{rg.idRubrique.libelle} - ((#{formatDateController.formatDate(rg.dateEffet)})-(#{formatDateController.formatDate(rg.dateEcheance)}))
+                                                </p:column>
+<!--                                                <p:column rendered="#{tarifConntroller.garantie.forfaire==true}">
+                                                #{rg.idRubrique.libelle} - ((#{formatDateController.formatDate(rg.datecreation)})-(#{rg.id}))
+                                            </p:column>-->
+                                                <p:ajax event="change"  listener="#{tarifConntroller.chargeListeRubriCaracteristique()}" update=":tabprincipal:form2,:tabprincipal:form2:tabsecond:idrcgTable,:tabprincipal:form2:tabsecond:idtarifTable"  process="@this"/>
+                                            </p:selectOneMenu>  
+
+                                            <p:selectOneMenu value="#{tarifConntroller.rubriqueGarantieSelecte}" style=" float: left; " 
+                                                             converter="#{genericConverter}" id="Rubrique_Garantie2" validator="requiredValidator" required="true" var="rg" filter="true" filterMatchMode="contains" rendered="#{tarifConntroller.garantie.forfaire==true}" >
+                                                <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                <!--<f:selectItems value="#{tarifConntroller.listeRG}" var="rga" itemLabel=" #{rga.idRubrique.libelle} - ((#{formatDateController.formatDate(rga.dateEffet)})-(#{formatDateController.formatDate(rga.dateEcheance)})) " itemValue="#{rga}"  rendered="#{tarifConntroller.rubriqueGarantieSelecte.datecreation==null}"/>-->
+                                                <f:selectItems value="#{tarifConntroller.listeRG}" var="rga" itemLabel=" #{rga.idRubrique.libelle} - ((#{formatDateController.formatDate(rga.datecreation)})-(#{rga.id})-(#{tarifConntroller.tarif==null?0:formatDateController.formatNumberGeneral(tarifConntroller.tarif.constant1.longValue())} ))" itemValue="#{rga}"  />
+
+<!--                                                <p:column rendered="#{tarifConntroller.garantie.forfaire==false }">
+                                                #{rg.idRubrique.libelle} - ((#{formatDateController.formatDate(rg.dateEffet)})-(#{formatDateController.formatDate(rg.dateEcheance)}) )
+                                            </p:column>-->
+                                                <p:column rendered="#{tarifConntroller.garantie.forfaire==true}">
+                                                    #{rg.idRubrique.libelle} - ((#{formatDateController.formatDate(rg.datecreation)})-(#{rg.id}))
+                                                </p:column>
+                                                <p:ajax event="change"  listener="#{tarifConntroller.chargeListeRubriCaracteristique()}" update=":tabprincipal:form2,:tabprincipal:form2:tabsecond:idrcgTable,:tabprincipal:form2:tabsecond:idtarifTable"  process="@this"/>
+                                            </p:selectOneMenu>
+                                        </p:panelGrid>
+
+                                        <p:dataTable var="rc" value="#{tarifConntroller.lisRubriqueCaracteristique}"  widgetVar="rcTable" 
+                                                     filteredValue="#{tarifConntroller.filterRubriqueCaracteristique}"    scrollable="true" 
+                                                     globalFilterFunction="#{tarifConntroller.globalFilterFunctionRubriCaracter}"
+                                                     emptyMessage="#{msg['emptyMessage']}"    id="idrcgTable"
+
+                                                     >
+
+                                            <f:facet name="header">
+                                                <!--                                                <p:outputPanel>
+                                                                                                    <h:outputText value="#{msg['recherche']} : "/>
+                                                
+                                                                                                    <p:inputText id="globalFilter"
+                                                                                                                 onkeyup="PF('rcTable').filter()"
+                                                                                                                 style="width:150px" placeholder="Search text..."  > 
+                                                
+                                                                                                                                                    </p:inputText>  
+                                                                                                
+                                                
+                                                                                                </p:outputPanel>-->
+                                                <div class="p-d-flex p-jc-end">
+                                                    <p:inputText id="globalFilter" onkeyup="PF('rcTable').filter()" style="width:300px"
+                                                                 placeholder="Search all text..." />
+                                                </div>
+
+                                            </f:facet> 
+                                            <p:column  >
+                                                <p:commandButton  icon="pi pi-plus"  
+                                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{rc.idRubriqueGarantie.id!=null and rc.id==null and tarifConntroller.accessCreerRubriqueCaracterisque()==true}" onclick="PF('manageAddDialog2').show()"  >
+                                                    <f:setPropertyActionListener value="#{rc}" target="#{tarifConntroller.rubriqueCaracteristique}"   />
+                                                </p:commandButton>
+                                                <p:commandButton  icon="pi pi-times"  
+                                                                  styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rc.idRubriqueGarantie.id!=null and rc.id==null }" oncomplete="PF('manageRemoveDialog2').show()"    >
+                                                    <f:setPropertyActionListener value="#{rc}" target="#{tarifConntroller.rubriqueCaracteristique}"   />
+                                                </p:commandButton>
+
+                                                <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                                  styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{rc.idRubriqueGarantie.id!=null and rc.id!=null and tarifConntroller.accessModifierRubriqueCaracteristique()==true}"   onclick="PF('manageUpdateDialog2').show()" >
+                                                    <f:setPropertyActionListener value="#{rc}" target="#{tarifConntroller.rubriqueCaracteristique}"    />
+                                                </p:commandButton>
+                                                <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                                  styleClass="danger-button" style="margin-right: .5rem"  rendered="#{rc.idRubriqueGarantie.id!=null and rc.id!=null  and tarifConntroller.accessSupprimerRubriqueCaracteristique()==true}"   onclick="PF('managDeleteDialog2').show()"    >
+                                                    <f:setPropertyActionListener value="#{rc}" target="#{tarifConntroller.rubriqueCaracteristique}"   />
+                                                </p:commandButton>
+
+                                            </p:column>
+
+                                            <p:column headerText="#{msg['code']}" sortBy="#{rc.idCaracteristiques.code}" filterBy="#{rc.idCaracteristiques.code}" style="width: 50px">
+                                                <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{rc.idCaracteristiques.code}"  disabled="#{rg.id!=null}"  >
+                                                    <p:ajax event="keyup"   oncomplete="PF('managecaracteristDialog').show()" update=":form11:idcaracteristiqueTable"  listener="#{tarifConntroller.updateTableCaracteristique()}" />
+                                                </p:inputText>
+                                            </p:column>
+                                            <p:column headerText="#{msg['libelle']}" >
+                                                <h:outputText value="#{ rc.idCaracteristiques.orclass_Objet==null ?  rc.idCaracteristiques.libelle : tarifConntroller.valuObjet(rc.idCaracteristiques.libelle)}"  />
+
+
+                                            </p:column>
+
+
+
+                                            <p:column headerText="#{msg['statut']}" >
+                                                <p:selectOneMenu value="#{rc.statutCaracteristique}" style=" float: left; " 
+                                                                 converter="#{genericConverter}" id="statut"   >
+                                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                    <f:selectItems value="#{tarifConntroller.statutCaracteristique}" />
+
+                                                    <f:ajax event="change"  render="statut"  />
+
+                                                </p:selectOneMenu>
+                                            </p:column>
+
+
+
+
+
+                                        </p:dataTable>
+
+
+
+                                    </p:tab>
+                                    <p:tab title="#{msg['formule']}" rendered="#{tarifConntroller.accessCreerFormule()==true}">
+                                        <p:toolbarGroup >
+
+
+                                            <p:outputLabel value="#{tarifConntroller.rubriqueGarantieSelecte.idRubrique.code} "  class="info-label" style="color: #03A9F4;font-size: x-large"/>
+                                            <p:spacer width="10"/>
+                                            <p:outputLabel value=" #{tarifConntroller.rubriqueGarantieSelecte.idRubrique.libelle}" class="info-label" style="color: #03A9F4;font-size: x-large"/>
+                                            <p:spacer width="10"/>
+                                            <p:commandButton value="#{msg['etablir.formule']}" icon="pi pi-sliders-h"   onclick="PF('manageFormulleDialog').show()"
+
+                                                             styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"    process="@this" rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null and tarifConntroller.tarif.id==null and tarifConntroller.accessCreerFormule() }"   action="#{tarifConntroller.udpdateDialogEtablirFormule()}"   />
+                                            <p:spacer width="10"/>
+                                            <p:outputLabel  value="#{msg['datedebut']}" style="float: top" rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null and tarifConntroller.tarif.id!=null}"/>
+                                            <p:spacer width="10"/>
+                                            <p:outputLabel  value="#{formatDateController.formatDate(tarifConntroller.rubriqueGarantieSelecte.dateEffet)}" style=" color: #1B72C4" rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null and tarifConntroller.tarif.id!=null}"/>
+                                            <p:spacer width="10"/>
+                                            <p:outputLabel  value="#{msg['dateEch']}" style="float: top" rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null and tarifConntroller.tarif.id!=null}"/>
+                                            <p:spacer width="10"/>
+                                            <p:outputLabel  value="#{formatDateController.formatDate(tarifConntroller.rubriqueGarantieSelecte.dateEcheance)}" style=" color: red" rendered="#{tarifConntroller.rubriqueGarantieSelecte.id!=null and tarifConntroller.tarif.id!=null}"/>
+
+                                        </p:toolbarGroup>
+                                        <p:spacer width="10"/>
+                                        <br/>
+                                        <p:toolbarGroup rendered="#{tarifConntroller.tarif.id!=null}"  >
+                                            <p:outputLabel value="=" style=" color: red"/>
+                                            ( <p:inputNumber disabled="#{false}" value="#{tarifConntroller.tarif.valeur_Additif}"  placeholder="#{msg['val.additif']}"  decimalPlaces="0" emptyValue="#{0}"   id="valeur_addR"  style=" width: 100px"  title="#{msg['val.additif']}"  >
+                                                <f:ajax event="blur"   render="rapport_division" listener="#{tarifConntroller.updateTarificationDirect()}"/>
+                                            </p:inputNumber>
+                                            <p:outputLabel value="+" style=" color: red"/>
+                                            <p:inputNumber  disabled="#{false}" value="#{tarifConntroller.tarif.coefficient}"  placeholder="#{msg['coefficient_multiplicateur']}"  decimalPlaces="0" emptyValue="#{1}"   id="coefficient_multiR" style="float: bottom" title="#{msg['coefficient_multiplicateur']}"  >
+                                                <f:ajax event="blur"   render="rapport_division" listener="#{tarifConntroller.updateTarificationDirect()}"/>
+                                            </p:inputNumber>
+                                            <p:outputLabel value="/" style=" color: red"/>
+                                            <p:inputNumber  disabled="#{false}" value="#{tarifConntroller.tarif.rapport_Division}"  placeholder="#{msg['rapport.division']}"  decimalPlaces="0" emptyValue="#{1}"   id="rapport_divisionR" title=" #{msg['rapport.division']}" >
+                                                <f:ajax event="blur"   render="coefficient_multi" listener="#{tarifConntroller.updateTarificationDirect()}"/>
+                                            </p:inputNumber> )
+                                            <p:outputLabel value="x" style=" color: red"/>
+                                            (  
+<!--                                            <p:selectOneMenu value="#{tarifConntroller.tarif.operationTarif1}"   disabled="#{true}"
+                                                                 converter="#{genericConverter}" id="nature_operation1R"   >
+                                                <f:selectItem itemLabel="#{msg['select.nature.operation']} " itemValue="#{null}" />
+                                                <f:selectItems value="#{tarifConntroller.natureOperationForTarif}" />
+
+
+                                                <p:ajax event="change"  listener="#{tarifConntroller.changeValeurChoixForNatureOperation1()}" update=":form11" process="@this"/>
+                                            </p:selectOneMenu>-->
+
+                                            <p:inputText id="nature_operation1R"  disabled="#{true}"    value="#{tarifConntroller.tarif.operationTarif1}"  rendered="#{tarifConntroller.tarif.operationTarif1!=null}"  >
+
+                                            </p:inputText>
+
+                                            <p:spacer width="10"/>
+                                            <p:inputText id="rubrique1R"  disabled="#{true}" placeholder="  #{msg['select.rubrique']}"   value="#{tarifConntroller.tarif.idRubrique1}"  rendered="#{tarifConntroller.tarif.idRubrique1!=null}"  >
+                                                <p:ajax event="keyup"   oncomplete="PF('manageRubriqueGarantieDialog').show()" />
+                                            </p:inputText>
+
+                                            <p:spacer width="10"/>
+                                            <p:inputText id="caracteristique1R"  disabled="#{true}"  placeholder="  #{msg['select.caracteristique']}"   value="#{tarifConntroller.tarif.idCaracteristiques1}"  rendered="#{tarifConntroller.tarif.idCaracteristiques1!=null}"  >
+                                                <p:ajax event="keyup"   oncomplete="PF('manageRubriqueCaracteristiqueDialog').show()" />
+
+                                            </p:inputText>
+                                            <p:spacer width="10"/>
+                                            <p:inputNumber value="#{tarifConntroller.tarif.constant1}"  disabled="#{false}"  placeholder="#{msg['consttant']}"  decimalPlaces="2" emptyValue="#{0}"   id="constantR"  rendered="#{tarifConntroller.tarif.constant1!=null}" >
+                                                <f:ajax event="blur"   render="constant" listener="#{tarifConntroller.updateTarificationDirect()}"/>
+                                            </p:inputNumber> 
+                                            <p:spacer width="10"/>
+
+<!--                                            <p:selectOneMenu value="#{tarifConntroller.tarif.operations}"   disabled="#{true}"
+                                                             converter="#{genericConverter}" id="operation1R"    >
+                                                <f:selectItem itemLabel="#{msg['select.operation']} " itemValue="#{null}" />
+                                                <f:selectItems value="#{tarifConntroller.operationForTarif}" />
+                                                <f:ajax event="change"   render="operation1"/>
+                                            </p:selectOneMenu>
+                                            <p:spacer width="10"/>-->
+
+
+                                            <p:inputText id="operation1R"  disabled="#{true}"    value="#{formatDateController.valueObject(tarifConntroller.tarif.operations)}"  rendered="#{tarifConntroller.tarif.operations!=null}"  >
+
+                                            </p:inputText>
+
+     <!--<p:ajax event="change"  listener="#{tarifConntroller.chargeRubriqueGarantieByGarantie()}" update=":tabprincipal:form1,:tabprincipal:form1:idirgTable" process="@this"/>-->
+
+<!--                                            <p:selectOneMenu value="#{tarifConntroller.tarif.operationTarif2}"   disabled="#{true}"
+                                                             converter="#{genericConverter}" id="nature_operation2R"  rendered="#{tarifConntroller.tarif.operationTarif1!=null}" >
+                                                <f:selectItem itemLabel="#{msg['select.nature.operation']} " itemValue="#{null}" />
+                                                <f:selectItems value="#{tarifConntroller.natureOperationForTarif}" />
+                                                <p:ajax event="change"  listener="#{tarifConntroller.changeValeurChoixForNatureOperation2()}" update=":form11" process="@this"/>
+
+                                            </p:selectOneMenu>-->
+                                            <p:spacer width="10"/>
+                                            <p:inputText id="nature_operation2R"  placeholder="  #{msg['select.nature.operation']}"   disabled="#{true}" value="#{tarifConntroller.tarif.operationTarif2}"  rendered="#{tarifConntroller.tarif.operationTarif2!=null}"  >
+                                                <p:ajax event="keyup"   oncomplete="PF('manageRubriqueGarantieDialog').show()" />
+                                            </p:inputText>
+
+                                            <p:spacer width="10"/>
+                                            <p:inputText id="rubrique2R"  placeholder="  #{msg['select.rubrique']}"   disabled="#{true}" value="#{tarifConntroller.tarif.idRubrique2}"  rendered="#{tarifConntroller.tarif.idRubrique2!=null  }"  >
+                                                <p:ajax event="keyup"   oncomplete="PF('manageRubriqueGarantieDialog').show()" />
+                                            </p:inputText>
+
+                                            <p:inputText id="caracteristique2R"  placeholder="  #{msg['select.caracteristique']}"  disabled="#{true}"  value="#{tarifConntroller.tarif.idCaracteristiques2}"  rendered="#{tarifConntroller.tarif.idCaracteristiques2!=null}"  >
+                                                <p:ajax event="keyup"   oncomplete="PF('manageRubriqueCaracteristiqueDialog').show()" />
+                                            </p:inputText>
+                                            <p:spacer width="10"/>
+                                            <p:inputText id="operation11R"  disabled="#{true}"    value="#{formatDateController.valueObject(tarifConntroller.tarif.operations1)}"  rendered="#{tarifConntroller.tarif.operations1!=null}"  >
+
+                                            </p:inputText>
+                                            <p:spacer width="10"/>
+                                            <p:inputNumber value="#{tarifConntroller.tarif.constant2}"  disabled="#{false}" placeholder="#{msg['consttant']}"  decimalPlaces="2" emptyValue="#{0}"   id="constant2R"  rendered="#{tarifConntroller.tarif.constant2!=null}"  >
+                                                <f:ajax event="blur"   render="constant2" listener="#{tarifConntroller.updateTarificationDirect()}" />
+                                            </p:inputNumber> 
+                                            <!--
+                                                                                        <p:selectOneMenu value="#{tarifConntroller.tarif.operations1}"   disabled="#{true}"
+                                                                                                         converter="#{genericConverter}" id="operation11R"  rendered="#{tarifConntroller.tarif.operations!=null}" >
+                                                                                            <f:selectItem itemLabel="#{msg['select.operation']} " itemValue="#{null}"  />
+                                                                                            <f:selectItems value="#{tarifConntroller.operationForTarif}" />
+                                            
+                                            
+                                                                                            <f:ajax event="change"   render="operation11"/>
+                                                                                        </p:selectOneMenu>-->
+                                            )
+
+
+
+
+                                        </p:toolbarGroup>
+                                        <br/>
+                                        <br/>
+                                        <p:fieldset legend="#{msg['condition']}"  rendered="#{tarifConntroller.tarif.id!=null}" >
+                                            <p:dataTable var="t" value="#{tarifConntroller.lisTarifConditions}"  widgetVar="tarifTable" 
+                                                         filteredValue="#{tarifConntroller.filterOrclassTarifCondition}"    scrollable="true" 
+
+                                                         emptyMessage="#{msg['emptyMessage']}"    id="idtarifTable"
+
+                                                         >
+                                                <!--
+                                                                                                <f:facet name="header">
+                                                                                                    <p:outputPanel>
+                                                                                                        <h:outputText value="#{msg['recherche']} : "/>
+                                                
+                                                                                                        <p:inputText id="globalFilter"
+                                                                                                                     onkeyup="PF('tarifTable').filter()"
+                                                                                                                     style="width:150px" placeholder="Search text..."  > 
+                                                
+                                                                                                        </p:inputText>  
+                                                
+                                                
+                                                                                                    </p:outputPanel>
+                                                
+                                                                                                </f:facet> -->
+                                                <p:column  >
+                                                    <p:commandButton  icon="pi pi-plus"  
+                                                                      styleClass="success-button" style="margin-right: .5rem"  rendered="#{t.idTarif.id!=null and t.id==null}" onclick="PF('manageAddDialog3').show()"  >
+                                                        <f:setPropertyActionListener value="#{t}" target="#{tarifConntroller.tarifCondition}"   />
+                                                    </p:commandButton>
+                                                    <p:commandButton  icon="pi pi-times"  
+                                                                      styleClass="danger-button" style="margin-right: .5rem"  rendered="#{t.idTarif.id!=null and t.id==null}" oncomplete="PF('manageRemoveDialog3').show()"    >
+                                                        <f:setPropertyActionListener value="#{t}" target="#{tarifConntroller.tarifCondition}"   />
+                                                    </p:commandButton>
+
+                                                    <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}"
+                                                                      styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{t.idTarif.id!=null and t.id!=null}"   onclick="PF('manageUpdateDialog3').show()" >
+                                                        <f:setPropertyActionListener value="#{t}" target="#{tarifConntroller.tarifCondition}"    />
+                                                    </p:commandButton>
+                                                    <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                                      styleClass="danger-button" style="margin-right: .5rem"  rendered="#{t.idTarif.id!=null and t.id!=null}"   onclick="PF('managDeleteDialog3').show()"    >
+                                                        <f:setPropertyActionListener value="#{t}" target="#{tarifConntroller.tarifCondition}"   />
+                                                    </p:commandButton>
+
+                                                </p:column>
+
+                                                <p:column headerText="#{msg['caracteristique']}" >
+                                                    <p:inputText id="code"  placeholder="  #{msg['SAISIR']}"   value="#{t.idRubriqueCaracteristique.idCaracteristiques.code}"  disabled="#{t.id!=null}"  >
+                                                        <p:ajax event="keyup"   oncomplete="PF('manageRubriqueCaracteristiqueDialog2').show()" />
+                                                    </p:inputText>
+                                                </p:column>
+                                                <p:column headerText="" >
+                                                    <h:outputText value="#{t.idRubriqueCaracteristique.idCaracteristiques.libelle}"  />
+                                                </p:column>
+                                                <p:column headerText="#{msg['valeurMin']}: "  >
+                                                    <p:inputNumber value="#{t.valeurMin}"  placeholder="#{msg['valeurMin']}"  decimalPlaces="0" emptyValue="#{0}"   id="valMin"   >
+                                                        <f:ajax event="blur"   render="valMin"/>
+                                                    </p:inputNumber> 
+                                                </p:column>
+                                                <p:column headerText="#{msg['valeurMax']}: "  >
+                                                    <p:inputNumber value="#{t.valeurMax}"  placeholder="#{msg['valeurMax']}"  decimalPlaces="0" emptyValue="#{0}"   id="valMax"   >
+                                                        <f:ajax event="blur"   render="valMax"/>
+                                                    </p:inputNumber> 
+                                                </p:column>
+
+                                                <p:column headerText="#{msg['classe']}: "  >
+                                                    <p:inputText id="classe"    value="#{t.classCode}"    >
+                                                        <f:ajax event="blur"  render="classe"   />
+                                                    </p:inputText>
+                                                </p:column>
+                                                <p:column headerText=""  >
+                                                    <p:inputText id="valeurText"    value="#{t.valeurTexte}"  rendered="#{t.genre_vehicule==false and t.usage_vehicule==false and t.zone==false and t.energie==false}">
+                                                        <f:ajax event="blur"  render="valeurText"   />
+                                                    </p:inputText>
+                                                    <p:selectOneMenu value="#{t.valeurTexte}" rendered="#{(t.id==null and (t.usage_vehicule==true or t.genre_vehicule==true ))}"
+                                                                     converter="#{genericConverter}" id="genreVehicule"  var="vu" filter="true" filterMatchMode="contains"  >
+                                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                                        <f:selectItems value="#{tarifConntroller.listeGenreOrUsageVehicule}" var="v" itemLabel="#{v}" itemValue="#{v}"/>
+
+                                                        <p:column>
+                                                            #{vu}
+                                                        </p:column>
+                                                        <f:ajax event="change" render="genreVehicule" />
+                                                    </p:selectOneMenu> 
+                                                    <p:selectOneMenu  converter="#{genericConverter}" id="ZoneVehicule" value="#{t.valeurTexte}"  rendered="#{(t.id==null and t.zone==true )}"   >
+                                                        <f:selectItem itemLabel="#{msg['select']} " itemValue="#{null}" noSelectionOption="true"/> 
+                                                        <f:selectItems  value="#{tarifConntroller.zoneVehicule}"  />
+                                                        <f:ajax event="change" render="ZoneVehicule" />
+
+                                                    </p:selectOneMenu  >
+
+                                                    <p:selectOneMenu  converter="#{genericConverter}" id="energie" value="#{t.valeurTexte}"  rendered="#{(t.id==null and t.energie==true )}"  >
+                                                        <f:selectItem itemLabel="#{msg['select']} #{msg['energie']}" itemValue="#{null}" noSelectionOption="true"/> 
+                                                        <f:selectItems  value="#{tarifConntroller.energie}"  />
+                                                        <f:ajax event="change" render="energie" />
+
+                                                    </p:selectOneMenu  > 
+                                                </p:column>
+                                                <p:column headerText="#{msg['Boolean']}: "  >
+                                                    <p:selectBooleanButton onLabel="Yes" offLabel="No"
+                                                                           id="boolean"    value="#{t.valeurBoolean}"        onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" >
+                                                        <f:ajax event="blur"  render="boolean"   />
+                                                    </p:selectBooleanButton>
+
+
+
+                                                </p:column>
+                                                <p:column headerText="#{msg['valeur.non.null']}: "  >
+
+                                                    <p:selectBooleanButton onLabel="Yes" offLabel="No"
+                                                                           id="vn"    value="#{t.valeurNonNull}"       onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" >
+                                                        <f:ajax event="blur"  render="vn"   />
+                                                    </p:selectBooleanButton>
+
+                                                </p:column>
+
+
+
+
+
+
+                                            </p:dataTable>
+
+                                        </p:fieldset>
+
+                                    </p:tab>
+                                    <p:tab title="#{msg['limite']}" rendered="#{tarifConntroller.tarif.id!=null}" >
+                                        <p:fieldset style="color: #044D92">
+                                            <p:panelGrid columns="4"
+                                                         columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4"
+                                                         layout="grid"
+                                                         styleClass="ui-panelgrid-blank ui-fluid"
+                                                         style="border:0px none; background-color:transparent;">
+                                                <p:outputLabel  value="#{msg['limit.inf']}"/>
+                                                <p:inputNumber value="#{tarifConntroller.tarif.limiteInferieur}"  placeholder="#{msg['SAISIR']}"  decimalPlaces="0" emptyValue="#{0}"   id="linf"   >
+                                                    <f:ajax event="blur"   render="linf"/>
+                                                </p:inputNumber> 
+                                                <p:outputLabel  value="#{msg['limit.sup']}"/>
+                                                <p:inputNumber value="#{tarifConntroller.tarif.limiteSuperieur}"  placeholder="#{msg['SAISIR']}"  decimalPlaces="0" emptyValue="#{0}"   id="lsup"   >
+                                                    <f:ajax event="blur"   render="lsup"/>
+                                                </p:inputNumber> 
+                                                <p:outputLabel  value="#{msg['limit.inf.prorata']}"/>
+                                                <p:inputNumber value="#{tarifConntroller.tarif.limiteInfProrata}"  placeholder="#{msg['SAISIR']}"  decimalPlaces="0" emptyValue="#{0}"   id="linfp"   >
+                                                    <f:ajax event="blur"   render="linfp"/>
+                                                </p:inputNumber> 
+                                                <p:outputLabel  value="#{msg['limit.sup.prorata']}"/>
+                                                <p:inputNumber value="#{tarifConntroller.tarif.limiteSupProrata}"  placeholder="#{msg['SAISIR']}"  decimalPlaces="0" emptyValue="#{0}"   id="lsupp"   >
+                                                    <f:ajax event="blur"   render="lsupp"/>
+                                                </p:inputNumber> 
+                                                <f:facet name="footer">
+                                                    <center>
+                                                        <p:commandButton value="#{msg['bouton.enregistrer']}"     actionListener="#{tarifConntroller.updateTarif()}"  update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"  ajax="true" />
+
+                                                    </center>
+                                                </f:facet>
+
+                                            </p:panelGrid>
+                                        </p:fieldset>
+                                    </p:tab>
+
+                                </p:tabView>
+                            </h:form>
+                        </p:tab>
+
+
+                    </p:tabView>
+                    <h:form id="form11">
+                        <p:dialog widgetVar="manageRubriqueDialog" header="#{msg['reference.rubrique']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <p:dataTable var="pa" value="#{tarifConntroller.lisTRubrique}" paginator="true" rows="10" widgetVar="rubriqueTable"  id="idrubrique" rendered="#{tarifConntroller.afficheRubriqueGarantie}"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{tarifConntroller.filterRubrique}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{pa.code}" selectionMode="single"  selection="#{tarifConntroller.rubrique}" 
+
+                                         scrollable="true"  scrollHeight="300" >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeRubriqueInListRubriqueGarentie()}"     
+                                        process="@this" update="tabprincipal:form1,tabprincipal:form1:idirgTable"  oncomplete="PF('manageRubriqueDialog').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rubriqueTable').filter()"
+                                                     style="width:350px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+
+
+
+
+                                <!--</p:column>-->
+                                <p:column headerText="#{msg['code']}" sortBy="#{pa.code}" filterBy="#{pa.code}">
+                                    <h:outputText value="#{pa.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{pa.libelle}" filterBy="#{pa.libelle}">
+
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{pa.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+                        <p:dialog widgetVar="managecaracteristDialog" header="#{msg['caracteristique']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <p:dataTable var="c" value="#{tarifConntroller.lisTCaracteristiques}" paginator="true" rows="1000" widgetVar="caracteristiqueTable"  id="idcaracteristiqueTable"
+                                         paginatorAlwaysVisible="true" rowsPerPageTemplate="10,15,50,100,500,1000" filterEvent="enter" filteredValue="#{tarifConntroller.filterCaracteristique}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         currentPageReportTemplate=" Total :{totalRecords} "
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{c.id}" selectionMode="single"  selection="#{tarifConntroller.caracteristiques}"
+
+                                         scrollable="true"  scrollHeight="300"     >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeRubriqueInListRubriqueCaracteristiqueByCaracteristique()}"     
+                                        process="@this" update="tabprincipal:form2:tabsecond:idrcgTable"  oncomplete="PF('managecaracteristDialog').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('caracteristiqueTable').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+                                <!--</p:column>-->
+                                <p:column headerText="#{msg['code']}" sortBy="#{c.code}" filterBy="#{c.code}">
+                                    <h:outputText value="#{c.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{c.libelle}" filterBy="#{c.libelle}">
+
+<!--                                    <h:outputText style="vertical-align: middle; margin-left: .5rem" rendered="#{c.orclass_Objet==null}"
+                                                  value="#{c.libelle}"/>
+                                    
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem" rendered="#{c.orclass_Objet!=null}"
+                                                  value="#{formatDateController.valueObject(c.libelle)}"/>-->
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{c.orclass_Objet==null ?  c.libelle : tarifConntroller.valuObjet(c.libelle)}"/>
+
+                                </p:column>
+                                <p:column headerText="#{msg['objet']}" sortBy="#{tarifConntroller.valuObjet(c.orclass_Objet.classeObjet)}" filterBy="#{tarifConntroller.valuObjet(c.orclass_Objet.classeObjet)}">
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{tarifConntroller.valuObjet(c.orclass_Objet.classeObjet)}"/>
+
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageAddDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.addRubriqueGarantie()}" oncomplete=" PF('manageAddDialog').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.removeRubriqueByListe()}" oncomplete=" PF('manageRemoveDialog').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog22" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.updateRubriqueGarantie()}" oncomplete=" PF('manageUpdateDialog22').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog22').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update.rubriqueGarantie']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.changerLaDateDecheance()}" oncomplete=" PF('manageUpdateDialog2').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog').show(), PF('manageUpdateDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.deleteRubriqueGarantie()}" oncomplete=" PF('managDeleteDialog').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageAddDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.addRubriqueCaracteristique()}" oncomplete=" PF('manageAddDialog2').hide()" update=":tabprincipal:form2,:tabprincipal:form1:msg"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageRemoveDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.removeRubriqueByListeRubriqueCaracteristique()}" oncomplete=" PF('manageRemoveDialog2').hide()" update=":tabprincipal:form2,:tabprincipal:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.updateRubriqueCaracteristique()}" oncomplete=" PF('manageUpdateDialog2').hide()" update=":tabprincipal:form2,:tabprincipal:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog2" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.deleteRubriqueCaracteristique()}" oncomplete=" PF('managDeleteDialog2').hide()" update=":tabprincipal:form1,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog2').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageAddDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.addTarifCondition()}" oncomplete=" PF('manageAddDialog3').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"  ajax="true" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageAddDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageRemoveDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['retire.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.removeTarifConditionByListe()}" oncomplete=" PF('manageRemoveDialog3').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageRemoveDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.updateTarifCondition()}" oncomplete=" PF('manageUpdateDialog3').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"   />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageUpdateDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="managDeleteDialog3" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.deleteTarifCondition()}" oncomplete=" PF('managDeleteDialog3').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog3').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                        <p:dialog header="#{msg['edition.formule']}"  showEffect="fade" modal="true" widgetVar="manageFormulleDialog" responsive="true">
+                            <center>
+                                <p:toolbarGroup id="toolb">
+
+
+                                    <p:outputLabel value="#{tarifConntroller.rubriqueGarantieSelecte.idRubrique.code} "  class="info-label" style="color: #03A9F4;font-size: x-large"/>
+                                    <p:spacer width="10"/>
+                                    <p:outputLabel value=" #{tarifConntroller.rubriqueGarantieSelecte.idRubrique.libelle}" class="info-label" style="color: #03A9F4;font-size: x-large"/>
+                                    <p:spacer width="10"/>
+                                    #{msg['du']}
+                                    <p:outputLabel value=" #{formatDateController.formatDate(tarifConntroller.rubriqueGarantieSelecte.dateEffet)}" class="info-label" style="color: #03A9F4;font-size: x-large"/>
+                                    #{msg['au']}
+                                    <p:outputLabel value=" #{formatDateController.formatDate(tarifConntroller.rubriqueGarantieSelecte.dateEcheance)}" class="info-label" style="color: #03A9F4;font-size: x-large"/>
+
+                                </p:toolbarGroup>
+                            </center>
+                            <p:fieldset legend="#{msg['formules.tarif']}" >
+                                <p:toolbarGroup id="toolb2">
+
+                                    ( <p:inputNumber value="#{tarifConntroller.tarif.valeur_Additif}"  placeholder="#{msg['val.additif']}"  decimalPlaces="3" emptyValue="#{0}"   id="valeur_add" decimalSeparator="," thousandSeparator="." style=" width: 100px"  title="#{msg['val.additif']}"  >
+                                        <f:ajax event="blur"   render="rapport_division"/>
+                                    </p:inputNumber>
+                                    <p:outputLabel value="+" style=" color: red"/>
+                                    <p:inputNumber value="#{tarifConntroller.tarif.coefficient}"  placeholder="#{msg['coefficient_multiplicateur']}"  decimalPlaces="3" emptyValue="#{0}"  decimalSeparator="," thousandSeparator="." id="coefficient_multi" style="float: bottom" title="#{msg['coefficient_multiplicateur']}"  >
+                                        <f:ajax event="blur"   render="rapport_division"/>
+                                    </p:inputNumber>
+                                    <p:outputLabel value="/" style=" color: red"/>
+                                    <p:inputNumber value="#{tarifConntroller.tarif.rapport_Division}"  placeholder="#{msg['rapport.division']}"  decimalPlaces="0" emptyValue="#{1}"   id="rapport_division" title=" #{msg['rapport.division']}" >
+                                        <f:ajax event="blur"   render="coefficient_multi"/>
+                                    </p:inputNumber> )
+                                    <p:outputLabel value="x" style=" color: red"/>
+                                    (   <p:selectOneMenu value="#{tarifConntroller.tarif.operationTarif1}"  
+                                                         converter="#{genericConverter}" id="nature_operation1"   >
+                                        <f:selectItem itemLabel="#{msg['select.nature.operation']} " itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.natureOperationForTarif}" />
+
+
+                                        <p:ajax event="change"  listener="#{tarifConntroller.changeValeurChoixForNatureOperation1()}" update=":form11" process="@this"/>
+                                    </p:selectOneMenu>
+                                    <p:spacer width="10"/>
+                                    <p:inputText id="rubrique1"  placeholder="  #{msg['select.rubrique']}"   value="#{tarifConntroller.tarif.idRubrique1}"  rendered="#{tarifConntroller.valeurChoixNaturOperation==3}"  >
+                                        <p:ajax event="keyup"   oncomplete="PF('manageRubriqueGarantieDialog').show()"  />
+                                    </p:inputText>
+
+
+                                    <p:inputText id="caracteristique1"  placeholder="  #{msg['select.caracteristique']}"   value="#{tarifConntroller.tarif.idCaracteristiques1}"  rendered="#{tarifConntroller.valeurChoixNaturOperation==5}"  >
+                                        <!--<p:ajax event="keyup"   oncomplete="PF('manageRubriqueCaracteristiqueDialog').show()" />-->
+                                        <p:ajax event="keyup"   listener="#{tarifConntroller.chargeDialogRubriqueCaracterististique()}"   />
+
+                                    </p:inputText>
+                                    <p:inputNumber value="#{tarifConntroller.tarif.constant1}"  placeholder="#{msg['consttant']}"  decimalPlaces="0" emptyValue="#{0}"   id="constant"  rendered="#{tarifConntroller.valeurChoixNaturOperation==1}" >
+                                        <f:ajax event="blur"   render="constant"/>
+                                    </p:inputNumber> 
+
+
+                                    <p:selectOneMenu value="#{tarifConntroller.tarif.operations}"  
+                                                     converter="#{genericConverter}" id="operation1"    >
+                                        <f:selectItem itemLabel="#{msg['select.operation']} " itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.operationForTarif}" />
+                                        <f:ajax event="change"   render="operation1"/>
+                                    </p:selectOneMenu>
+                                    <p:spacer width="10"/>
+
+     <!--<p:ajax event="change"  listener="#{tarifConntroller.chargeRubriqueGarantieByGarantie()}" update=":tabprincipal:form1,:tabprincipal:form1:idirgTable" process="@this"/>-->
+
+                                    <p:selectOneMenu value="#{tarifConntroller.tarif.operationTarif2}"  
+                                                     converter="#{genericConverter}" id="nature_operation2"  rendered="#{tarifConntroller.tarif.operationTarif1!=null}" >
+                                        <f:selectItem itemLabel="#{msg['select.nature.operation']} " itemValue="#{null}" />
+                                        <f:selectItems value="#{tarifConntroller.natureOperationForTarif}" />
+                                        <p:ajax event="change"  listener="#{tarifConntroller.changeValeurChoixForNatureOperation2()}" update=":form11" process="@this"/>
+
+                                    </p:selectOneMenu>
+                                    <p:inputText id="rubrique2"  placeholder="  #{msg['select.rubrique']}"   value="#{tarifConntroller.tarif.idRubrique2}"  rendered="#{tarifConntroller.valeurChoixNaturOperation2==33}"  >
+                                        <p:ajax event="keyup"   oncomplete="PF('manageRubriqueGarantieDialog').show()" />
+                                    </p:inputText>
+
+                                    <p:inputText id="caracteristique2"  placeholder="  #{msg['select.caracteristique']}"   value="#{tarifConntroller.tarif.idCaracteristiques2}"  rendered="#{tarifConntroller.valeurChoixNaturOperation2==55}"  >
+                                        <p:ajax event="keyup"   listener="#{tarifConntroller.chargeDialogRubriqueCaracterististique()}"   />
+                                    </p:inputText>
+                                    <p:inputNumber value="#{tarifConntroller.tarif.constant2}"  placeholder="#{msg['consttant']}"  decimalPlaces="0" emptyValue="#{0}"   id="constant2"  rendered="#{tarifConntroller.valeurChoixNaturOperation2==11}"  >
+                                        <f:ajax event="blur"   render="constant2"/>
+                                    </p:inputNumber> 
+                                    <p:spacer width="10"/>
+
+                                    <p:selectOneMenu value="#{tarifConntroller.tarif.operations1}"  
+                                                     converter="#{genericConverter}" id="operation11"  rendered="#{tarifConntroller.tarif.operations!=null}" >
+                                        <f:selectItem itemLabel="#{msg['select.operation']} " itemValue="#{null}"  />
+                                        <f:selectItems value="#{tarifConntroller.operationForTarif}" />
+
+
+                                        <f:ajax event="change"   render="operation11"/>
+                                    </p:selectOneMenu>)
+
+
+
+
+
+                                </p:toolbarGroup>
+
+                            </p:fieldset>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"    actionListener="#{tarifConntroller.valideTarif()}"  oncomplete=" PF('manageFormulleDialog').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageFormulleDialog').hide()"  action="#{tarifConntroller.resetValeurChoix()}" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+                        <p:dialog header="#{msg['wait']}" width="600" showEffect="fade" modal="true" widgetVar="message" responsive="true">
+                            <center>
+                                <h4>#{msg['list.rubrique.caract.vide']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('message').hide()"  />
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+
+
+
+
+
+
+
+
+                    </h:form>
+                    <h:form id="form12">
+
+
+                        <p:dialog widgetVar="manageRubriqueGarantieDialog" header="#{msg['rubrique.garantie']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+
+
+<!--                            <p:dataTable var="rc" value="#{tarifConntroller.listeRG}"  widgetVar="rcTable2" 
+                                         filteredValue="#{tarifConntroller.filterRubriqueGarantie}"    scrollable="true" 
+                                       rowIndexVar="rowIndex"
+                                         emptyMessage="#{msg['emptyMessage']}"    id="idrcgTable2" rowKey="#{rc.id}"  selectionMode="single" selection="#{tarifConntroller.rubriqueGarantieSelect}"
+
+                                         >
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeRubriqueCaracteristiqueByRubrique()}"     
+                                        process="@this" update=":form11"  oncomplete="PF('manageRubriqueGarantieDialog').hide()" />
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rcTable2').filter()"
+                                                     style="width:150px" placeholder="Search text..."  > 
+
+                                        </p:inputText>  
+
+
+                                    </p:outputPanel>
+
+                                </f:facet> 
+
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{rc.idCaracteristiques.code}" filterBy="#{rc.idCaracteristiques.code}" style="width: 50px">
+                                    <p:inputText id="code"  placeholder="  #{msg['code']}"   value="#{rc.idRubrique.code}"   >
+                                      
+                                    </p:inputText>
+                                    <h:outputText  value="#{rc.idRubrique.code}" />
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" >
+                                    <h:outputText value="#{rc.idRubrique.libelle}"  />
+                                </p:column>
+
+
+
+
+
+                            </p:dataTable>-->
+                            <p:dataTable var="rc" value="#{tarifConntroller.listeRG}"   widgetVar="rcTable2"  id="idrcgTable2"
+                                         filteredValue="#{tarifConntroller.filterRubriqueGarantie}"
+
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{rc.id}"  selectionMode="single"  selection="#{tarifConntroller.rubriqueGarantieSelect}"
+
+                                         scrollable="true"  >
+
+                                >
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeRubriqueCaracteristiqueByRubrique()}"     
+                                        process="@this" update=":form11"  oncomplete="PF('manageRubriqueGarantieDialog').hide()" />
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rcTable2').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+
+
+
+
+                                <!--</p:column>-->
+                                <p:column headerText="#{msg['code']}" sortBy="#{rc.code}" filterBy="#{rc.idRubrique.code}">
+                                    <h:outputText value="#{rc.idRubrique.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{rc.idRubrique.libelle}" filterBy="#{rc.idRubrique.libelle}">
+
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{rc.idRubrique.libelle}- ((#{rc.dateEffet})/((#{rc.dateEcheance}))" />
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+
+
+
+                        </p:dialog>
+                        <p:dialog widgetVar="manageRubriqueCaracteristiqueDialog" header="#{msg['rubrique.caracterisque']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <p:dataTable var="r" value="#{tarifConntroller.lisRubriqueCaracteristique}"   widgetVar="rubriqueCaracteristiqueTable2"  id="idrubriqueCaracteristiqueTable"
+                                         filteredValue="#{tarifConntroller.filterRubriqueCaracteristique}"
+
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{r.id}"  selectionMode="single"  selection="#{tarifConntroller.rubriqueCaracteristiqueSelecte}"
+
+                                         scrollable="true"  >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeCaracteristiqueByRubriqueCaracteristique()}"     
+                                        process="@this" update=":form11"  oncomplete="PF('manageRubriqueCaracteristiqueDialog').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rubriqueCaracteristiqueTable2').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+
+
+
+
+                                <!--</p:column>-->
+                                <p:column headerText="#{msg['code']}" sortBy="#{r.idCaracteristiques.code}" filterBy="#{r.idCaracteristiques.code}">
+                                    <h:outputText value="#{r.idCaracteristiques.code}"/>
+                                </p:column>
+                                <p:column headerText="#{msg['libelle']}" sortBy="#{r.idCaracteristiques.libelle}" filterBy="#{r.idCaracteristiques.libelle}">
+
+                                    <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                                  value="#{r.idCaracteristiques.libelle}"/>
+                                </p:column>
+
+
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+                        <p:dialog widgetVar="manageRubriqueCaracteristiqueDialog2" header="#{msg['rubrique.caracterisque']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <p:dataTable var="r" value="#{tarifConntroller.lisRubriqueCaracteristiqueForTarifCondition}"   widgetVar="rubriqueCaracteristiqueTable22"  id="idrubriqueCaracteristiqueTable22"
+                                         filteredValue="#{tarifConntroller.filterRubriqueCaracteristique}"
+
+                                         emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{r.id}"  selectionMode="single"  selection="#{tarifConntroller.rubriqueCaracteristiqueSelecteForTarifCondition}"
+
+                                         >
+
+                                <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{tarifConntroller.chargeLigneTarifConditionByRubriqueCaracteristique()}"     
+                                        process="@this" update=":tabprincipal:form2:tabsecond"  oncomplete="PF('manageRubriqueCaracteristiqueDialog2').hide()" />
+
+
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg['recherche']} : "/>
+
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('rubriqueCaracteristiqueTable22').filter()"
+                                                     style="width:150px" placeholder="Search text"  />
+                                    </p:outputPanel>
+
+                                </f:facet>
+
+
+
+
+
+
+
+                                <p:column headerText="#{msg['code']}" sortBy="#{r.idCaracteristiques.code}" filterBy="#{r.idCaracteristiques.code}">
+                                    <h:outputText value="#{r.idCaracteristiques.code} #{r.idCaracteristiques.libelle} "/>    
+
+
+                                </p:column>
+
+                            </p:dataTable>
+
+                        </p:dialog>
+
+                        <p:dialog widgetVar="etatGarantieDialog" header="#{msg['information']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+
+                            <center>
+                                <h4><p:outputLabel value="#{tarifConntroller.libelle}" id="libelle" /> </h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+<!--                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{tarifConntroller.addTarifCondition()}" oncomplete=" PF('manageAddDialog3').hide()" update=":tabprincipal:form2:tabsecond,:tabprincipal:form1:msg"  ajax="true" />
+                                    <p:spacer width="10"/>-->
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('etatGarantieDialog').hide()"  styleClass="danger-button"/>
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

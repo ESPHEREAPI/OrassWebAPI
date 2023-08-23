@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/reduction">#{msg['reduction']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <h:form id="form1">
+
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                        <h:panelGrid columns="4" style="margin-bottom:10px" cellpadding="5">
+                             <p:outputLabel  value="#{msg['reduction']}: " />
+                             
+                               <p:selectOneMenu id="libelle" value="#{reductionController.refReduction}"  converter="#{genericConverter}" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{reductionController.listeRefReduction}"  var="r" itemLabel="#{r.code} - #{r.libelle}" itemValue="#{r}"/>
+                                        <p:ajax event="change"  listener="#{reductionController.chargeReductionByRefReduction()}" update=":form1" process="@this"/>
+
+                                    </p:selectOneMenu>
+                                 <p:commandButton  icon="pi pi-plus"  
+                                                   styleClass="success-button" style="margin-right: .5rem"  rendered="#{ (reductionController.accessAjouter() or reductionController.accessCreer())and reductionController.refReduction.id==null }" onclick="PF('manageAddRefReductionDialog').show()" update=":form3:grid1">
+                                   
+                                </p:commandButton>
+                               <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}" id ="modifier"
+                                                 styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{reductionController.accessModifier()==true  and reductionController.refReduction.id!=null}"    update=":form3" actionListener="#{reductionController.chargeUpdateRefReduction()}">
+                                  
+                                </p:commandButton>
+                             
+                        </h:panelGrid>
+
+
+                        <p:dataTable var="red" value="#{reductionController.listeReduction}"  widgetVar="reductionTable" 
+                                     filteredValue="#{reductionController.filterReduction}"    scrollable="true" 
+
+                                     emptyMessage="#{msg['emptyMessage']}"    id="idreductionTable"
+                                     globalFilterFunction="#{reductionController.globalFilterFunction}"
+
+                                     >
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-end">
+                                    <p:inputText id="globalFilter" onkeyup="PF('reductionTable').filter()" style="width:300px"
+                                                 placeholder="Search all text..." />
+                                </div>
+
+                            </f:facet> 
+                            <p:column  >
+
+                                <p:commandButton  icon="pi pi-plus"  
+                                                  styleClass="success-button" style="margin-right: .5rem"  rendered="#{red.idGarantie.id!=null and red.id==null and (reductionController.accessAjouter() or reductionController.accessCreer())}" onclick="PF('manageConfirmeAddDialog').show()">
+                                    <f:setPropertyActionListener value="#{red}" target="#{reductionController.reduction}"   />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-times"  
+                                                  styleClass="danger-button" style="margin-right: .5rem"  rendered="#{red.idGarantie.id!=null and red.id==null}" onclick="PF('manageConfirmeRemoveDialog').show()">
+                                    <f:setPropertyActionListener value="#{red}" target="#{reductionController.reduction}"   />
+                                </p:commandButton>
+
+                                <p:commandButton  icon="pi pi-trash"   title="#{msg['supprimer']}"
+                                                  styleClass="danger-button" style="margin-right: .5rem" rendered="#{(red.idGarantie.id!=null and red.id!=null) and reductionController.accessSupprimer()}"   onclick="PF('manageDeleteDialog').show()"  >
+
+                                    <f:setPropertyActionListener value="#{red}" target="#{reductionController.reduction}"   />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-pencil"   title="#{msg['bouton.modifier']}" disabled="#{reductionController.controleUpdateReductionUsePolice(red)}"
+                                                  styleClass="secondary-button" style="margin-right: .5rem"  rendered="#{red.idGarantie.id!=null and red.id!=null and reductionController.accessModifier()==true}"   onclick="PF('manageConfirmeUpdateDialog').show()">
+                                    <f:setPropertyActionListener value="#{red}" target="#{reductionController.reduction}"   />
+                                </p:commandButton>
+
+                            </p:column>
+                            <p:column headerText="#{msg['date_effet']}"   >
+                                <p:calendar value="#{red.dateEffet}"  mode="popup"   showOn="both"  id="dateeffet" pattern="dd/MM/yyyy"   >
+                                    <f:ajax event="dateSelect"  render="dateeffet" />
+                                </p:calendar>
+                            </p:column>
+                            <p:column headerText="#{msg['categorie']}" sortBy="#{red.idGarantie.idCategories.code}"  >
+                                <p:selectOneMenu value="#{reductionController.categories}" style=" float: left; " rendered="#{red.id==null}"
+                                                 converter="#{genericConverter}" id="categorie"  var="c" filter="true" filterMatchMode="contains" >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{reductionController.listeCategories}" var="cat" itemLabel="#{cat.code} #{formatDateController.valueObject(cat.libelle,cat)}" itemValue="#{cat}"/>
+
+                                    <p:column>
+                                        #{c.code}  #{formatDateController.valueObject(c.libelle,c)} 
+                                    </p:column>
+                                    <f:ajax event="change"  render=":categorie"/>
+                                    <p:ajax event="change"  listener="#{reductionController.chargeGarantieByCategorie()}" update=":form1:idreductionTable" />
+                                   
+                                </p:selectOneMenu>
+                                <p:outputLabel  value="#{red.idGarantie.idCategories.code} #{formatDateController.valueObject(red.idGarantie.idCategories.libelle,red.idGarantie.idCategories)}"  rendered="#{red.id!=null}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['garantie']}" sortBy="#{red.idGarantie.idRefGaranties.code}"  >
+                                <p:selectOneMenu value="#{red.idGarantie}" style=" float: left; "  rendered="#{red.id==null}"
+                                                 converter="#{genericConverter}" id="garantie"   var="ga" filter="true" filterMatchMode="contains" >
+                                    <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                    <f:selectItems value="#{reductionController.listeGaranties}" var="g" itemLabel="#{g.idRefGaranties.code} - #{g.idRefGaranties.libelle}" itemValue="#{g}"/>
+
+                                    <p:column>
+                                        #{ga.idRefGaranties.code} - #{ga.idRefGaranties.libelle}
+                                    </p:column>
+                                    <f:ajax event="change"   render="garantie" />
+                                    <p:ajax event="change"  update=":form1:idreductionTable" />
+                                </p:selectOneMenu>
+                                <p:outputLabel  value="#{red.idGarantie.idRefGaranties.code} - #{red.idGarantie.idRefGaranties.libelle} "  rendered="#{red.id!=null}"/>
+                       
+                            </p:column>
+                            <p:column headerText="#{msg['taux']}"   >
+                                <p:inputNumber id="taux" value="#{red.taux}" symbol="%" 
+                                symbolPosition="s" required="true" emptyValue="zero">
+                                    <p:ajax event="blur" update="taux" />  
+                </p:inputNumber>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
+                    <h:form id="form2">
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageConfirmeAddDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{reductionController.addRduction}" oncomplete=" PF('manageConfirmeAddDialog').hide()" update="form1,:form1:msg" process="@this" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeAddDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageConfirmeRemoveDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.retire.garantie.liste']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{reductionController.removeReductionByListe()}" oncomplete=" PF('manageConfirmeRemoveDialog').hide()" update="form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeRemoveDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog widgetVar="manageDeleteDialog" header="#{msg['welcome.dlg.header']}" closable="true"  showEffect="fade" modal="true" responsive="true">
+                            <center>
+                                <h:outputText value="#{msg['welcome.msgDelete']}" />  
+                            </center>
+
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="OK" actionListener="#{reductionController.deleteReduction()}" update=":form1,:form1:msg" onclick="PF('manageDeleteDialog').hide()" />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageDeleteDialog').hide()"/>  
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="manageConfirmeUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{reductionController.updateReduction()}" oncomplete=" PF('manageConfirmeUpdateDialog').hide()" update="form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeUpdateDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+                    </h:form>
+                    <h:form id="form3">
+                        
+                        
+                        <p:dialog header="#{msg['welcome.bienvenue']}"  showEffect="fade" modal="true" widgetVar="manageAddRefReductionDialog" responsive="true" closable="false">
+
+                            <p:fieldset  id="fieldset1" >
+                                <p:panelGrid styleClass="noBorders" columns="8" style="border: 0px; border-bottom: 0px" layout="grid" id="grid1">
+                                    <p:outputLabel value="#{msg['code']}: "  /> 
+                                    <p:inputText id="code2"  title="code2" validator="requiredValidator"  value="#{reductionController.refReductionAdd.code}"  required="true" >
+                                        <f:ajax event="blur" render="code2"/>
+                                    </p:inputText>
+                                    <!--<p:message for="code" />-->
+                                    <p:outputLabel value="#{msg['libelle']}: "  /> <!--
+                                    -->                                    <p:inputText id="libelle2"  title="libelle" validator="requiredValidator" value="#{reductionController.refReductionAdd.libelle}" >
+                                        <f:ajax event="blur" render="libelle2"/>
+                                    </p:inputText>
+                                    
+                                </p:panelGrid>
+
+                            </p:fieldset>
+
+                            <f:facet name="footer">
+                                <center>
+
+
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}"  icon="pi pi-check"  update=":form1,:form1:msg" process="@this"  rendered="#{(reductionController.accessAjouter()==true or reductionController.accessCreer()==true) and reductionController.refReductionAdd.id==null}"
+                                                     styleClass="success-button" style="margin-right: .5rem"   actionListener="#{reductionController.addRefReduction()}"   />             
+                                    <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form2,:form1,:form1:msg" process="@this"  rendered="#{reductionController.accessModifier() and reductionController.refReductionAdd.id!=null}"
+                                                     styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"   actionListener="#{reductionController.updateRefReduction()}"  ajax="false"/>
+
+
+                                    <p:commandButton value="#{msg['bouton.fermer']}" icon="pi pi-times"  
+                                                     styleClass="warning-button p-mr-2 p-mb-2" style="margin-right: .5rem"  onclick="PF('manageAddRefReductionDialog').hide()" actionListener="#{reductionController.reset()}" update="@form" process="@all"/>
+
+                                </center>
+                            </f:facet>
+                        </p:dialog>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

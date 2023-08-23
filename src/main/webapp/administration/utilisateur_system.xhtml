@@ -1,0 +1,164 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/administration/utilisateur_system">#{msg['utilisateur.system']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+                    <f:view locale="#{languageController.localeCode}">
+
+                        <h4>#{msg['bouton.creer']} #{msg['utilisateur.system']}</h4>
+
+
+                        <h:form id="form1">
+                            <p:growl id="grwFile" showDetail="true" />
+<!--                            <p:commandButton value=" #{msg['utilisateur.system']}"  icon="pi pi-plus" actionListener="#{configurationController.addUserSystem()}" update="form1"  
+                                             styleClass="success-button" style="margin-right: .5rem" />-->
+                            <h:panelGrid id="gridinfoGeneral"  columns="3" styleClass="noBorders">
+                                <p:outputLabel value="#{msg['login']}: *" for="login" />
+                                <p:inputText id="login" style="text-transform: uppercase;"  value="#{configurationController.utilisateur.login}" title="#{msg['login']}" placeholder="#{msg['SAISIR']} #{msg['login']}"  validator="requiredValidator" />
+                                <p:message for="login" /> 
+
+                                <p:outputLabel value="#{msg['nom']}: *" for="nom" />
+                                <p:inputText id="nom" style="text-transform: uppercase;" value="#{configurationController.utilisateur.nom}"  title="#{msg['nom']}"  placeholder="#{msg['SAISIR']} #{msg['nom']}" validator="requiredValidator" />
+                                <p:message for="nom" /> 
+
+                                <p:outputLabel value="#{msg['prenom']}: *" for="prenom" />
+                                <p:inputText  style="text-transform: uppercase;" id="prenom" value="#{configurationController.utilisateur.prenom}"  title="#{msg['prenom']}"  placeholder="#{msg['SAISIR']} #{msg['prenom']}" validator="requiredValidator" />
+                                <p:message for="prenom" /> 
+<!--                                <h:outputLabel value="#{msg['actif']}: " />
+                                <p:selectBooleanButton  onLabel="Yes" offLabel="No" onIcon="ui-icon-check"  value="#{configurationController.utilisateur.actif}" offIcon="ui-icon-close" id="actif">-->
+
+                                <!--</p:selectBooleanButton>-->
+                                <!--<p:outputLabel value=""  />-->
+                                <p:outputLabel for="email_user" >#{msg['email']}:*</p:outputLabel>
+
+                                <p:inputText id="email_user" value="#{configurationController.utilisateur.adresse.email}"  validator="emailValidator" />
+                                <p:message for="email_user" /> 
+                              <!--                                <h:outputLabel value="#{msg['langue.parle']}"  />
+                                                              <p:selectOneMenu  id="langueDefaut" value="#{configurationController.utilisateur.langue}"    validator="requiredValidator"  style="width: 250px">
+                                                                  <f:selectItem    itemLabel="#{msg['select']}" itemValue="#{null}" />
+                                                                  <f:selectItems value="#{configurationController.languageCountrie}"  />
+                                                              </p:selectOneMenu>
+                                                              <p:message for="langueDefaut" />-->
+                                <f:facet name="footer" >
+
+
+                                    <center>
+                                        <p:commandButton  value="#{msg['bouton.creer']}" icon="pi pi-plus"   update=":form2" process="@this" actionListener="#{configurationController.showDialogConfirmeCleSecurite()}" ajax="false"/>  
+
+
+                                    </center>
+                                </f:facet> 
+                            </h:panelGrid>   
+
+                            <!--                            <div class="products-buttonbar">
+                                                            <p:commandButton value="#{msg['bouton.creer']} #{msg['motdePasse']}" icon="pi pi-plus"  oncomplete="PF('motPasseDialog').show()" 
+                                                                             styleClass="success-button" style="margin-right: .5rem" />
+                                                        </div>-->
+
+
+
+
+                            <p:separator />
+                            <h:link  outcome="/acceuil_admin_system" styleClass="layout-topbar-logo" >
+
+                                <i class="topbar-icon pi pi-home " style="font-size: 2em"></i>
+
+
+                            </h:link>
+                        </h:form>
+                        <h:form id="form2">
+                            <p:dialog header="#{msg['cle.securite']}"  showEffect="fade" modal="true" widgetVar="motPasseDialog2" responsive="true">
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['cle.securite.conf']}* :
+                                    </label> 
+
+<!--                                    <p:inputText id="cle_confirm"  title="cle"  value="#{configurationController.cle_securite}" validator="requiredValidator" style=" text-transform: uppercase;">
+
+                                      
+                                    </p:inputText>-->
+                                    <p:inputMask id="cle_confirm" value="#{configurationController.cle_securite}" mask="**-**-**" validateMask="true" >
+                                      <f:ajax event="blur" render="cle_confirm"/>
+                                    </p:inputMask>
+                                </div>
+                                <f:facet name="footer" >
+                                    <center>
+                                        <p:commandButton  value="#{msg['bouton.valider']}" icon="pi pi-check"   update=":form2" process="@this" actionListener="#{configurationController.controlerAddUtisateurSysteme()}"   ajax="false" oncomplete="PF('motPasseDialog').hide()"/>  
+
+                                    </center>
+
+                                </f:facet>
+                            </p:dialog>
+                            <p:dialog header="#{msg['motdePasse']}"  showEffect="fade" modal="true" widgetVar="motPasseDialog" responsive="true">
+                                <!--                                <h:panelGrid id="display" columns="2" cellpadding="5">  
+                                                                    <h:outputLabel for="pwd3" value="#{msg['motdePasse']}* : " />  
+                                                                    <p:password id="pwd3" value="#{configurationController.utilisateur.password}" match="pwd4" validatorMessage="#{msg['user.info.pwdnotsame']}" label="#{msg['motdePasse']}" validator="requiredValidator" 
+                                                                                feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['user.info.pwd']}" weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true" />  
+                                
+                                
+                                                                    <h:outputLabel for="pwd4" value="#{msg['CONFIRM_MOT_DE_PASSE']}* : " />  
+                                                                    <p:password id="pwd4" value="#{configurationController.utilisateur.password}" label="#{msg['CONFIRM_MOT_DE_PASSE']}" validator="requiredValidator" feedback="true" goodLabel="#{msg['user.info.pwdbon']}" promptLabel="#{msg['CONFIRM_MOT_DE_PASSE']}" 
+                                                                                weakLabel="#{msg['user.info.pwdmauvais']}" strongLabel="#{msg['user.info.pwdfort']}" redisplay="true"/>  
+                                                                    <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.ajouter']}"  onclick="PF('motPasseDialog').hide()"  update="form1" actionListener="#{configurationController.addUserSystem()}"/>  
+                                                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('motPasseDialog').hide()" immediate="true"/> 
+                                                                </h:panelGrid>-->
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-user"></i> #{msg['login']} * :
+                                    </label> 
+                                    <h4>#{configurationController.login}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['motdePasse']} * :
+                                    </label> 
+                                    <h4>#{configurationController.passWord}</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label >
+                                        <i class="glyphicon glyphicon-lock "></i> #{msg['cle.securite']}* :
+                                    </label> 
+
+                                    <h4>#{configurationController.cle}</h4>
+                                </div>
+
+                                <!--                                <f:facet name="footer" >
+                                
+                                
+                                                                    <center>
+                                                                        <p:commandButton icon="ui-icon-disk" value="#{msg['bouton.ajouter']}"  onclick="PF('motPasseDialog').hide()"  update="form1" actionListener="#{configurationController.addUserSystem()}"/>  
+                                                                        <p:spacer width="10"/>
+                                                                        <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('motPasseDialog').hide()" immediate="true"/> 
+                                
+                                                                    </center>
+                                                                </f:facet> -->
+
+                            </p:dialog>
+                        </h:form>
+                    </f:view>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

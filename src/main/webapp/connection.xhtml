@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>E-SPHERE Login</title>
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet"></link>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <h:outputStylesheet library="webjars" name="bootstrap/3.3.6/css/bootstrap.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="bootstrap/3.3.6/css/bootstrap-theme.min-jsf.css" />
+        <h:outputStylesheet library="webjars" name="font-awesome/4.5.0/css/font-awesome.min-jsf.css" />
+        <style type="text/css">
+            body.login-page {
+                background-color: transparent;
+            }
+
+            .backgroun {
+                background: url(#{resource[ 'images:login-bg.jpg' ]}) no-repeat center center fixed;
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
+            }
+
+            @media (max-width: 768px) {
+                .backgroun  {
+                    background-image: url(#{resource[ 'images:login-bg-mobile.jpeg' ]});
+                }
+            }
+        </style>
+    </h:head>
+
+    <h:body styleClass="login-body backgroun "  >
+        <p:spacer height="700" width="0" ></p:spacer>
+        <h:form id="form1" >
+            <p:growl id="messages" showDetail="true" />
+            <div class="login-card" >
+                <h1>E-SPHERE <span>LOGIN</span></h1>
+                <span>#{msg['welcome.connection']}</span>
+                <div class="form-group">
+                    <label for="InputLogin"><i class="glyphicon glyphicon-user"></i> #{msg['login']} * :</label> 
+                    <p:inputText placeholder="#{msg['write.login']}" value="#{connectionController.user.login}" validator="requiredValidator" id="login"/>
+                </div>
+                <div class="form-group">
+                    <label for="InputPassword1">
+                        <i class="glyphicon glyphicon-lock "></i> #{msg['motdePasse']} * :
+                    </label> 
+                    <p:password placeholder="#{msg['write.password']}"  value="#{connectionController.user.password}" validator="requiredValidator" id="toggle" toggleMask="true" redisplay="true"/>
+                </div>
+
+                <div class="form-footer">
+                    <div class="checkbox">
+                        <span>#{msg['connection.me']}</span>
+                        <p:selectBooleanCheckbox />
+                    </div>
+<p:link outcome="/createnewcompte.xhtml" value="#{msg['connection.foget']}"  >
+
+                </p:link>
+                    <!--<a href="#{connectionController.cheminApplication()}/createnewcompte.xhtml" ></a>-->
+                </div>
+
+                <p:commandButton  value="#{msg['connection']}" style="width: 250px"  actionListener="#{connectionController.login()}"  ajax="false"/>
+
+            </div>
+        </h:form>
+        <h:outputStylesheet name="css/primeicons.css" library="rain-layout" />
+        <h:outputStylesheet name="css/#{guestPreferences.layout}.css" library="rain-layout" />
+    </h:body>
+
+</html>

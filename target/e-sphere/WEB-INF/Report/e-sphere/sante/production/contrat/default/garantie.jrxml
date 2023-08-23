@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="db6af00a-5bbc-4c8e-ad62-6bd29916d3f1">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="prcent" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[100]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tva_v_1" class="java.math.BigDecimal"/>
+	<parameter name="tva_v" class="java.math.BigDecimal"/>
+	<parameter name="scpd" class="java.util.List"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\projet\\svn_Esphere\\src\\main\\webapp\\WEB-INF\\Report\\e-sphere\\sante\\production\\contrat\\default\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="path_file" class="java.lang.String"/>
+	<field name="capital" class="java.math.BigDecimal"/>
+	<field name="taux" class="java.math.BigDecimal"/>
+	<field name="pourcentage" class="java.lang.Object"/>
+	<field name="prime" class="java.math.BigDecimal"/>
+	<field name="idGarantie.idRefGaranties.libelle" class="java.lang.String"/>
+	<field name="idGroup.id" class="java.lang.Long"/>
+	<field name="idPolice.police" class="java.math.BigDecimal"/>
+	<field name="libellePrime" class="java.lang.String"/>
+	<field name="libelleCapital" class="java.lang.String"/>
+	<variable name="totalPrime" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{prime}]]></variableExpression>
+	</variable>
+	<variable name="netpaye" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.add($V{taxeTva})]]></variableExpression>
+	</variable>
+	<variable name="taxeTva" class="java.math.BigDecimal" resetType="Group" resetGroup="groupe">
+		<variableExpression><![CDATA[$V{totalPrime}.multiply($P{tva_v_1})]]></variableExpression>
+	</variable>
+	<variable name="prcent" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[100]]></variableExpression>
+	</variable>
+	<variable name="taux" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[java.math.BigDecimal.valueOf(19.25)]]></variableExpression>
+	</variable>
+	<variable name="primeValue" class="java.lang.String"/>
+	<variable name="capitalValue" class="java.lang.String"/>
+	<group name="groupe">
+		<groupExpression><![CDATA[$F{idPolice.police}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<staticText>
+					<reportElement uuid="aed7402e-82a3-40ab-b8fe-b8ebfa2dcab8" mode="Opaque" x="268" y="1" width="128" height="15" backcolor="#666666"/>
+					<box>
+						<pen lineColor="#FFFFFF"/>
+						<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="DejaVu Sans" isBold="true" isItalic="false"/>
+					</textElement>
+					<text><![CDATA[Capital]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="b83e6288-36bb-467c-8aa7-872b5382f05e" mode="Opaque" x="455" y="1" width="100" height="15" backcolor="#666666"/>
+					<box>
+						<pen lineColor="#FFFFFF"/>
+						<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Right">
+						<font fontName="DejaVu Sans" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Prime]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="5abb1cff-aa92-4860-8e02-63d52a2c0e33" mode="Opaque" x="0" y="1" width="268" height="16" forecolor="#000000" backcolor="#666666"/>
+					<box>
+						<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement>
+						<font fontName="DejaVu Sans" size="12" isBold="true" isUnderline="false" isStrikeThrough="false"/>
+					</textElement>
+					<text><![CDATA[Garanties]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="27235d58-26a2-4c4f-b6a0-b847d18f57e9" mode="Opaque" x="396" y="1" width="59" height="15" backcolor="#666666"/>
+					<box>
+						<pen lineColor="#FFFFFF"/>
+						<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+						<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="DejaVu Sans"/>
+					</textElement>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement uuid="bf6d8c5d-ebe2-431c-86d9-5ab87163234c" mode="Opaque" x="0" y="0" width="268" height="15" backcolor="#CCCCCC"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" "+$F{idGarantie.idRefGaranties.libelle}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="0a801269-dd1b-43eb-b886-6ba9d4129c8d" mode="Opaque" x="455" y="0" width="100" height="15" backcolor="#CCCCCC"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libellePrime}!=null)? $F{libellePrime}:""]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="7d8cd505-4c07-4ccf-b0da-31c0e229603d" mode="Opaque" x="268" y="0" width="128" height="15" backcolor="#CCCCCC"/>
+				<box>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{libelleCapital}!=null)?$F{libelleCapital}:""]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="856c6c84-7675-4379-9e74-337113afdded" mode="Opaque" x="396" y="0" width="59" height="15" backcolor="#CCCCCC"/>
+				<box>
+					<pen lineColor="#FFFFFF"/>
+					<topPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="2.0" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="2.0" lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<subreport>
+				<reportElement uuid="11acf110-1762-43e8-a150-321fe3068bbc" x="0" y="15" width="555" height="15"/>
+				<subreportParameter name="prcent"/>
+				<subreportParameter name="tva_v_1"/>
+				<subreportParameter name="tva_v"/>
+				<subreportParameter name="scpd"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{scpd})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{path_file}+ "scpd1.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

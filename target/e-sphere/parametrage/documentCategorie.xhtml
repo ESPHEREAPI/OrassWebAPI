@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/documentCategorie">#{msg['documentCategorie']}</p:link>
+        </li>
+    </ui:define>
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <div class="card">
+
+                    <h:form id="form1">
+                        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+                        <p:toolbarGroup>
+
+                            <p:commandButton value="#{msg['bouton.ajouter']}" icon="pi pi-plus"   
+                                             styleClass="success-button" style="margin-right: .5rem"   rendered="#{true}"  onclick="PF('TypeDocDialog').show()" update=":form2:grid"  />
+
+                            <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo"   
+                                             styleClass="warning-button" style="margin-right: .5rem"       actionListener="#{documentCategoriesController .reload()}" ajax="false"/> 
+
+
+                        </p:toolbarGroup>
+
+                        <p:dataTable var="td" value="#{documentCategoriesController.listeDocumentCategories}" paginator="true" rows="100" widgetVar="tableDoc_Cat"  id="idTableDoc_Cat"
+                                     paginatorAlwaysVisible="false" rowsPerPageTemplate="50,100,500,1000" filterEvent="enter" filteredValue="#{documentCategoriesController.filterDocumentCategories}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                     emptyMessage="#{msg['emptyMessage']}"   >
+
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('tableTypeDoc').filter()"
+                                                 style="width:350px" placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+                            <p:column style="width: 50px;">
+                                <f:facet name="header">
+                                    <h:outputText value="Options"/>
+                                </f:facet>
+
+
+
+                                <p:commandButton  icon="pi pi-trash"  
+                                                  styleClass="danger-button" style="margin-right: .5rem" onclick="PF('manageDeleteDialog').show()"  rendered="#{documentCategoriesController.accessSupprimer()}" >
+                                    <f:setPropertyActionListener value="#{td}" target="#{documentCategoriesController.documentCategories}"  />
+                                </p:commandButton>
+                                <p:commandButton  icon="pi pi-pencil"  
+                                                  styleClass="info-button" style="margin-right: .5rem" process="@this" update=":form2,:form1" rendered="#{documentCategoriesController.accessModifier()}" oncomplete="PF('TypeDocDialog').show()" actionListener="#{documentCategoriesController.showDetail(td)}">
+                                    <f:setPropertyActionListener value="#{td}" target="#{documentCategoriesController.documentCategories}"  />
+                                </p:commandButton>
+                            </p:column>
+                            <p:column headerText="id"  style="width: 50px">
+                                <h:outputText value="#{td.id}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['categorie']}" sortBy="#{td.idCategories.code}" filterBy="#{td.idCategories.code}" style="width: 50px">
+                                <h:outputText value="#{td.idCategories.code}"/>
+                            </p:column>
+                            <p:column  sortBy="#{documentCategoriesController.valueObjectByLibelleAutres(td.idCategories)}" filterBy="#{documentCategoriesController.valueObjectByLibelleAutres(td.idCategories)}"  style="width: 100px">
+                                <h:outputText value="#{documentCategoriesController.valueObjectByLibelleAutres(td.idCategories)}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg['typeDocument']}" style="width: 50px"  >
+                                <h:outputText value="#{td.typeDocument.code}"/>
+                            </p:column>
+                            <p:column  >
+                                <h:outputText value="#{td.typeDocument.libelle}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['nature.doc']}" style="width: 50px" >
+                                <h:outputText value=" #{td.natureDocuments.code}"/>
+                            </p:column>
+                            <p:column  >
+                                <h:outputText value=" #{td.natureDocuments.libelle}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['date_effet']}"   >
+                                <h:outputText value=" #{formatDateController.formatDate(td.date_effet)}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg['stock.papier']}"    >
+                                <p:selectBooleanButton   offLabel="NO"  onLabel="YES" onIcon="ui-icon-check" offIcon="ui-icon-close" id="stock_papier_table"  value="#{td.stockPapier}"  disabled="true"  >
+
+                                </p:selectBooleanButton>
+                            </p:column>
+                            <p:column headerText="#{msg['stock.logiq']}"   >
+                                <p:selectBooleanButton   offLabel="NO"  onLabel="YES" onIcon="ui-icon-check" offIcon="ui-icon-close" id="stock_Logique_table"  value="#{td.stockLogique}"  disabled="true"  >
+
+                                </p:selectBooleanButton>
+                            </p:column>
+
+
+                        </p:dataTable>
+
+
+
+                        <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageUpdateDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['confirmation.action.update']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{documentCategoriesController.updateDocumentCategorie()}" oncomplete=" PF('TypeDocDialog').hide()" update=":form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('TypeDocDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                        <p:dialog header="#{msg['welcome.dlg.header']}" width="1000" showEffect="fade" modal="true" widgetVar="manageDeleteDialog" responsive="true">
+                            <center>
+                                <h4>#{msg['welcome.msgDelete']}</h4> 
+                            </center>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{documentCategoriesController.deleteDocumentCategories()}" oncomplete=" PF('managDeleteDialog').hide()"  update=":form1,:form1:msg"  />
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('managDeleteDialog').hide()"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog>
+
+                    </h:form>
+
+                    <h:form id="form2">
+                        <p:dialog header="#{msg['confirmation']}"  showEffect="fade" modal="true" widgetVar="TypeDocDialog" responsive="true">
+
+
+                            <p:fieldset  id="fieldset1" >
+                                <p:panelGrid  columns="8"  layout="grid" id="grid">
+                                    <p:outputLabel  value="#{msg['typeDocument']}" />
+                                    <p:selectOneMenu value="#{documentCategoriesController.typeDocument}" 
+                                                     converter="#{genericConverter}" id="type_document" validator="requiredValidator" required="true" var="t" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{documentCategoriesController.listeTypeDocument}" var="td" itemLabel="  #{td.libelle}"  itemValue="#{td}" />
+
+                                        <p:column>
+                                            #{t.code} #{t.libelle}
+
+                                        </p:column>
+                                        <p:ajax event="change"  listener="#{documentCategoriesController.chargeCategorieByTypeDocument()}" update=":form2" process="@this"/>
+                                    </p:selectOneMenu>
+                                    <p:outputLabel  value="#{msg['nature.doc']}" />
+                                    <p:selectOneMenu value="#{documentCategoriesController.natureDocument}" 
+                                                     converter="#{genericConverter}" id="nature_doc" validator="requiredValidator" required="true" var="n" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{documentCategoriesController.listeNatureDocument}" var="nd" itemLabel="  #{nd.libelle}"  itemValue="#{nd}" />
+
+                                        <p:column>
+                                            #{n.code} #{n.libelle}
+
+                                        </p:column>
+
+                                    </p:selectOneMenu>
+
+                                    <p:outputLabel  value="#{msg['categorie']}" />
+                                    <p:selectOneMenu value="#{documentCategoriesController.categories}" style="width: 150px"
+                                                     converter="#{genericConverter}" id="categorie" validator="requiredValidator" required="true" var="c" filter="true" filterMatchMode="contains" >
+                                        <f:selectItem itemLabel="Select" itemValue="#{null}" />
+                                        <f:selectItems value="#{documentCategoriesController.listeCategories}" var="cat" itemLabel=" #{cat.code} #{documentCategoriesController.valueObjectByLibelleAutres(cat)}"  itemValue="#{cat}" />
+
+                                        <p:column>
+                                            #{c.code} #{documentCategoriesController.valueObjectByLibelleAutres(c)}
+
+                                        </p:column>
+                                    </p:selectOneMenu>
+
+                                    
+
+
+
+
+                                </p:panelGrid>
+                                <p:panelGrid  columns="8"  layout="grid" id="grid2">
+                                    <p:outputLabel  value="#{msg['date_effet']}"  />
+                                    <p:calendar value="#{documentCategoriesController.documentCategories.date_effet}" mode="popup"  title="#{msg['date_effet']}" showOn="both"  id="date_effet" pattern="dd/MM/yyyy">
+                                        <f:ajax event="dateSelect"  render="date_effet"   />
+                                    </p:calendar>
+
+
+                                    <p:outputLabel  value="#{msg['stock.papier']}"   />
+                                    <p:selectBooleanButton   offLabel="NO"  onLabel="YES" onIcon="ui-icon-check" offIcon="ui-icon-close" id="stock_papier"  value="#{documentCategoriesController.documentCategories.stockPapier}"   >
+                                        <f:ajax event="change" render="stock_papier"/>
+
+
+                                    </p:selectBooleanButton>
+
+                                    <p:outputLabel  value="#{msg['stock.logiq']}"   />
+                                    <p:selectBooleanButton   offLabel="NO"  onLabel="YES" onIcon="ui-icon-check" offIcon="ui-icon-close" id="stocke_logique"  value="#{documentCategoriesController.documentCategories.stockLogique}"   >
+                                        <f:ajax event="change" render="stocke_logique"/>
+
+
+                                    </p:selectBooleanButton>
+                                </p:panelGrid>
+
+
+                            </p:fieldset>
+                            <f:facet name="footer">
+                                <center>
+                                    <p:commandButton value="#{msg['bouton.enregistrer']}"     actionListener="#{documentCategoriesController.addDocumentCategories()}" oncomplete=" PF('TypeDocDialog').show()" update=":form1:,:form1:msg,:form2" rendered="#{documentCategoriesController.documentCategories.id==null}"  />
+                                    <p:commandButton value="#{msg['bouton.modifier']}"  styleClass="second-button"   actionListener="#{documentCategoriesController.updateDocumentCategorie()}" oncomplete=" PF('TypeDocDialog').hide()" update=":form1:,:form1:msg,:form2" rendered="#{documentCategoriesController.documentCategories.id!=null}"  />
+
+                                    <p:spacer width="10"/>
+                                    <p:commandButton value="#{msg['bouton.fermer']}" onclick="PF('TypeDocDialog').hide()" styleClass="danger-button"/>
+                                </center>
+                            </f:facet>
+
+                        </p:dialog> 
+
+
+
+                    </h:form>
+
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+

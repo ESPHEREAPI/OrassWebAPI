@@ -1,0 +1,290 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/template_2.xhtml">
+
+
+    <!--<ui:define name="title">Empty Page</ui:define>-->
+
+    <ui:define name="viewname">
+        <li>PAGES</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/parametrage/registre/registre_production">#{msg['registre_production']}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="PRINCIPAL PAGE" />
+
+    <ui:define name="content">
+        <div class="p-grid">
+            <div class="p-col">
+                <h:form id="form11">
+                    <p:toolbarGroup>
+
+
+                        <p:commandButton value="#{msg['select']} #{msg['categorie']}" icon="pi pi-sliders-h"  oncomplete="PF('manageCategorieDialog').show()" 
+                                         styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem" rendered="#{registreController.accessAfficheListe()}" />
+
+                                <!--<h:outputLabel value="#{categorieController.categoriesSelect.code}  #{formatDateController.valueObjectByLibelleAutres(categorieController.cat.libelle)}" class="info-label"/>-->
+                    </p:toolbarGroup>
+                </h:form>
+                <h:form id="form1">
+                    <p:growl id="msg" showDetail="true" escape="false"/>
+
+                    <div class="card">
+<!--                             <p:fieldset legend="#{msg['categorie']}" toggleable="#{registreController.categories.idCategorie!=null}" toggleSpeed="500" >-->
+
+
+                                 <p:panelGrid styleClass="noBorders" columns="9" layout="grid" style="border: 0px; border-bottom: 0px" rendered="#{registreController.categories.idCategorie!=null}">
+                                <p:outputLabel value="#{msg['categorie']}: "  /> 
+                                <p:inputText id="categorie" value="#{registreController.categories.code}  #{formatDateController.valueObject(registreController.categories.libelle,registreController.categories)}" style="width: 250px"   disabled="#{true}" >
+
+                                </p:inputText>
+
+
+                                <h:outputLabel value="#{msg['branche']}*: " for="branche"/>
+                                <p:inputText id="branche"  title="branche"  value="#{formatDateController.valueObject(registreController.branches.libelle,registreController.branches)}"  style="width: 250px" disabled="true"  >
+
+                                </p:inputText>
+
+
+
+                                <p:outputLabel value="#{msg['classe']}: *"    /> 
+                                <p:inputText id="classe"  title="classe"  value="#{formatDateController.valueObject(registreController.classes.libelle,registreController.classes)}"  style="width: 250px" disabled="true"  >
+
+                                </p:inputText>
+
+
+                            </p:panelGrid>
+
+                        <!--</p:fieldset>-->
+
+
+                        <p:fieldset legend="#{msg['registre_production']}">
+
+                            <p:toolbarGroup>
+
+
+                                <p:commandButton value="#{msg['bouton.enregistrer']}" icon="pi pi-check"  update=":form2,:form1,:form1:msg" process="@this" 
+                                                 styleClass="success-button" style="margin-right: .5rem"  disabled="#{registreController.production.id!=null}"  actionListener="#{registreController.controllerValidationRegistreProduction()}" rendered="#{registreController.accessCree() or registreController.accessAjouter()}"/>
+                                <p:commandButton value="#{msg['bouton.modifier']}" icon="pi pi-pencil"  update=":form2,:form1,:form1:msg" process="@this" 
+                                                 styleClass="secondary-button p-mr-2 p-mb-2" style="margin-right: .5rem"  disabled="#{registreController.production.id==null}"  actionListener="#{registreController.updateProduction()}" rendered="#{registreController.accessModifier()}"/>
+                                <p:commandButton value="#{msg['bouton.rafraichir']}" icon="pi pi-undo" 
+                                                 styleClass="help-button p-mr-2 p-mb-2" style="margin-right: .5rem" actionListener="#{registreController.reset()}" update="@form" process="@this" />
+
+
+                            </p:toolbarGroup>
+                       
+                            <p:panelGrid styleClass="noBorders" columns="6" style="border: 0px; border-bottom: 0px" layout="grid" >
+
+                                <p:outputLabel value="#{msg['code']}: " for="code"  /> 
+                                <p:inputText id="code"  title="code" validator="requiredValidator"  value="#{registreController.production.code}"   required="true"  >
+                                    <f:ajax event="blur" render="code"/>
+                                </p:inputText>
+
+                                <p:outputLabel value="#{msg['prefixe']}: " for="prefixe"  /> 
+                                <p:inputText id="prefixe"  title="#{msg['prefixe']}" validator="requiredValidator"  value="#{registreController.production.prefixe}"   required="true" maxlength="4" placeholder="Max 4 caract.">
+                                    <p:ajax event="blur" update=":form1:prefixe" listener="#{registreController.generatValeurByPlageNumero()}"  process="@this"/>
+                                </p:inputText>
+
+                                <p:outputLabel value="#{msg['plage.numero']}: " for="plage"  /> 
+                                <p:inputNumber id="plage"  title="#{msg['plage']}" validator="requiredValidator"  value="#{registreController.production.plage_numero}"   required="true"  maxValue="#{9}" placeholder="exp 7" >
+                                    <p:ajax event="keyup" update=":form1" listener="#{registreController.generatValeurByPlageNumero()}"  process="@this"/>
+                                </p:inputNumber>
+
+
+
+                                <p:outputLabel value="#{msg['num.debut']}: " for="debut"  /> 
+                                <p:inputText id="debut"  title="#{msg['num.debut']}" validator="requiredValidator"  value="#{registreController.production.num_debut}"   required="true"  placeholder=" exp. 2110000001">
+                                    <f:ajax event="blur" render="debut"/>
+                                </p:inputText>
+
+
+                                <p:outputLabel value="#{msg['num.fin']}: " for="fin"  /> 
+                                <p:inputText id="fin"  title="#{msg['num.fin']}" validator="requiredValidator"  value="#{registreController.production.num_fin}"   required="true"  placeholder=" exp. 2119999999">
+                                    <f:ajax event="blur" render="fin"/>
+                                </p:inputText>
+
+
+                            </p:panelGrid>
+                        </p:fieldset>
+
+                        
+
+                    </div>
+                    <div class="card">
+                        <p:dataTable var="pr" value="#{registreController.lisRegistreProduction}" paginator="false" rows="15" widgetVar="productionTable" 
+                                     paginatorAlwaysVisible="true" rowsPerPageTemplate="15,50,100,500,1000" filterEvent="enter" filteredValue="#{registreController.filterRegistreProduction}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} " id="idproductionTable"
+                                     emptyMessage="#{msg['emptyMessage']}"   rowKey="#{pr.id}" selectionMode="single"  selection="#{registreController.production}" 
+
+                                     scrollable="true"  >
+
+                            <p:ajax event="rowDblselect" async="true" partialSubmit="true" listener="#{registreController.showDetails(pr)}"  
+                                    process="@this" update=":form1" oncomplete="PF('productionTable').hide()" rendered="#{registreController.accessModifier()}"  />
+
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('productionTable').filter()"
+                                                 
+                                                 placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+                            <p:column style="width: 50px;">
+                                <f:facet name="header">
+                                    <h:outputText value="Options"/>
+                                </f:facet>
+
+
+
+                                <p:column exportable="false">
+                                    <p:commandButton icon="pi pi-pencil" 
+                                                     styleClass="edit-button rounded-button success-button" process="@this" update=":form1,:form1:msg"  title="#{msg['bouton.modifier']}" actionListener="#{registreController.showDetails(pr)}" 
+                                                     rendered="#{registreController.accessModifier()}"         >
+                                        <f:setPropertyActionListener value="#{pr}" target="#{registreController.production}"  />
+                                    </p:commandButton>
+
+                                </p:column>
+                            </p:column>
+                            <p:column headerText="#{msg['code']}" sortBy="#{pr.code}" filterBy="#{pr.code}">
+                                <h:outputText value="#{pr.code}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['prefixe']}" >
+                                <h:outputText value="#{pr.prefixe}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['prefixe']}" >
+                                <h:outputText value="#{pr.plage_numero}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['num.debut']}" >
+                                <h:outputText value="#{pr.num_debut}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg['num.fin']}" >
+                                <h:outputText value="#{pr.num_fin}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['categorie']}" >
+                                <h:outputText value="#{registreController.chargeCategoriesByRegistreProduction(pr).code} #{formatDateController.valueObject(registreController.chargeCategoriesByRegistreProduction(pr).libelle,registreController.chargeCategoriesByRegistreProduction(pr))}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </div>
+
+                </h:form>
+                <h:form id="form2">
+                    <p:dialog header="#{msg['welcome.bienvenue']}" width="1000" showEffect="fade" modal="true" widgetVar="manageCategorieDialog" responsive="true">
+                        <p:dataTable var="cl" value="#{registreController.lisCategories}" paginator="true" rows="3" widgetVar="classTable2"  id="table2"
+                                     paginatorAlwaysVisible="true" rowsPerPageTemplate="3,5,15,50,100,500,1000" filterEvent="enter" filteredValue="#{registreController.filterCategories}"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate=" Total :{totalRecords} "
+                                     emptyMessage="#{msg['emptyMessage']}"  style="width: 100%;" rowKey="#{cl.idCategorie}" selectionMode="single"  selection="#{registreController.categories}"
+
+                                     scrollable="true" scrollHeight="300" >
+
+                            <p:ajax event="rowDblselect" async="true" partialSubmit="true"  listener="#{registreController.chargeByCategories()}"     
+                                    process="@this" update=":form1"  oncomplete="PF('manageCategorieDialog').hide()" />
+
+
+
+                            <f:facet name="header">
+                                <p:outputPanel>
+                                    <h:outputText value="#{msg['recherche']} : "/>
+
+                                    <p:inputText id="globalFilter"
+                                                 onkeyup="PF('classTable2').filter()"
+                                                 style="width:350px" placeholder="Search text"  />
+                                </p:outputPanel>
+
+                            </f:facet>
+
+
+                            <p:column headerText="id"  style="width: 50px">
+                                <h:outputText value="#{cl.idCategorie}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['code']}" sortBy="#{cl.code}" filterBy="#{cl.code}"  style="width: 200px">
+                                <h:outputText value="#{cl.code}"/>
+                            </p:column>
+                            <p:column headerText="#{msg['libelle']}" sortBy="#{cl.libelle}" filterBy="#{cl.libelle}"  style="width: 250px">
+                                <span class="flag flag-#{cl.libelle}" style="width: 30px; height: 20px"/>
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                              value="#{formatDateController.valueObject(cl.libelle,cl)}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg['branche']}" sortBy="#{cl.idBranche.code}" filterBy="#{cl.idBranche.code}" style="width: 250px">
+                                <h:outputText value="#{cl.idBranche.code} #{formatDateController.valueObject(cl.libelle,cl)}"/>
+                            </p:column>
+
+                        </p:dataTable>
+
+                    </p:dialog>
+
+<!--                    <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                        <center>
+                            <h4>#{msg['confirmation.action']}</h4> 
+                        </center>
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{categorieController.addGarantieByCategorie()}" oncomplete=" PF('manageConfirmeDialog').hide()" update="form1_1,:form1_1:msg"  />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                            </center>
+                        </f:facet>
+
+                    </p:dialog>-->
+
+                    <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog" responsive="true">
+                        <center>
+                            <h4>#{msg['confirme.validation.registre.production']}</h4> 
+                        </center>
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="#{msg['select']} #{msg['categorie']}" icon="pi pi-sliders-h"  oncomplete="PF('manageCategorieDialog').show();PF('manageConfirmeDialog').hide()" 
+                                                 styleClass="info-button p-mr-2 p-mb-2" style="margin-right: .5rem"  />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog').hide()"/>
+                            </center>
+                        </f:facet>
+
+                    </p:dialog>
+<!--                    <p:dialog header="#{msg['confirmation']}" width="1000" showEffect="fade" modal="true" widgetVar="manageConfirmeDialog3" responsive="true">
+                        <center>
+                            <h4>#{msg['confirmation.action.update']}</h4> 
+                        </center>
+                        <f:facet name="footer">
+                            <center>
+                                <p:commandButton value="#{msg['bouton.valider']}"     actionListener="#{categorieController.updateGarantieByCategorie()}" oncomplete=" PF('manageConfirmeDialog3').hide()" update="form1_1,:form1_1:msg"  />
+                                <p:spacer width="10"/>
+                                <p:commandButton value="#{msg['bouton.annuler']}" onclick="PF('manageConfirmeDialog3').hide()"/>
+                            </center>
+                        </f:facet>
+
+                    </p:dialog>-->
+
+                    <!--                    <p:dialog header="Attention" widgetVar="infosDialog" minHeight="40" width="650" showEffect="fade">
+                                            <h4>     <p class="p-m-0" style="color: red">"#{msg['infos.garantie']}"</p></h4> 
+                                            <f:facet name="footer">
+                                                <p:commandButton type="button" value="#{msg['bouton.fermer']}" styleClass="ui-button-flat p-mr-2" style="width: 6rem"  onclick="PF('infosDialog').hide()"/>
+                    
+                                            </f:facet>
+                                        </p:dialog>-->
+
+
+
+
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>
