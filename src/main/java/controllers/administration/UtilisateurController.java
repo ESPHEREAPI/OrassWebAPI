@@ -116,12 +116,12 @@ public class UtilisateurController implements Serializable {
     Photo photo;
     @EJB
     PaysDao paysDao;
-    
+
     @EJB
     IndicatifPaysDao indicatifPaysDao;
     @EJB
     OrclassProfilsDao profilsDao;
-    
+
     @EJB
     ISecurite serviceEntreprise;
     @EJB
@@ -134,7 +134,7 @@ public class UtilisateurController implements Serializable {
     OrclassModulesDao modulesDao;
     @EJB
     IDroitAcces serviceAccess;
- 
+
     @EJB
     OrclssMailInscriptionDao mailInscriptionDao;
 
@@ -221,7 +221,7 @@ public class UtilisateurController implements Serializable {
     }
 
     public void chargerUtilisateur() {
-        if (societe != null && societe.getCodesoci()!= null) {
+        if (societe != null && societe.getCodesoci() != null) {
             datasource = (List<OrclassUtilisateurs>) utilisateursDao.listUtilisateurWithFilters(societe);
         }
 
@@ -332,16 +332,16 @@ public class UtilisateurController implements Serializable {
             }
         }
         this.absolutePathImages = defautImage;
-        colProfil = (List<OrclassProfils>) profilsDao.getAllProfilHaveAccesByEntreprise(societe);
+        colProfil = (List<OrclassProfils>) profilsDao.findAll();
         colProfil.add(chargerProfilAdmin());
         selectedProfils = new ArrayList<>();
 
-        datasource = (List<OrclassUtilisateurs>) utilisateursDao.listUtilisateurWithFilters(societe);
+        datasource = (List<OrclassUtilisateurs>) utilisateursDao.findAll();
 //        colProfil=new ArrayList<>();
         menu = menusDao.findEntityHavingValue("code", "entite.user");
         module = modulesDao.findEntityHavingValue("code", "mod.admin");
         user = (OrclassUtilisateurs) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(GlobalFonctions.SESSION_USER);
-     
+
         listeIndicatifPays = (List<IndicatifPays>) indicatifPaysDao.findAll();
         if (Objects.equals(societe.getLogin_user_automatique(), Boolean.TRUE)) {
             utilisateurs.setLogin(this.createLoginUser());
@@ -350,7 +350,7 @@ public class UtilisateurController implements Serializable {
     }
 
     public String createLoginUser() {
-        String login,prefixe;
+        String login, prefixe;
         Long nbre = utilisateursDao.nbreUserCreateByCompagny(societe);
         nbre++;
         login = nbre.toString().length() == 1 ? "0" + nbre.toString() : nbre.toString();
@@ -358,21 +358,21 @@ public class UtilisateurController implements Serializable {
 
             login = societe.getPrefix_login_user() + "" + login;
             while (utilisateursDao.findEntityHavingValue("login", login) != null) {
-            nbre++;
-            login = nbre.toString().length() == 1 ? "0" + nbre.toString() : nbre.toString();
-            login = societe.getPrefix_login_user() + "" + login;
+                nbre++;
+                login = nbre.toString().length() == 1 ? "0" + nbre.toString() : nbre.toString();
+                login = societe.getPrefix_login_user() + "" + login;
 
-        }
+            }
             return login;
 
         }
-            while (utilisateursDao.findEntityHavingValue("login", login) != null) {
+        while (utilisateursDao.findEntityHavingValue("login", login) != null) {
             nbre++;
             login = nbre.toString().length() == 1 ? "0" + nbre.toString() : nbre.toString();
 //            login = entreprise.getPrefix_login_user() + "" + login;
 
         }
-        
+
         return login;
     }
 
@@ -569,7 +569,7 @@ public class UtilisateurController implements Serializable {
 //            employeur.setMatricule(matricule);
 //            if (utilisateursDao.findEntityHavingValue("login", utilisateurs.getLogin().toUpperCase()) == null) {
             utilisateurs.setActif(Boolean.TRUE);
-            this.serviceEntreprise.addUtilisateur(utilisateurs, selectedProfils, societe);
+            this.serviceEntreprise.addUtilisateur(utilisateurs, selectedProfils, utilisateurs.getServiceDepartement());
 //            }
 
             utilisateurs = utilisateursDao.findEntityHavingValue("login", utilisateurs.getLogin().toUpperCase());
@@ -641,7 +641,7 @@ public class UtilisateurController implements Serializable {
 
         String password = KeyGenCode.genPassWord();
         Societe e = this.societe;
-        if (password != null && e != null && e.getCodesoci()!= null) {
+        if (password != null && e != null && e.getCodesoci() != null) {
             //verification si cette cle a ete deja generer  
             while (Objects.equals(utilisateursDao.passWordExiste(password, e), Boolean.TRUE)) {
                 password = KeyGenCode.genPassWord();
@@ -714,8 +714,8 @@ public class UtilisateurController implements Serializable {
         subject = "";
 
         if (test) {
-            user.setPassword(Crypto.sha256(passWord==null ? this.createPassWordForUser().toUpperCase():passWord.toUpperCase()));
-            user.setCle_securite(cle==null ? Crypto.sha256(this.createCleSecuriteForUser().toUpperCase()):Crypto.sha256(cle.toUpperCase()));
+            user.setPassword(Crypto.sha256(passWord == null ? this.createPassWordForUser().toUpperCase() : passWord.toUpperCase()));
+            user.setCle_securite(cle == null ? Crypto.sha256(this.createCleSecuriteForUser().toUpperCase()) : Crypto.sha256(cle.toUpperCase()));
             user.setMailEnvoye(Boolean.TRUE);
             utilisateursDao.update(user);
             System.out.println("envoit mails terminer");
@@ -725,13 +725,13 @@ public class UtilisateurController implements Serializable {
 //            PrimeFaces.current().ajax().update(":form1");
 
         } else {
-            user.setPassword(Crypto.sha256(passWord==null ? this.createPassWordForUser().toUpperCase():passWord.toUpperCase()));
-            user.setCle_securite(cle==null ? Crypto.sha256(this.createCleSecuriteForUser().toUpperCase()):Crypto.sha256(cle.toUpperCase()));
+            user.setPassword(Crypto.sha256(passWord == null ? this.createPassWordForUser().toUpperCase() : passWord.toUpperCase()));
+            user.setCle_securite(cle == null ? Crypto.sha256(this.createCleSecuriteForUser().toUpperCase()) : Crypto.sha256(cle.toUpperCase()));
             user.setMailEnvoye(Boolean.FALSE);
             utilisateursDao.update(user);
             login = user.getLogin();
-            cle=cle==null ? this.createCleSecuriteForUser().toUpperCase():cle;
-            passWord=passWord==null ?  Crypto.sha256(this.createPassWordForUser().toUpperCase()): Crypto.sha256(passWord.toUpperCase());
+            cle = cle == null ? this.createCleSecuriteForUser().toUpperCase() : cle;
+            passWord = passWord == null ? Crypto.sha256(this.createPassWordForUser().toUpperCase()) : Crypto.sha256(passWord.toUpperCase());
             ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, exception.Error.OPERATION_FAILED.name(), ""));
             PrimeFaces.current().ajax().update(":form2");
             PrimeFaces.current().executeScript("PF('motPasseDialog').show()");
@@ -794,7 +794,7 @@ public class UtilisateurController implements Serializable {
         //Locale myLoc =new Locale("fr");
         String entete[] = {LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "utilisateur", null, myLoc)};
         String[] detail = {entete[0], "Parametres"};
-       
+
         if (ancienEmail.equals(utilisateurs.getAdresse().getEmail()) == Boolean.FALSE && Objects.equals(utilisateursDao.isexistEmail(utilisateurs.getAdresse().getEmail()), Boolean.TRUE)) {
             ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "ADRESSE EMAIL UTILISATEUR EXISTANT...RENSEIGNER A NOUVEAU VOTRE  EMAIL", "IL SERA IMPOSSIBLE A CET UTILISATEUR DE SE CONNECTER"));
             return null;
@@ -807,7 +807,7 @@ public class UtilisateurController implements Serializable {
 
             if (utilisateurs != null && utilisateurs.getIdUtilisateur() != null) {
                 if (!selectedProfils.isEmpty()) {
-                    this.serviceEntreprise.addUtilisateur(utilisateurs, selectedProfils, societe);
+                    this.serviceEntreprise.addUtilisateur(utilisateurs, selectedProfils, utilisateurs.getServiceDepartement());
                     for (OrclassProfils pr : selectedProfils) {
                         if (pROFILS_UTILISATEURSDao.finkey(utilisateurs, pr) == null) {
                             ORCLASS_PROFILS_UTILISATEURS pu = new ORCLASS_PROFILS_UTILISATEURS();
@@ -1070,18 +1070,21 @@ public class UtilisateurController implements Serializable {
 
     public String getlogo() {
         FacesContext ctx = FacesContext.getCurrentInstance();
-        OrclassEntreprises e = (OrclassEntreprises) ctx.getExternalContext().getSessionMap().get(GlobalFonctions.ENTREPRISE_ACTIF);
-        if (e != null && e.getIdEntreprise() != null && e.getImage() != null) {
-            File file = new File("" + e.getChemin_logo());
-            if (file.exists() == Boolean.TRUE) {
-                return e.getChemin_logo();
+        Societe s = (Societe) ctx.getExternalContext().getSessionMap().get(GlobalFonctions.ENTREPRISE_ACTIF);
+        if (s != null && s.getCodesoci() != null && s.getLogosoci() != null) {
+            if (!"".equals(s.getChemin_logo()) && s.getChemin_logo() != null) {
+                File file = new File("" + s.getChemin_logo());
+                if (file.exists() == Boolean.TRUE) {
+                    return s.getChemin_logo();
 
-            } else {
-                // on creer le logo à apprtir de l image byte
-                GlobalFonctions.createImageByLibellePhotos(e.getChemin_logo(), e.getImage());
+                } else {
+                    // on creer le logo à apprtir de l image byte
+                    GlobalFonctions.createImageByLibellePhotos(s.getChemin_logo(), s.getLogosoci());
+                }
+
+                return s.getChemin_logo();
             }
 
-            return e.getChemin_logo();
         }
         return "";
     }
@@ -1109,8 +1112,6 @@ public class UtilisateurController implements Serializable {
     public void setPaysDao(PaysDao paysDao) {
         this.paysDao = paysDao;
     }
-
-   
 
     public IndicatifPaysDao getIndicatifPaysDao() {
         return indicatifPaysDao;
@@ -1356,8 +1357,6 @@ public class UtilisateurController implements Serializable {
         this.colProfil = colProfil;
     }
 
-  
-
     public List<OrclassProfils> getSelectedProfils() {
         return selectedProfils;
     }
@@ -1434,8 +1433,6 @@ public class UtilisateurController implements Serializable {
     public void setProfilsByUser(OrclassProfils profilsByUser) {
         this.profilsByUser = profilsByUser;
     }
-
-  
 
     public List<IndicatifPays> getListeIndicatifPays() {
         return listeIndicatifPays;

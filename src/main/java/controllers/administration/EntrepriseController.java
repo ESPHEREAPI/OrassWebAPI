@@ -40,9 +40,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
-import modele.Adresse;
 import modele.OrclassActions;
-import modele.OrclassEntreprises;
 import modele.OrclassEntreprisesModules;
 import modele.OrclassEntreprisesModulesPK;
 import modele.OrclassFonctionnalites;
@@ -359,7 +357,7 @@ public class EntrepriseController implements Serializable {
         OrclassEntreprisesModulesPK mepk;
         try {
 
-            if (orclassEntreprisesModules.getOrclassEntreprisesModulesPK() != null) {
+            if (orclassEntreprisesModules.getIdSocieteModules() != null) {
                 orclassEntreprisesModulesDao.delete(orclassEntreprisesModules);
             }
 

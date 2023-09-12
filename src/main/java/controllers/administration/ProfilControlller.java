@@ -16,9 +16,11 @@ import dao.OrclassProfilsAccesDao;
 import dao.OrclassProfilsDao;
 import dao.OrclassUtilisateursAccesDao;
 import dao.OrclassUtilisateursDao;
+import dao.ServiceProfilDao;
 import droitAcces.IDroitAcces;
 import enums.Actions;
 import enums.FonctionnaliteModuleAdministration;
+import enums.ServiceDepartement;
 import exception.GlobalException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,12 +32,12 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import modele.OrclassActions;
-import modele.OrclassEntreprises;
 import modele.OrclassFonctionnalites;
 
 import modele.OrclassMenus;
@@ -45,6 +47,7 @@ import modele.OrclassProfils;
 import modele.OrclassProfilsAcces;
 import modele.OrclassUtilisateurs;
 import modele.OrclassUtilisateursAcces;
+import modele.ServiceProfil;
 import modele.Societe;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
@@ -72,6 +75,9 @@ public class ProfilControlller implements Serializable {
     @EJB
     private ISecurite securiteService;
     private Collection<OrclassModules> moduleUser;
+    @EJB
+    private ServiceProfilDao serviceProfilDao;
+    private ServiceProfil serviceProfils;
 
     @EJB
     ORCLASS_PROFILS_UTILISATEURSDao pROFILS_UTILISATEURSDao;
@@ -113,7 +119,7 @@ public class ProfilControlller implements Serializable {
     private List<OrclassActions> actionSource;
     private List<OrclassActions> actionTarget;
     private List<OrclassProfils> colProfil = new ArrayList<>();
- 
+
     private List<OrclassProfils> selectedProfils = new ArrayList<>();
     private Societe societe;
     private OrclassProfils profilsByUser;
@@ -121,6 +127,7 @@ public class ProfilControlller implements Serializable {
     private List<OrclassUtilisateurs> listUtilisateur = new ArrayList<>();
     private OrclassFonctionnalites fonctionnaliteByUser;
     private List<OrclassProfils> filteredProfilAcces;
+     private List<ServiceProfil> filteredServiceProfil;
     private Boolean activeAction = Boolean.FALSE;// ceci permettra de controller la manipulation des actions pour un profil lorsqu il n apas ete attribuer par un utilisateur
 
     private static final Logger logger = LoggerFactory.getLogger(UtilisateurController.class);
@@ -132,6 +139,7 @@ public class ProfilControlller implements Serializable {
     int nombreMaxFonctionaliteByModule = 15;
     List<OrclassModules> moduleTransFert = new ArrayList<>();
     List<OrclassFonctionnalites> fonctionnaliteTransFert = new ArrayList<>();
+    List<ServiceProfil> listeProfilsSelected = new ArrayList<>();
     private Boolean adminNotUpdate = Boolean.FALSE;
     private OrclassMenus menu;
     private OrclassModules module;
@@ -139,11 +147,13 @@ public class ProfilControlller implements Serializable {
     OrclassUtilisateurs utilisateurs;
     @EJB
     IDroitAcces serviceAccess;
+    ServiceDepartement serviceDepartement;
 
     public ProfilControlller() {
         moduleSelectForTarget = new OrclassModules();
         profilsByUser = new OrclassProfils();
         profilsByUserForDelete = new OrclassProfils();
+        serviceProfils = new ServiceProfil();
 
     }
 
@@ -209,6 +219,7 @@ public class ProfilControlller implements Serializable {
         modulesTarget = new ArrayList<>();
         modulesModel = new DualListModel<>(modulesSource, modulesTarget);
         profilsByUserForDelete = new OrclassProfils();
+        serviceDepartement = null;
 //        modulesSource = new ArrayList<>();
 
         this.getModulesModel();
@@ -220,22 +231,22 @@ public class ProfilControlller implements Serializable {
         PrimeFaces.current().ajax().update(":form1,:form2");
 
     }
-    
-     public String codeprofil(){
-      String code;
-      Long nbre=profilsDao.nbreProfileCreateByCompagny(societe);
-      nbre++;
-      code=nbre.toString().length()==1 ? "0"+nbre.toString():nbre.toString();
-         if (societe.getPrefix_code_profile()!=null && !"".equals(societe.getPrefix_code_profile())) {
-            return societe.getPrefix_code_profile()+""+code;
-         }
-         return code;
-     }
+
+    public String codeprofil() {
+        String code;
+        Long nbre = profilsDao.nbreProfileCreateByCompagny(societe);
+        nbre++;
+        code = nbre.toString().length() == 1 ? "0" + nbre.toString() : nbre.toString();
+        if (societe.getPrefix_code_profile() != null && !"".equals(societe.getPrefix_code_profile())) {
+            return societe.getPrefix_code_profile() + "" + code;
+        }
+        return code;
+    }
 
     public void getallProfilAccessByEntreprise() {
-        if (societe != null && societe.getCodesoci()!= null) {
+        if (societe != null && societe.getCodesoci() != null) {
             listeProfileAccesByEntreprise = profilsDao.getAllProfilHaveAccesByEntreprise(societe);
-            for (OrclassProfils p : profilsDao.allProfilByEntrePrise(societe)) {
+            for (OrclassProfils p : profilsDao.findAll()) {
                 if (listeProfileAccesByEntreprise.contains(p) == false) {
                     listeProfileAccesByEntreprise.add(p);
                 }
@@ -351,6 +362,12 @@ public class ProfilControlller implements Serializable {
                 }
 
                 profilsDao.update(profilsByUser);
+                if (serviceProfilDao.finKey(profilsByUser, serviceDepartement) == null) {
+                    serviceProfils = new ServiceProfil();
+                    serviceProfils.setIdProfil(profilsByUser);
+                    serviceProfils.setServiceDepartement(serviceDepartement);
+                    serviceProfilDao.create(serviceProfils);
+                }
 
                 summary = LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "" + exception.Success.OPERATION_SUCCESS.toString(), entete, myLoc);
 
@@ -369,6 +386,33 @@ public class ProfilControlller implements Serializable {
 
 //        reset();
         return null;
+
+    }
+
+    /*
+    charger les service lier au profil
+     */
+    public void chargeServiceByProfile(OrclassProfils item) {
+        if (item == null || item.getIdProfil() == null) {
+            PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage("PLEASE SELECT PROFIL... VALUES IS EMPTY"));
+            return;
+        }
+        this.setProfilsByUser(item);
+        listeProfilsSelected = serviceProfilDao.listeProfilByService(item);
+        PrimeFaces.current().ajax().update(":form1");
+        PrimeFaces.current().executeScript("PF('manageServiceDialog').show()");
+
+    }
+
+    public void deleteServiceProfil(ServiceProfil sd) {
+        if (sd == null || sd.getIdProfil() == null) {
+            PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage("PLEASE SELECT SERVICE AND PROFIL... VALUES IS EMPTY"));
+            return;
+        }
+        serviceProfilDao.delete(sd);
+        listeProfilsSelected = serviceProfilDao.listeProfilByService(sd.getIdProfil());
+        PrimeFaces.current().ajax().update(":form1");
+        PrimeFaces.current().executeScript("PF('manageServiceDialog').show()");
 
     }
 
@@ -427,6 +471,63 @@ public class ProfilControlller implements Serializable {
         return null;
     }
 
+    public String saveServiceProfil() {
+        FacesContext ctx = FacesContext.getCurrentInstance();
+        //get default locale
+        Locale myLoc = ctx.getViewRoot().getLocale();
+        String entete[] = {LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "cree.profil", null, myLoc)};
+
+        // on recupere tous les modules qui lui sont attribuer puis on inserre
+        String[] detail = {entete[0], "Module(s)"};
+        try {
+            if (listeProfilsSelected.isEmpty() || listeProfilsSelected.isEmpty()) {
+                PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage(FacesMessage.SEVERITY_WARN, "PROFILE NOT SELECT", "PLEASE SELECT PROFILE"));
+                return "";
+            }
+
+//            for (OrclassProfils p : listeProfilsSelected) {
+//                if (serviceProfilDao.finKey(p, serviceDepartement) == null) {
+//                    serviceProfils = new ServiceProfil();
+//                    serviceProfils.setIdProfil(p);
+//                    serviceProfils.setServiceDepartement(serviceDepartement);
+//                    serviceProfilDao.create(serviceProfils);
+//                }
+//
+//            }
+            summary = LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "summary.ajout.succes", entete, myLoc);
+            msgdetail = LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "detail.ajout.succes", detail, myLoc);
+            ctx.addMessage("msg", new FacesMessage(FacesMessage.SEVERITY_INFO, summary, msgdetail));
+
+        } catch (GlobalException e) {
+//            GlobalFonctions.displayMessages("msg", ctx, FacesMessage.SEVERITY_ERROR, profilsByUser.getCode(), e.getCode(), e.getParam());
+            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getCode(), e.getCode()));
+//throw e;
+        } catch (ConstraintViolationException ejb) {
+            GlobalFonctions.displayMessages("msg", ctx, FacesMessage.SEVERITY_WARN, ejb.getCause().getClass().getSimpleName(), exception.Error.DUPLICATE_ERROR_INSERT + "", null);
+            throw ejb;
+        } catch (Exception th) {
+            GlobalFonctions.displayMessages(null, ctx, FacesMessage.SEVERITY_FATAL, "cree.profil", exception.Error.FATAL_ERROR + "", new Object[]{"cree.profil"});
+            logger.error("Erreur Survenu", th);
+        }
+        this.reset();
+        PrimeFaces.current().executeScript("PF('manageProfilDialog').show();");
+        return null;
+    }
+
+    public List<SelectItem> getServiceDepartements() {
+        List<SelectItem> items = new ArrayList<>();
+
+        FacesContext ctx = FacesContext.getCurrentInstance();
+        Locale myLoc = ctx.getViewRoot().getLocale();
+        for (ServiceDepartement sd : ServiceDepartement.values()) {
+
+            items.add(new SelectItem(sd, LocaleHelper.getLocaleString(RecupBundle.FichierBundle, sd.name(), null, myLoc)));
+
+        }
+
+        return items;
+    }
+
     public String saveProfilAccess() {
         FacesContext ctx = FacesContext.getCurrentInstance();
         //get default locale
@@ -440,8 +541,13 @@ public class ProfilControlller implements Serializable {
                 PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage(FacesMessage.SEVERITY_WARN, "GIVE THE FUNCTIONALY TO THIS PROFILE", "PLEASE TRY AGAINST"));
                 return "";
             }
+            if (serviceDepartement == null) {
+                PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage(FacesMessage.SEVERITY_WARN, "VALUES IS NULL ", "PLEASE TRY AGAINST...VALUE SERVICE"));
+                return "";
+            }
             if ((profilsByUser == null || profilsByUser.getIdProfil() == null) && profilsByUser.getCode() != null) {
-                profilsByUser.setIdSociete(societe);
+//                profilsByUser.setIdSociete(societe);
+                profilsByUser.setServiceDepartement(serviceDepartement);
                 summary = securiteService.addProfilForAccess(listeModuleSaveForFonctionnalite, tableauFonctinnaliteBymodule, profilsByUser);
                 if (summary.equals(exception.Success.OPERATION_SUCCESS.toString())) {
                     summary = LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "summary.ajout.succes", entete, myLoc);
@@ -557,12 +663,12 @@ public class ProfilControlller implements Serializable {
         Collection<OrclassModules> modul = new ArrayList<>();
         Collection<OrclassModules> modul2 = new ArrayList<>();
 
-        if (societe != null && societe.getCodesoci()!= null && (profilsByUser == null || profilsByUser.getIdProfil() == null)) {
+        if (societe != null && societe.getCodesoci() != null && (profilsByUser == null || profilsByUser.getIdProfil() == null)) {
 
             if (modulesModel != null && !modulesModel.getSource().isEmpty()) {
                 modulesSource = new ArrayList<>();
                 modulesTarget = new ArrayList<>();
-                modul = securiteService.getAllModulesByEntreprise(societe);
+                modul = securiteService.getAllModulesByEntreprise(user.getServiceDepartement());
                 modulesTarget = modulesModel.getTarget();
                 if (modul.isEmpty() == false) {
                     for (OrclassModules md : modulesModel.getTarget()) {
@@ -577,7 +683,7 @@ public class ProfilControlller implements Serializable {
             } else {
                 modulesSource = new ArrayList<>();
                 modulesTarget = new ArrayList<>();
-                modul = securiteService.getAllModulesByEntreprise(societe);
+                modul = securiteService.getAllModulesByEntreprise(user.getServiceDepartement());
 
                 if (modul.isEmpty() == false) {
                     modulesSource.addAll(modul);
@@ -610,7 +716,7 @@ public class ProfilControlller implements Serializable {
                 modulesTarget = (List<OrclassModules>) securiteService.getModuleByProfile(profilsByUser);
             }
 
-            modul = securiteService.getAllModulesByEntreprise(societe);
+            modul = securiteService.getAllModulesByEntreprise(user.getServiceDepartement());
             for (OrclassModules mdo : modulesTarget) {
 
                 if (modul.contains(mdo) == true) {
@@ -638,7 +744,6 @@ public class ProfilControlller implements Serializable {
 //
 //        }
 //    }
-
     public void setModulesModel(DualListModel<OrclassModules> modulesModel) {
         this.modulesModel = modulesModel;
     }
@@ -649,7 +754,7 @@ public class ProfilControlller implements Serializable {
         if (moduleSelectForTarget != null && moduleSelectForTarget.getIdModule() != null) {
 
             if (instanceTableau == 0) {
-                int taille1 = securiteService.getAllModulesByEntreprise(societe).size();
+                int taille1 = securiteService.getAllModulesByEntreprise(user.getServiceDepartement()).size();
                 int taille2 = fonctionnalitesDao.findAll().size();
                 tableauFonctinnaliteBymodule = new OrclassFonctionnalites[taille1][taille2];
                 listeModuleSaveForFonctionnalite = new ArrayList<>();
@@ -679,7 +784,7 @@ public class ProfilControlller implements Serializable {
                 List<OrclassUtilisateursAcces> listUa = new ArrayList<>();
                 OrclassUtilisateursAcces ua = null;
                 for (OrclassFonctionnalites f : fonctionaliteModel.getSource()) {
-                    listPa = profilsAccesDao.getAllProfilByFonctionnalite(f,profilsByUser, societe);
+                    listPa = profilsAccesDao.getAllProfilByFonctionnalite(f, profilsByUser, societe);
                     if (listPa.isEmpty()) {
                         continue;
                     }
@@ -811,6 +916,10 @@ public class ProfilControlller implements Serializable {
 //            menusTarget = new ArrayList<>();
 //        }
     }
+    
+    public String retourneValeur(Object object){
+        return GlobalFonctions.valueObject(object);
+    }
 
     public void showDetails(OrclassProfils item) {
         if (profilsByUser == null || profilsByUser.getIdProfil() == null) {
@@ -843,8 +952,6 @@ public class ProfilControlller implements Serializable {
     public void setActionTarget(List<OrclassActions> actionTarget) {
         this.actionTarget = actionTarget;
     }
-
-   
 
     public OrclassProfils getProfilsByUser() {
         return profilsByUser;
@@ -965,7 +1072,29 @@ public class ProfilControlller implements Serializable {
     public void setSociete(Societe societe) {
         this.societe = societe;
     }
-    
-    
+
+    public List<ServiceProfil> getListeProfilsSelected() {
+        return listeProfilsSelected;
+    }
+
+    public void setListeProfilsSelected(List<ServiceProfil> listeProfilsSelected) {
+        this.listeProfilsSelected = listeProfilsSelected;
+    }
+
+    public ServiceDepartement getServiceDepartement() {
+        return serviceDepartement;
+    }
+
+    public void setServiceDepartement(ServiceDepartement serviceDepartement) {
+        this.serviceDepartement = serviceDepartement;
+    }
+
+    public List<ServiceProfil> getFilteredServiceProfil() {
+        return filteredServiceProfil;
+    }
+
+    public void setFilteredServiceProfil(List<ServiceProfil> filteredServiceProfil) {
+        this.filteredServiceProfil = filteredServiceProfil;
+    }
 
 }

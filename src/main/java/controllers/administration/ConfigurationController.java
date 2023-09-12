@@ -13,6 +13,7 @@ import static com.sun.org.apache.xerces.internal.impl.io.ASCIIReader.DEFAULT_BUF
 //import static com.sun.org.apache.xerces.internal.impl.XMLEntityManager.DEFAULT_BUFFER_SIZE;
 import controllers.ConnectionController;
 import controllers.CurrentInstance;
+import dao.IndicatifPaysDao;
 
 import dao.OrclassEntreprisesModulesDao;
 import dao.OrclassModulesDao;
@@ -21,6 +22,7 @@ import dao.OrclssMailInscriptionDao;
 import dao.PaysDao;
 import dao.SocieteDao;
 import dao.VilleDao;
+import enums.ServiceDepartement;
 
 import enums.TypeUtilisateur;
 import exception.Success;
@@ -50,6 +52,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import mdb.Mail;
 import modele.Adresse;
+import modele.IndicatifPays;
 import modele.OrclassEntreprises;
 import modele.OrclassEntreprisesModules;
 import modele.OrclassEntreprisesModulesPK;
@@ -111,6 +114,8 @@ public class ConfigurationController implements Serializable {
     OrclssMailInscriptionDao mailInscriptionDao;
     @Inject
     ConnectionController connectionController;
+     @EJB
+    IndicatifPaysDao indicatifPaysDao;
     OrclassUtilisateurs utilisateur;
     private String currentFolder = "/photos";
     private String imagePath;
@@ -132,6 +137,8 @@ public class ConfigurationController implements Serializable {
     String login;
     Connection con;
     OrclssMailInscription mailInscription;
+    ServiceDepartement serviceDepartement;
+      private List<IndicatifPays> listeIndicatifPays = new ArrayList<>();
 
     public ConfigurationController() {
         societe = new Societe();
@@ -160,13 +167,14 @@ public class ConfigurationController implements Serializable {
     void initialiseSession() {
         FacesContext.getCurrentInstance().getExternalContext().getSession(true);
 
-        societe = new Societe();
+        societe = (Societe) (societeDao.findAll().isEmpty() ? new Societe():societeDao.findAll().toArray()[0]);
         selectedModules = new ArrayList<>();
         orclassEntreprisesModules = new OrclassEntreprisesModules();
         utilisateur = new OrclassUtilisateurs();
-        listModules = orclassModulesDao.findAll();
+//        listModules = orclassModulesDao.findAll();
         listeSociete = societeDao.findAll();
         listVille = villeDao.findAll();
+        listeIndicatifPays = (List<IndicatifPays>) indicatifPaysDao.findAll();
 //        connectionController.optionChoix(0);
 
     }
@@ -194,6 +202,9 @@ public class ConfigurationController implements Serializable {
         s = societeDao.findEntityHavingValue("codesoci", event.getObject());
         if (s != null && s.getCodesoci() != null) {
             this.setSociete(s);
+            if (s.getLogosoci()!=null) {
+                this.chargeLogo();
+            }
             PrimeFaces.current().ajax().update(":form1");
         }
     }
@@ -203,13 +214,16 @@ public class ConfigurationController implements Serializable {
         s = societeDao.findEntityHavingValue("raissoci", event.getObject());
         if (s != null && s.getCodesoci() != null) {
             this.setSociete(s);
+            if (s.getLogosoci()!=null) {
+                this.chargeLogo();
+            }
             PrimeFaces.current().ajax().update(":form1");
         }
     }
 
     public void chargerModuleNotHaveEntite() {
-        if (societe != null && societe.getCodesoci() != null) {
-            listModules = orclassModulesDao.listeModulesNotHaveEntreprise(societe);
+        if (serviceDepartement != null ) {
+            listModules = orclassModulesDao.listeModulesNotHaveEntreprise(serviceDepartement);
         }
     }
 
@@ -234,6 +248,33 @@ public class ConfigurationController implements Serializable {
 
     }
 
+     public void chargeLogo() {
+        if (societe != null && societe.getCodesoci() != null) {
+
+          
+            if (societe != null && societe.getLogosoci()!= null) {
+                FacesContext ctx = FacesContext.getCurrentInstance();
+                ExternalContext extContext = ctx.getExternalContext();
+                if (societe.getChemin_logo()==null) {
+                  imagePath=  extContext.getRealPath(currentFolder)+"/logo.png";
+            
+                }else{
+                      imagePath = extContext.getRealPath("") + societe.getChemin_logo();
+                }
+              
+                File dossiers = new File(imagePath);
+                if (dossiers.exists() == false) {
+                    String libelle = GlobalFonctions.createImageByLibellePhotos(imagePath, societe.getLogosoci());
+                 societe.setChemin_logo(libelle);
+                }
+               
+                absolutePathImages = societe.getChemin_logo();
+//            absolutePathImages=photo.getImage().toString();
+            } 
+
+        }
+
+    }
     public String uploadFile(FileUploadEvent event, String folderDestination, String nameFile) {
         InputStream inputStream = null;
         OutputStream out = null;
@@ -295,6 +336,7 @@ public class ConfigurationController implements Serializable {
         //Locale myLoc =new Locale("fr");
         String entete[] = {LocaleHelper.getLocaleString(RecupBundle.FichierBundle, "entite.entreprise", null, myLoc)};
         String[] detail = {entete[0], "Parametres"};
+        Boolean resultat=Boolean.FALSE;
         try {
 //            employeur.setMatricule(matricule);
             if (utilisateur.getAdresse() != null && utilisateur.getAdresse().getEmail() == null) {
@@ -305,10 +347,10 @@ public class ConfigurationController implements Serializable {
                 return null;
             }
 
-            societe = serviceEntreprise.addEntreprise((List<OrclassModules>) selectedModules, societe, debut, fin, utilisateur);
+            resultat = serviceEntreprise.addEntreprise(utilisateur);
             //generation cle de securite et mot de passe
 
-            if (societe != null && societe.getCodesoci() != null) {
+            if (Objects.equals(resultat, Boolean.TRUE)) {
                 this.sendInfosConnectionForMail();
 
                 FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().put(GlobalFonctions.ENTREPRISE_ACTIF, societe);
@@ -537,13 +579,13 @@ public class ConfigurationController implements Serializable {
         try {
 
             for (OrclassModules m : selectedModules) {
-                mepk = new OrclassEntreprisesModulesPK(m.getIdModule(), societe.getCodesoci());
-                me = orclassEntreprisesModulesDao.find(mepk);
+                
+                me = orclassEntreprisesModulesDao.finKey(m,serviceDepartement);
                 if (me == null) {
-                    me = new OrclassEntreprisesModules(new OrclassEntreprisesModulesPK(m.getIdModule(), societe.getCodesoci()));
+                    me = new OrclassEntreprisesModules();
                     me.setDateDebut(debut);
                     me.setDateFin(fin);
-                    me.setSociete(societe);
+                    me.setServiceDepartement(serviceDepartement);
                     me.setOrclassModules(m);
 
                     mes.add(me);
@@ -603,7 +645,7 @@ public class ConfigurationController implements Serializable {
         OrclassEntreprisesModulesPK mepk;
         try {
 
-            if (orclassEntreprisesModules.getOrclassEntreprisesModulesPK() != null) {
+            if (orclassEntreprisesModules.getIdSocieteModules() != null) {
                 orclassEntreprisesModulesDao.delete(orclassEntreprisesModules);
             }
 
@@ -791,6 +833,21 @@ public class ConfigurationController implements Serializable {
         }
     }
 
+       public List<SelectItem> getServiceDepartements() {
+        List<SelectItem> items = new ArrayList<>();
+
+        FacesContext ctx = FacesContext.getCurrentInstance();
+        Locale myLoc = ctx.getViewRoot().getLocale();
+        for (ServiceDepartement sd : ServiceDepartement.values()) {
+
+            items.add(new SelectItem(sd, LocaleHelper.getLocaleString(RecupBundle.FichierBundle, sd.name(), null, myLoc)));
+
+        }
+
+        return items;
+    }
+
+    
     public String showDetails() {
         return null;
     }
@@ -1043,5 +1100,23 @@ public class ConfigurationController implements Serializable {
     public void setListVille(Collection<Ville> listVille) {
         this.listVille = listVille;
     }
+
+    public ServiceDepartement getServiceDepartement() {
+        return serviceDepartement;
+    }
+
+    public void setServiceDepartement(ServiceDepartement serviceDepartement) {
+        this.serviceDepartement = serviceDepartement;
+    }
+
+    public List<IndicatifPays> getListeIndicatifPays() {
+        return listeIndicatifPays;
+    }
+
+    public void setListeIndicatifPays(List<IndicatifPays> listeIndicatifPays) {
+        this.listeIndicatifPays = listeIndicatifPays;
+    }
+    
+    
 
 }
